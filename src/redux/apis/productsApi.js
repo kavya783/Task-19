@@ -9,7 +9,7 @@ const api = new API();
 export const createProductApi = async (data) => {
 try {
 const response = await api.post(
-"api/v1/products",
+"v1/products",
 data
 );
 
@@ -37,9 +37,8 @@ throw error;
 export const getProductsApi = async () => {
 try {
 const response = await api.get(
-"api/v1/products"
+"v1/products"
 );
-
 
 return response.data;
 
@@ -63,9 +62,8 @@ throw error;
 export const getCategoriesApi = async () => {
 try {
 const response = await api.get(
-"api/v1/categories"
+"v1/categories"
 );
-
 
 return response.data;
 
@@ -109,12 +107,16 @@ method: "PUT",
 );
 
 if (!response.ok) {
-let message = "Failed to update product";
+let message =
+"Failed to update product";
+
 
 try {
-  const errorData = await response.json();
+  const errorData =
+    await response.json();
 
-  const errors = errorData.errors;
+  const errors =
+    errorData.errors;
 
   message = Array.isArray(errors)
     ? errors.join(", ")
@@ -131,6 +133,7 @@ try {
 }
 
 throw new Error(message);
+
 
 }
 
@@ -152,18 +155,20 @@ const response = await fetch(
 {
 method: "DELETE",
 
+
   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   },
 }
 
-
 );
 
 if (!response.ok) {
 const errorData =
 await response.json();
+
+
 throw new Error(
   errorData.errors ||
     errorData.error ||

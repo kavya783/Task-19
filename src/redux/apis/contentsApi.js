@@ -12,7 +12,7 @@ console.log("API function called");
 
 
 const response = await api.get(
-  "api/v1/contents"
+  "v1/contents"
 );
 
 console.log(
@@ -29,9 +29,7 @@ console.error(
 error
 );
 
-
 throw error;
-
 
 }
 };
@@ -48,7 +46,7 @@ console.log(
 
 
 const response = await api.get(
-  "api/v1/contents?category=Most_Loved_by_Customers"
+  "v1/contents?category=Most_Loved_by_Customers"
 );
 
 console.log(
@@ -84,7 +82,7 @@ console.log(
 
 
 const response = await api.get(
-  "api/v1/contents?category=Our_Face_Bestsellers"
+  "v1/contents?category=Our_Face_Bestsellers"
 );
 
 console.log(
@@ -120,7 +118,7 @@ console.log(
 
 
 const response = await api.get(
-  "api/v1/contents?category=Our_Hair_Bestsellers"
+  "v1/contents?category=Our_Hair_Bestsellers"
 );
 
 console.log(
@@ -129,7 +127,6 @@ console.log(
 );
 
 return response.data;
-
 
 } catch (error) {
 console.error(
@@ -155,7 +152,7 @@ console.log(
 
 
 const response = await api.get(
-  "api/v1/contents?category=Our_Baby_Bestsellers"
+  "v1/contents?category=Our_Baby_Bestsellers"
 );
 
 console.log(
@@ -191,7 +188,7 @@ console.log(
 
 
 const response = await api.get(
-  "api/v1/contents?category=Shop_By_Ingredients"
+  "v1/contents?category=Shop_By_Ingredients"
 );
 
 console.log(
@@ -227,7 +224,7 @@ console.log(
 
 
 const response = await api.get(
-  "api/v1/contents?category=Our_Makeup_Bestsellers"
+  "v1/contents?category=Our_Makeup_Bestsellers"
 );
 
 console.log(
@@ -246,7 +243,6 @@ error
 
 
 throw error;
-
 
 }
 };
