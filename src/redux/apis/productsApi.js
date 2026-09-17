@@ -56,10 +56,7 @@ export const getProductsApi = async () => {
 };
 
 
-// ========================================
-// GET CATEGORIES
-// ADMIN PANEL -> CATEGORIES TABLE
-// ========================================
+
 
 export const getCategoriesApi = async () => {
 

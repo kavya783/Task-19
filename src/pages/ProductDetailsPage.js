@@ -94,7 +94,22 @@ function getProductImages(product) {
             : [];
 }
 
+const GUEST_CART_KEY = "mamaearth_cart_guest";
+const USER_STORAGE_KEY = "user";
 
+const getCartKey = () => {
+    try {
+        const user = JSON.parse(
+            localStorage.getItem(USER_STORAGE_KEY) || "null"
+        );
+
+        return user?.id
+            ? `mamaearth_cart_${user.id}`
+            : GUEST_CART_KEY;
+    } catch {
+        return GUEST_CART_KEY;
+    }
+};
 
 // PRODUCT DETAILS PAGE
 
@@ -174,16 +189,23 @@ function ProductDetailsPage() {
     }, [id]);
 
     useEffect(() => {
-        const syncProductQuantity = () => {
-            try {
-                const cart = JSON.parse(localStorage.getItem("mamaearth_cart") || "[]");
-                const cartItem = cart.find((item) => String(item.id) === String(id));
-                setCartQuantity(Number(cartItem?.quantity) || 0);
-            } catch {
-                setCartQuantity(0);
-            }
-        };
+      const syncProductQuantity = () => {
+    try {
+        const cartKey = getCartKey();
 
+        const cart = JSON.parse(
+            localStorage.getItem(cartKey) || "[]"
+        );
+
+        const cartItem = cart.find(
+            (item) => String(item.id) === String(id)
+        );
+
+        setCartQuantity(Number(cartItem?.quantity) || 0);
+    } catch {
+        setCartQuantity(0);
+    }
+};
         syncProductQuantity();
         window.addEventListener("cart:update", syncProductQuantity);
 
@@ -253,14 +275,6 @@ function ProductDetailsPage() {
     );
 
 
-    // DISCOUNT
-
-    const discount =
-        product?.discount_percentage ||
-        product?.discount ||
-        "";
-
-
     // SELECTED VARIANT DATA
 
     const selectedVariantData =
@@ -275,18 +289,55 @@ function ProductDetailsPage() {
 
     // DISPLAY PRICE
 
+    const variantSalePrice = Number(selectedVariantData.sale_price);
+    const productSalePrice = Number(product?.sale_price);
+    const productPrice = Number(product?.price);
+    const productDiscountPrice = Number(product?.discount_price);
+    const displayMrpValue = Number(
+        selectedVariantData.mrp || product?.mrp || 0
+    );
+
     const displaySalePrice =
-        selectedVariantData.sale_price ||
-        product?.sale_price ||
-        product?.price;
+        variantSalePrice > 0
+            ? variantSalePrice
+            : productSalePrice > 0
+                ? productSalePrice
+                : productPrice > 0
+                    ? productPrice
+                    : productDiscountPrice > 0
+                        ? productDiscountPrice
+                        : displayMrpValue;
 
-    const displayMrp =
-        selectedVariantData.mrp ||
-        product?.mrp;
-
-    const displayDiscount =
+    const explicitDiscount = Number(
         selectedVariantData.discount_percentage ||
-        discount;
+        product?.discount_percentage ||
+        product?.discount ||
+        0
+    );
+    const calculatedDiscount =
+        displayMrpValue > 0 &&
+        displaySalePrice > 0 &&
+        displaySalePrice < displayMrpValue
+            ? Math.round(
+                ((displayMrpValue - displaySalePrice) /
+                    displayMrpValue) *
+                    100
+            )
+            : 0;
+    const displayDiscount =
+        displaySalePrice < displayMrpValue
+            ? explicitDiscount || calculatedDiscount
+            : 0;
+    const displayMrp = displayDiscount > 0 ? displayMrpValue : 0;
+    const formatPrice = (value) => {
+        const numericValue = Number(value);
+
+        if (!Number.isFinite(numericValue)) {
+            return "-";
+        }
+
+        return String(Math.round(numericValue));
+    };
 
 
     // ==========================================================
@@ -375,8 +426,10 @@ function ProductDetailsPage() {
  // ADD TO CART
 const handleAddToCart = () => {
     try {
+        const cartKey = getCartKey();
+
         const existingCart = JSON.parse(
-            localStorage.getItem("mamaearth_cart") || "[]"
+            localStorage.getItem(cartKey) || "[]"
         );
 
         const productId = String(product.id);
@@ -386,11 +439,9 @@ const handleAddToCart = () => {
         );
 
         if (cartIndex >= 0) {
-            // Already in cart → increase quantity
             existingCart[cartIndex].quantity =
                 (Number(existingCart[cartIndex].quantity) || 1) + 1;
         } else {
-            // New product → add with quantity 1
             existingCart.push({
                 ...product,
                 quantity: 1,
@@ -398,18 +449,19 @@ const handleAddToCart = () => {
         }
 
         localStorage.setItem(
-            "mamaearth_cart",
+            cartKey,
             JSON.stringify(existingCart)
         );
 
-        // Notify Cart / Cart Sidebar
         window.dispatchEvent(
             new CustomEvent("cart:update")
         );
 
-        setCartQuantity(cartIndex >= 0
-            ? (Number(existingCart[cartIndex].quantity) || 1)
-            : 1);
+        setCartQuantity(
+            cartIndex >= 0
+                ? Number(existingCart[cartIndex].quantity) || 1
+                : 1
+        );
 
         setSnackbarMessage("Added to cart");
         setSnackbarOpen(true);
@@ -423,17 +475,22 @@ const handleAddToCart = () => {
 
 const handleCartQuantityChange = (change) => {
     try {
+        const cartKey = getCartKey();
+
         const existingCart = JSON.parse(
-            localStorage.getItem("mamaearth_cart") || "[]"
+            localStorage.getItem(cartKey) || "[]"
         );
+
         const productId = String(product.id);
+
         const cartIndex = existingCart.findIndex(
             (item) => String(item.id) === productId
         );
 
         if (cartIndex < 0) return;
 
-        const nextQuantity = (Number(existingCart[cartIndex].quantity) || 1) + change;
+        const nextQuantity =
+            (Number(existingCart[cartIndex].quantity) || 1) + change;
 
         if (nextQuantity <= 0) {
             existingCart.splice(cartIndex, 1);
@@ -441,11 +498,21 @@ const handleCartQuantityChange = (change) => {
             existingCart[cartIndex].quantity = nextQuantity;
         }
 
-        localStorage.setItem("mamaearth_cart", JSON.stringify(existingCart));
+        localStorage.setItem(
+            cartKey,
+            JSON.stringify(existingCart)
+        );
+
         setCartQuantity(Math.max(0, nextQuantity));
-        window.dispatchEvent(new CustomEvent("cart:update"));
+
+        window.dispatchEvent(
+            new CustomEvent("cart:update")
+        );
     } catch (error) {
-        console.error("Cart quantity update failed:", error);
+        console.error(
+            "Cart quantity update failed:",
+            error
+        );
     }
 };
 
@@ -1023,49 +1090,61 @@ const handleCartQuantityChange = (change) => {
                             RATING & REVIEWS
                         ================================================== */}
 
-                        <Stack
-                            direction="row"
-                            alignItems="center"
-                            spacing={0.6}
-                            sx={{
-                                mt: 1,
-                                flexWrap: "nowrap",
-                                whiteSpace: "nowrap",
-                            }}
-                        >
-                            <StarIcon
-                                sx={{
-                                    color: Colors.yellow,
-                                    fontSize: {
-                                        xs: 19,
-                                        sm: 22,
-                                    },
-                                }}
-                            />
+              <Stack
+    direction="row"
+    alignItems="center"
+    sx={{
+        mt: 1,
+        flexWrap: "nowrap",
+        whiteSpace: "nowrap",
+    }}
+>
+    <StarIcon
+        sx={{
+            color: Colors.orange,
+            fontSize: {
+                xs: 19,
+                sm: 22,
+            },
+            mr: 0.6,
+        }}
+    />
 
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    fontSize: Theme.font18Regular,
-                                }}
-                            >
-                                {rating > 0
-                                    ? rating.toFixed(1)
-                                    : "0.0"}{" "}
-                                |
-                            </Typography>
+    <Typography
+        variant="body2"
+        sx={{
+            fontSize: Theme.font18Regular,
+        }}
+    >
+        {rating > 0 ? rating.toFixed(1) : "0.0"}
+    </Typography>
 
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: Colors.blue,
-                                    fontSize: Theme.font14Bold,
-                                    ml: 0.5,
-                                }}
-                            >
-                                {reviewCount} Reviews
-                            </Typography>
-                        </Stack>
+    <Typography
+    sx={{
+        fontSize: Theme.font18Regular,
+        lineHeight: 1,
+        display: "flex",
+        alignItems: "center",
+        ml: 0.5,
+        mr: 0.5,
+    }}
+>
+    |
+</Typography>
+
+   <Typography
+    variant="body2"
+    sx={{
+        color: Colors.blue,
+        fontSize: Theme.font14Bold,
+        lineHeight: 1,
+        display: "flex",
+        alignItems: "center",
+    }}
+>
+    {reviewCount} Reviews
+</Typography>
+</Stack>
 
 
                         {/* ==================================
@@ -1105,7 +1184,7 @@ const handleCartQuantityChange = (change) => {
                                         }
                                         variant="outlined"
                                         sx={{
-                                            borderColor: "#b7df8f",
+                                            borderColor: Colors.orange,
                                             background: Colors.background,
 
                                             height: {
@@ -1202,16 +1281,26 @@ const handleCartQuantityChange = (change) => {
                                 variant="h4"
                                 fontWeight={700}
                                 sx={{
-                                    fontSize:
-                                        Theme.font24Bold,
+                                    fontSize: 0,
                                     whiteSpace:
                                         "nowrap",
+                                    overflow: "hidden",
+                                    "& > span": {
+                                        fontSize:
+                                            Theme.font24Bold.fontSize,
+                                        lineHeight:
+                                            Theme.font24Bold.lineHeight,
+                                    },
                                 }}
                             >
-                                ₹{displaySalePrice || "-"}
+                                <span>
+                                    ₹{displaySalePrice > 0
+                                        ? formatPrice(displaySalePrice)
+                                        : "-"}
+                                </span>
                             </Typography>
 
-                            {displayMrp && (
+                            {displayMrp > 0 && (
                                 <Typography
                                     sx={{
                                         fontSize:
@@ -1227,19 +1316,19 @@ const handleCartQuantityChange = (change) => {
                                                 "line-through",
                                         }}
                                     >
-                                        ₹{displayMrp}
+                                        ₹{formatPrice(displayMrp)}
                                     </span>
                                 </Typography>
                             )}
 
-                            {displayDiscount && (
+                            {displayDiscount > 0 && (
                                 <Typography
                                     sx={{
                                         fontSize:Theme.font14Bold,
                                         whiteSpace:
                                             "nowrap",
                                         color:
-                                            Colors.red,
+                                            Colors.orange,
                                     }}
                                 >
                                     {displayDiscount}% off
@@ -1302,6 +1391,14 @@ const handleCartQuantityChange = (change) => {
                                             const badge =
                                                 variant.badge ||
                                                 variant.variant_badge;
+                                            const variantMrp =
+                                                Number(variant.mrp) > 0
+                                                    ? Number(variant.mrp)
+                                                    : 0;
+                                            const variantSalePrice =
+                                                Number(variant.sale_price) > 0
+                                                    ? Number(variant.sale_price)
+                                                    : variantMrp;
 
                                             return (
                                                 <Box
@@ -1354,22 +1451,18 @@ const handleCartQuantityChange = (change) => {
                                                                         .includes(
                                                                             "trending"
                                                                         )
-                                                                        ? "#ff8a24"
+                                                                        ?Colors.orange
                                                                         : badge
                                                                             .toLowerCase()
                                                                             .includes(
                                                                                 "value"
                                                                             )
                                                                             ? Colors.blue
-                                                                            : Colors.red,
+                                                                            : Colors.green,
                                                                 color:
                                                                     Colors.background,
-                                                                fontSize: {
-                                                                    xs: 9,
-                                                                    sm: 11,
-                                                                },
-                                                                fontWeight:
-                                                                    600,
+                                                                fontSize:Theme.font14Bold,
+                                                               
                                                                 lineHeight:
                                                                     1.25,
                                                                 whiteSpace:
@@ -1472,9 +1565,9 @@ const handleCartQuantityChange = (change) => {
                                                                     Theme.font16SemiBold,
                                                             }}
                                                         >
-                                                            ₹
-                                                            {variant.sale_price ||
-                                                                "-"}
+                                                            ₹{formatPrice(
+                                                                variantSalePrice
+                                                            )}
                                                         </Typography>
 
                                                         <Typography
@@ -1484,8 +1577,9 @@ const handleCartQuantityChange = (change) => {
                                                             }}
                                                         >
                                                             MRP ₹
-                                                            {variant.mrp ||
-                                                                "-"}
+                                                            {variantMrp > 0
+                                                                ? formatPrice(variantMrp)
+                                                                : "-"}
                                                         </Typography>
 
                                                         {variant.usp && (
@@ -1582,10 +1676,7 @@ const handleCartQuantityChange = (change) => {
                         >
                             <LocationOnOutlinedIcon
                                 sx={{
-                                    fontSize: {
-                                        xs: 20,
-                                        sm: 24,
-                                    },
+                                   ...Theme.font18Bold,
                                 }}
                             />
 
@@ -2833,7 +2924,7 @@ const handleCartQuantityChange = (change) => {
                                 onClick={handleAddToCart}
                                 sx={{
                                     flexShrink: 0,
-                                    backgroundColor: "#08a9e6",
+                                    backgroundColor:Colors.blue,
                                     color: Colors.background,
                                     borderRadius: "30px",
                                     textTransform: "none",
@@ -2842,10 +2933,10 @@ const handleCartQuantityChange = (change) => {
                                     minWidth: { xs: 150, sm: 220 },
                                     height: { xs: 44, sm: 54 },
                                     px: { xs: 2, sm: 3 },
-                                    "&:hover": { backgroundColor: Colors.profile },
+                                    "&:hover": { backgroundColor: Colors.blue },
                                 }}
                             >
-                                Add to cart&nbsp; · &nbsp;₹{displaySalePrice || "-"}
+                                Add to cart&nbsp; · &nbsp;₹{displaySalePrice > 0 ? formatPrice(displaySalePrice) : "-"}
                             </Button>
                         )}
                     </Box>

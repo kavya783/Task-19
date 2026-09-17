@@ -1,4 +1,3 @@
-
 import * as types from "./actionTypes";
 
 import {
@@ -18,18 +17,15 @@ export const createProductDataStart = () => ({
   type: types.CREATE_PRODUCT_START,
 });
 
-
 export const createProductDataSuccess = (product) => ({
   type: types.CREATE_PRODUCT_SUCCESS,
   payload: product,
 });
 
-
 export const createProductDataError = (error) => ({
   type: types.CREATE_PRODUCT_ERROR,
   payload: error,
 });
-
 
 export const createProductDataActionInitiate = (data) => {
 
@@ -72,12 +68,10 @@ export const getProductsDataStart = () => ({
   type: types.FETCH_PRODUCTS_START,
 });
 
-
 export const getProductsDataSuccess = (products) => ({
   type: types.FETCH_PRODUCTS_SUCCESS,
   payload: products,
 });
-
 
 export const getProductsDataError = (error) => ({
   type: types.FETCH_PRODUCTS_ERROR,
@@ -85,22 +79,53 @@ export const getProductsDataError = (error) => ({
 });
 
 
+// ========================================
+// GET PRODUCTS - OPTIMIZED
+// ========================================
+
 export const getProductsDataActionInitiate = () => {
 
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
+
+    const {
+      products = [],
+      loading = false,
+    } = getState().product || {};
+
+
+    // ========================================
+    // PREVENT DUPLICATE API CALL
+    // ========================================
+
+    if (products.length > 0) {
+      return products;
+    }
+
+
+    // ========================================
+    // PREVENT MULTIPLE REQUESTS
+    // ========================================
+
+    if (loading) {
+      return products;
+    }
+
 
     dispatch(
       getProductsDataStart()
     );
+
 
     try {
 
       const res =
         await getProductsApi();
 
+
       dispatch(
         getProductsDataSuccess(res)
       );
+
 
       return res;
 
@@ -126,18 +151,15 @@ export const updateProductDataStart = () => ({
   type: types.UPDATE_PRODUCT_START,
 });
 
-
 export const updateProductDataSuccess = (product) => ({
   type: types.UPDATE_PRODUCT_SUCCESS,
   payload: product,
 });
 
-
 export const updateProductDataError = (error) => ({
   type: types.UPDATE_PRODUCT_ERROR,
   payload: error,
 });
-
 
 export const updateProductDataActionInitiate = (
   id,
@@ -188,18 +210,15 @@ export const deleteProductDataStart = () => ({
   type: types.DELETE_PRODUCT_START,
 });
 
-
 export const deleteProductDataSuccess = (id) => ({
   type: types.DELETE_PRODUCT_SUCCESS,
   payload: id,
 });
 
-
 export const deleteProductDataError = (error) => ({
   type: types.DELETE_PRODUCT_ERROR,
   payload: error,
 });
-
 
 export const deleteProductDataActionInitiate = (
   id
@@ -244,7 +263,6 @@ export const getCategoriesDataStart = () => ({
   type: types.FETCH_CATEGORIES_START,
 });
 
-
 export const getCategoriesDataSuccess = (
   categories
 ) => ({
@@ -252,14 +270,12 @@ export const getCategoriesDataSuccess = (
   payload: categories,
 });
 
-
 export const getCategoriesDataError = (
   error
 ) => ({
   type: types.FETCH_CATEGORIES_ERROR,
   payload: error,
 });
-
 
 export const getCategoriesDataActionInitiate = () => {
 

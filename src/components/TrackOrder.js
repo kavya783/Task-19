@@ -37,7 +37,7 @@ function TrackOrder() {
         left: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        backgroundColor:Colors.background,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -96,13 +96,13 @@ function TrackOrder() {
           sx={{
             marginTop: "20px",
             padding: "10px",
-            backgroundColor: Colors.banner,
+            backgroundColor: Colors.blue,
             color: Colors.headings,
             fontSize: Theme.font14Bold,
             textTransform: "none",
 
             "&:hover": {
-              backgroundColor: Colors.banner,
+              backgroundColor: Colors.blue,
             },
           }}
         >

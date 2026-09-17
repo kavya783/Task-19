@@ -1,5 +1,7 @@
 
 import React, {
+  memo,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -25,41 +27,431 @@ import {
 
 import ProductCards from "./ProductCards";
 
-import { Theme } from "../themes/GlobalStyles";
+import {
+  Theme,
+} from "../themes/GlobalStyles";
+
 import Colors from "../themes/colors";
 
+
+// ========================================
+// NORMALIZE CATEGORY
+// ========================================
+
+const normalizeCategory = (
+  category = ""
+) =>
+  String(category)
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+
+
+// ========================================
+// HAIR CATEGORY MAP
+// ========================================
+
+const HAIR_CATEGORY_MAP = {
+  shampoo: [
+    "shampoo",
+    "shampoos",
+  ],
+
+  conditioner: [
+    "conditioner",
+    "conditioners",
+  ],
+
+  hairoil: [
+    "hairoil",
+    "hairoils",
+    "oil",
+  ],
+
+  hairserum: [
+    "hairserum",
+    "hairserums",
+  ],
+
+  hairmask: [
+    "hairmask",
+    "hairmasks",
+  ],
+
+  haircream: [
+    "haircream",
+    "haircreams",
+  ],
+};
+
+
+// ========================================
+// GET PRODUCT CATEGORY
+// ========================================
+
+const getProductCategory = (
+  product
+) => {
+
+  if (
+    typeof product?.category ===
+    "string"
+  ) {
+    return product.category;
+  }
+
+  return (
+    product?.category?.name ||
+    product?.category?.heading ||
+    ""
+  );
+};
+
+
+// ========================================
+// CATEGORY ITEM
+// ========================================
+
+const CategoryItem = memo(
+  function CategoryItem({
+    item,
+    selectedCategory,
+    onClick,
+    mobile = false,
+  }) {
+
+    const categoryName =
+      item?.heading?.trim() || "";
+
+
+    const isSelected =
+      normalizeCategory(
+        selectedCategory
+      ) ===
+      normalizeCategory(
+        categoryName
+      );
+
+
+    const handleClick =
+      useCallback(() => {
+
+        onClick(categoryName);
+
+      }, [
+        onClick,
+        categoryName,
+      ]);
+
+
+    return (
+      <Box
+        onClick={handleClick}
+        sx={{
+          display: "flex",
+
+          flexDirection:
+            "column",
+
+          alignItems:
+            "center",
+
+          justifyContent:
+            "center",
+
+          flexShrink: 0,
+
+          cursor: "pointer",
+
+          ...(mobile
+            ? {
+                minWidth: "75px",
+                padding: "8px",
+              }
+            : {
+                width: 50,
+                minHeight: 30,
+                py: 0,
+                px: 0,
+              }),
+
+          borderRadius:
+            "10px",
+
+          backgroundColor:
+            isSelected
+              ? Colors.background
+              : "transparent",
+
+          transition:
+            "background-color 0.3s ease",
+
+          "&:hover": {
+            backgroundColor:
+              Colors.background,
+          },
+        }}
+      >
+
+        {/* CATEGORY IMAGE */}
+
+        <Box
+          component="span"
+          role="img"
+          aria-label={
+            categoryName ||
+            "Category"
+          }
+          sx={{
+            display: "block",
+
+            width: mobile
+              ? 42
+              : {
+                  sm: "32px",
+                  md: "36px",
+                },
+
+            height: mobile
+              ? 42
+              : {
+                  sm: "32px",
+                  md: "36px",
+                },
+
+            backgroundColor:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            WebkitMaskImage:
+              `url(${item?.image_url})`,
+
+            maskImage:
+              `url(${item?.image_url})`,
+
+            WebkitMaskRepeat:
+              "no-repeat",
+
+            maskRepeat:
+              "no-repeat",
+
+            WebkitMaskPosition:
+              "center",
+
+            maskPosition:
+              "center",
+
+            WebkitMaskSize:
+              "contain",
+
+            maskSize:
+              "contain",
+
+            transition:
+              "background-color 0.3s ease",
+          }}
+        />
+
+
+        {/* CATEGORY NAME */}
+
+        <Typography
+          sx={{
+            mt: mobile
+              ? 1
+              : 0.5,
+
+            textAlign:
+              "center",
+
+            whiteSpace:
+              "nowrap",
+
+            fontSize:
+              Theme.font12Regular,
+
+            color:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            fontWeight:
+              isSelected
+                ? 600
+                : 400,
+
+            transition:
+              "color 0.3s ease",
+          }}
+        >
+          {categoryName}
+        </Typography>
+
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// CATEGORY LIST
+// ========================================
+
+const CategoryList = memo(
+  function CategoryList({
+    categories,
+    selectedCategory,
+    onCategoryClick,
+    mobile = false,
+  }) {
+
+    return (
+      <Box
+        sx={{
+          display: mobile
+            ? {
+                xs: "flex",
+                sm: "none",
+              }
+            : {
+                xs: "none",
+                sm: "flex",
+              },
+
+          width: "100%",
+
+          ...(mobile
+            ? {
+                overflowX: "auto",
+                overflowY: "hidden",
+                gap: 2,
+                pb: 2,
+                mt: 3,
+              }
+            : {
+                justifyContent:
+                  "center",
+
+                alignItems:
+                  "center",
+
+                gap: {
+                  sm: 2,
+                  md: 3,
+                  lg: 4,
+                },
+
+                overflowX:
+                  "auto",
+
+                overflowY:
+                  "hidden",
+
+                pb: 1,
+
+                mt: 3,
+              }),
+
+          WebkitOverflowScrolling:
+            "touch",
+
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+
+          msOverflowStyle:
+            "none",
+
+          scrollbarWidth:
+            "none",
+        }}
+      >
+
+        {categories.map(
+          (item) => (
+
+            <CategoryItem
+              key={item.id}
+
+              item={item}
+
+              selectedCategory={
+                selectedCategory
+              }
+
+              onClick={
+                onCategoryClick
+              }
+
+              mobile={mobile}
+            />
+
+          )
+        )}
+
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// MAIN COMPONENT
+// ========================================
 
 function OurHairBestsellers({
   products: initialProducts = [],
 }) {
 
-  const dispatch = useDispatch();
+  const dispatch =
+    useDispatch();
 
 
   // ========================================
-  // CATEGORY DATA
+  // CONTENT SELECTORS
   // ========================================
 
-  const {
-    OurHairBestsellersImages,
-    loading: contentLoading,
-    error: contentError,
-  } = useSelector(
-    (state) => state.content
-  );
+  const OurHairBestsellersImages =
+    useSelector(
+      (state) =>
+        state.content
+          ?.OurHairBestsellersImages
+    );
+
+  const contentLoading =
+    useSelector(
+      (state) =>
+        state.content?.loading
+    );
+
+  const contentError =
+    useSelector(
+      (state) =>
+        state.content?.error
+    );
 
 
   // ========================================
-  // PRODUCT DATA
+  // PRODUCT SELECTORS
   // ========================================
 
-  const {
-    products: productData,
-    loading: productLoading,
-    error: productError,
-  } = useSelector(
-    (state) => state.product
-  );
+  const productData =
+    useSelector(
+      (state) =>
+        state.product?.products
+    );
+
+  const productLoading =
+    useSelector(
+      (state) =>
+        state.product?.loading
+    );
+
+  const productError =
+    useSelector(
+      (state) =>
+        state.product?.error
+    );
 
 
   // ========================================
@@ -93,50 +485,46 @@ function OurHairBestsellers({
   // NORMALIZE PRODUCTS
   // ========================================
 
-  const products = useMemo(() => {
+  const products =
+    useMemo(() => {
 
-    if (Array.isArray(productData)) {
-      return productData;
-    }
+      if (
+        Array.isArray(productData)
+      ) {
+        return productData;
+      }
 
-    if (
-      productData &&
-      Array.isArray(productData.products)
-    ) {
-      return productData.products;
-    }
 
-    if (
-      productData &&
-      productData.data &&
-      Array.isArray(
-        productData.data.products
+      if (
+        productData &&
+        Array.isArray(
+          productData.products
+        )
+      ) {
+        return productData.products;
+      }
+
+
+      if (
+        productData?.data &&
+        Array.isArray(
+          productData.data.products
+        )
+      ) {
+        return productData.data.products;
+      }
+
+
+      return Array.isArray(
+        initialProducts
       )
-    ) {
-      return productData.data.products;
-    }
+        ? initialProducts
+        : [];
 
-    return initialProducts;
-
-  }, [
-    productData,
-    initialProducts,
-  ]);
-
-
-  // ========================================
-  // NORMALIZE CATEGORY
-  // ========================================
-
-  const normalizeCategory = (
-    category = ""
-  ) => {
-
-    return String(category)
-      .toLowerCase()
-      .replace(/[\s_-]+/g, "");
-
-  };
+    }, [
+      productData,
+      initialProducts,
+    ]);
 
 
   // ========================================
@@ -144,8 +532,14 @@ function OurHairBestsellers({
   // ========================================
 
   const selectedCategoryKey =
-    normalizeCategory(
-      selectedCategory
+    useMemo(
+      () =>
+        normalizeCategory(
+          selectedCategory
+        ),
+      [
+        selectedCategory,
+      ]
     );
 
 
@@ -155,38 +549,40 @@ function OurHairBestsellers({
 
   const filteredProducts =
     useMemo(() => {
-      const hairCategoryMap = {
-        shampoo: ["shampoo", "shampoos"],
-        conditioner: ["conditioner", "conditioners"],
-        hairoil: ["hairoil", "hairoils", "oil"],
-        hairserum: ["hairserum", "hairserums"],
-        hairmask: ["hairmask", "hairmasks"],
-        haircream: ["haircream", "haircreams"],
-      };
+
+      if (
+        products.length === 0
+      ) {
+        return [];
+      }
+
 
       const selectedCategoryValues =
-        hairCategoryMap[
+        HAIR_CATEGORY_MAP[
           selectedCategoryKey
         ] || [
           selectedCategoryKey,
         ];
 
+
       return products.filter(
         (product) => {
 
+          const category =
+            getProductCategory(
+              product
+            );
+
+
           const productCategory =
             normalizeCategory(
-              typeof product?.category ===
-                "string"
-                ? product.category
-                : product?.category?.name ||
-                  product?.category?.heading
+              category
             );
+
 
           return selectedCategoryValues.includes(
             productCategory
           );
-
         }
       );
 
@@ -200,15 +596,35 @@ function OurHairBestsellers({
   // CATEGORY CLICK
   // ========================================
 
-  const handleCategoryClick = (
-    heading
-  ) => {
+  const handleCategoryClick =
+    useCallback(
+      (heading) => {
 
-    setSelectedCategory(
-      heading
+        setSelectedCategory(
+          heading
+        );
+
+      },
+      []
     );
 
-  };
+
+  // ========================================
+  // CATEGORY DATA
+  // ========================================
+
+  const categories =
+    useMemo(() => {
+
+      return Array.isArray(
+        OurHairBestsellersImages
+      )
+        ? OurHairBestsellersImages
+        : [];
+
+    }, [
+      OurHairBestsellersImages,
+    ]);
 
 
   // ========================================
@@ -225,15 +641,17 @@ function OurHairBestsellers({
         sx={{
           width: "100%",
           py: 5,
-          textAlign: "center",
+          textAlign:
+            "center",
         }}
       >
+
         <Typography>
           Loading...
         </Typography>
+
       </Box>
     );
-
   }
 
 
@@ -251,20 +669,23 @@ function OurHairBestsellers({
         sx={{
           width: "100%",
           py: 5,
-          textAlign: "center",
+          textAlign:
+            "center",
         }}
       >
+
         <Typography
           sx={{
-            color: Colors.red,
+            color:
+              Colors.red,
           }}
         >
           {contentError ||
             productError}
         </Typography>
+
       </Box>
     );
-
   }
 
 
@@ -273,10 +694,10 @@ function OurHairBestsellers({
   // ========================================
 
   return (
-
     <Box
       sx={{
         width: "100%",
+
         py: 3,
 
         px: {
@@ -287,13 +708,15 @@ function OurHairBestsellers({
       }}
     >
 
-      {/* ========================================
+      {/* ====================================
           HEADING
-      ======================================== */}
+      ==================================== */}
 
       <Typography
         sx={{
-          textAlign: "center",
+          textAlign:
+            "center",
+
           fontSize:
             Theme.font24SemiBold,
         }}
@@ -306,15 +729,18 @@ function OurHairBestsellers({
       </Typography>
 
 
-      {/* ========================================
+      {/* ====================================
           SUB HEADING
-      ======================================== */}
+      ==================================== */}
 
       <Typography
         sx={{
-          textAlign: "center",
+          textAlign:
+            "center",
+
           fontSize:
             Theme.font12Regular,
+
           mt: 0.5,
         }}
       >
@@ -324,359 +750,61 @@ function OurHairBestsellers({
       </Typography>
 
 
-      {/* ========================================
+      {/* ====================================
           DESKTOP CATEGORIES
-      ======================================== */}
+      ==================================== */}
 
-      <Box
-        sx={{
-          display: {
-            xs: "none",
-            sm: "flex",
-          },
+      <CategoryList
+        categories={
+          categories
+        }
 
-          justifyContent: "center",
-          alignItems: "center",
+        selectedCategory={
+          selectedCategory
+        }
 
-          width: "100%",
-
-          gap: {
-            sm: 2,
-            md: 3,
-            lg: 4,
-          },
-
-          overflowX: "auto",
-          overflowY: "hidden",
-
-          pb: 1,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
-        }}
-      >
-
-        {OurHairBestsellersImages.map(
-          (item) => {
-
-            const categoryName =
-              item.heading?.trim();
-
-            const isSelected =
-              selectedCategory
-                .toLowerCase() ===
-              categoryName?.toLowerCase();
-
-            return (
-
-              <Box
-                key={item.id}
-                onClick={() =>
-                  handleCategoryClick(
-                    categoryName
-                  )
-                }
-                sx={{
-                  display: "flex",
-
-                  flexDirection:
-                    "column",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
-
-                  flexShrink: 0,
-
-                  cursor: "pointer",
-
-                  width: 50,
-
-                  minHeight: 30,
-
-                  py: 0,
-
-                  px: 0,
-
-                  borderRadius:
-                    "10px",
-
-                  backgroundColor:
-                    isSelected
-                      ? Colors.background
-                      : "transparent",
-
-                  transition:
-                    "all 0.3s ease",
-
-                  "&:hover": {
-                    backgroundColor:
-                      Colors.background,
-                  },
-                }}
-              >
-
-                {/* CATEGORY IMAGE */}
-
-                <Box
-                  component="img"
-                  src={item.image_url}
-                  alt={item.heading}
-                  sx={{
-                    width: {
-                      sm: "32px",
-                      md: "36px",
-                    },
-
-                    height: {
-                      sm: "32px",
-                      md: "36px",
-                    },
-
-                    objectFit:
-                      "contain",
-
-                    borderRadius:
-                      "50%",
-
-                    filter:
-                      isSelected
-                        ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                        : "none",
-
-                    transition:
-                      "filter 0.3s ease",
-                  }}
-                />
+        onCategoryClick={
+          handleCategoryClick
+        }
+      />
 
 
-                {/* CATEGORY NAME */}
-
-                <Typography
-                  sx={{
-                    mt: 0.5,
-
-                    textAlign:
-                      "center",
-
-                    whiteSpace:
-                      "nowrap",
-
-                    fontSize:
-                      Theme.font12Regular,
-
-                    color:
-                      isSelected
-                        ? Colors.blue
-                        : Colors.black,
-
-                    fontWeight:
-                      isSelected
-                        ? 600
-                        : 400,
-
-                    transition:
-                      "color 0.3s ease",
-                  }}
-                >
-                  {item.heading}
-                </Typography>
-
-              </Box>
-
-            );
-
-          }
-        )}
-
-      </Box>
-
-
-      {/* ========================================
+      {/* ====================================
           MOBILE CATEGORIES
-      ======================================== */}
+      ==================================== */}
 
-      <Box
-        sx={{
-          display: {
-            xs: "flex",
-            sm: "none",
-          },
+      <CategoryList
+        categories={
+          categories
+        }
 
-          width: "100%",
+        selectedCategory={
+          selectedCategory
+        }
 
-          overflowX: "auto",
-          overflowY: "hidden",
+        onCategoryClick={
+          handleCategoryClick
+        }
 
-          gap: 2,
-
-          pb: 2,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
-        }}
-      >
-
-        {OurHairBestsellersImages.map(
-          (item) => {
-
-            const categoryName =
-              item.heading?.trim();
-
-            const isSelected =
-              selectedCategory
-                .toLowerCase() ===
-              categoryName?.toLowerCase();
-
-            return (
-
-              <Box
-                key={item.id}
-                onClick={() =>
-                  handleCategoryClick(
-                    categoryName
-                  )
-                }
-                sx={{
-                  display: "flex",
-
-                  flexDirection:
-                    "column",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
-
-                  flexShrink: 0,
-
-                  minWidth: "75px",
-
-                  cursor: "pointer",
-
-                  padding: "8px",
-
-                  borderRadius:
-                    "10px",
-
-                  backgroundColor:
-                    isSelected
-                      ? Colors.background
-                      : "transparent",
-
-                  transition:
-                    "all 0.3s ease",
-
-                  "&:hover": {
-                    backgroundColor:
-                      Colors.background,
-                  },
-                }}
-              >
-
-                {/* CATEGORY IMAGE */}
-
-                <Box
-                  component="img"
-                  src={item.image_url}
-                  alt={item.heading}
-                  sx={{
-                    width: 42,
-
-                    height: 42,
-
-                    objectFit:
-                      "contain",
-
-                    borderRadius:
-                      "50%",
-
-                    filter:
-                      isSelected
-                        ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                        : "none",
-
-                    transition:
-                      "filter 0.3s ease",
-                  }}
-                />
+        mobile
+      />
 
 
-                {/* CATEGORY NAME */}
-
-                <Typography
-                  sx={{
-                    mt: 1,
-
-                    fontSize:
-                      Theme.font12Regular,
-
-                    textAlign:
-                      "center",
-
-                    whiteSpace:
-                      "nowrap",
-
-                    color:
-                      isSelected
-                        ? Colors.blue
-                        : Colors.black,
-
-                    fontWeight:
-                      isSelected
-                        ? 600
-                        : 400,
-
-                    transition:
-                      "color 0.3s ease",
-                  }}
-                >
-                  {item.heading}
-                </Typography>
-
-              </Box>
-
-            );
-
-          }
-        )}
-
-      </Box>
-
-
-      {/* ========================================
+      {/* ====================================
           SELECTED CATEGORY
-      ======================================== */}
+      ==================================== */}
 
       <Box
         sx={{
           width: "100%",
-          maxWidth: "1200px",
+
+          maxWidth:
+            "1200px",
 
           mx: "auto",
 
           mt: 4,
+
           mb: 3,
         }}
       >
@@ -690,9 +818,13 @@ function OurHairBestsellers({
 
             fontWeight: 600,
 
-            textAlign: "left",
+            textAlign:
+              "left",
 
-            ml: 5,
+            ml: {
+              xs: 0,
+              sm: 5,
+            },
           }}
         >
           {selectedCategory}
@@ -701,20 +833,23 @@ function OurHairBestsellers({
       </Box>
 
 
-      {/* ========================================
+      {/* ====================================
           PRODUCTS
-      ======================================== */}
+      ==================================== */}
 
       {filteredProducts.length > 0 ? (
 
         <Box
           sx={{
             width: "100%",
-            maxWidth: "1200px",
+
+            maxWidth:
+              "1200px",
 
             mx: "auto",
 
-            overflow: "visible",
+            overflow:
+              "visible",
           }}
         >
 
@@ -728,22 +863,22 @@ function OurHairBestsellers({
 
       ) : (
 
-        /* ========================================
-            NO PRODUCTS
-        ======================================== */
-
         <Box
           sx={{
             width: "100%",
-            maxWidth: "1200px",
+
+            maxWidth:
+              "1200px",
 
             mx: "auto",
 
             py: 5,
 
-            textAlign: "center",
+            textAlign:
+              "center",
 
-            borderRadius: "10px",
+            borderRadius:
+              "10px",
           }}
         >
 
@@ -756,10 +891,8 @@ function OurHairBestsellers({
                 Theme.font14Regular,
             }}
           >
-            No products available
-            for{" "}
+            No products available for{" "}
             {selectedCategory}
-
           </Typography>
 
         </Box>
@@ -771,4 +904,10 @@ function OurHairBestsellers({
 }
 
 
-export default OurHairBestsellers;
+// ========================================
+// MEMOIZED EXPORT
+// ========================================
+
+export default memo(
+  OurHairBestsellers
+);

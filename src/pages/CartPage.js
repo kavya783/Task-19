@@ -14,39 +14,64 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 import EventNoteIcon from '@mui/icons-material/EventNote';
+import { useDispatch } from "react-redux";
+import { createPaymentActionInitiate } from "../redux/actions/paymentActions";
+import { useNavigate } from "react-router-dom";
 function CartPage({ open, onClose }) {
-    const [cartItems, setCartItems] = useState(() => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const user = (() => {
         try {
-            return JSON.parse(localStorage.getItem("mamaearth_cart") || "[]");
+            return JSON.parse(localStorage.getItem("user") || "null");
         } catch {
-            return [];
+            return null;
         }
-    });
+    })();
+     const cartKey = user?.id
+    ? `mamaearth_cart_${user.id}`
+    : "mamaearth_cart_guest";
+
+   const [cartItems, setCartItems] = useState(() => {
+    try {
+        return JSON.parse(
+            localStorage.getItem(cartKey) || "[]"
+        );
+    } catch {
+        return [];
+    }
+});
 
     const [showOffers, setShowOffers] = useState(false);
 
-    useEffect(() => {
-        const syncCartItems = () => {
-            try {
-                setCartItems(
-                    JSON.parse(localStorage.getItem("mamaearth_cart") || "[]")
-                );
-            } catch {
-                setCartItems([]);
-            }
-        };
+   useEffect(() => {
+    const syncCartItems = () => {
+        try {
+            setCartItems(
+                JSON.parse(
+                    localStorage.getItem(cartKey) || "[]"
+                )
+            );
+        } catch {
+            setCartItems([]);
+        }
+    };
 
-        const handleCartUpdate = () => syncCartItems();
-        const handleCartOpen = () => syncCartItems();
+    const handleCartUpdate = () => {
+        syncCartItems();
+    };
 
-        window.addEventListener("cart:update", handleCartUpdate);
-        window.addEventListener("cart:open", handleCartOpen);
+    const handleCartOpen = () => {
+        syncCartItems();
+    };
 
-        return () => {
-            window.removeEventListener("cart:update", handleCartUpdate);
-            window.removeEventListener("cart:open", handleCartOpen);
-        };
-    }, []);
+    window.addEventListener("cart:update", handleCartUpdate);
+    window.addEventListener("cart:open", handleCartOpen);
+
+    return () => {
+        window.removeEventListener("cart:update", handleCartUpdate);
+        window.removeEventListener("cart:open", handleCartOpen);
+    };
+}, [cartKey]);
 
     const handleRemoveCartItem = (productId) => {
         updateCart(
@@ -56,14 +81,18 @@ function CartPage({ open, onClose }) {
         );
     };
 
-    const updateCart = (updatedCart) => {
-        localStorage.setItem(
-            "mamaearth_cart",
-            JSON.stringify(updatedCart)
-        );
-        setCartItems(updatedCart);
-        window.dispatchEvent(new CustomEvent("cart:update"));
-    };
+   const updateCart = (updatedCart) => {
+    localStorage.setItem(
+        cartKey,
+        JSON.stringify(updatedCart)
+    );
+
+    setCartItems(updatedCart);
+
+    window.dispatchEvent(
+        new CustomEvent("cart:update")
+    );
+};
 
     const changeQuantity = (productId, change) => {
         const updatedCart = cartItems
@@ -131,7 +160,49 @@ function CartPage({ open, onClose }) {
 
     const formatMoney = (amount) =>
         `₹${amount.toFixed(2)}`;
+ const handlePayU = async () => {
+  try {
+    if (!cartItems.length) {
+      return;
+    }
 
+    const paymentData = await dispatch(
+      createPaymentActionInitiate({
+        amount: amountToPay.toFixed(2),
+        productinfo: "Mamaearth Order",
+        firstname: user?.name || "Customer",
+        email: user?.email || "customer@example.com",
+        phone: user?.phone || "9999999999",
+        user_id: user?.id,
+        items: cartItems,
+      })
+    );
+
+    const form = document.createElement("form");
+
+    form.method = "POST";
+    form.action = "https://test.payu.in/_payment";
+
+    Object.entries(paymentData).forEach(([key, value]) => {
+      console.log("PAYU FIELD:", key, "=>", value);
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value ?? "";
+
+      form.appendChild(input);
+    });
+
+    console.log("PAYU ACTION:", form.action);
+
+    document.body.appendChild(form);
+    form.submit();
+
+  } catch (error) {
+    console.error("PayU payment error:", error);
+  }
+};
     return (
         <Drawer
             anchor="right"
@@ -178,7 +249,8 @@ function CartPage({ open, onClose }) {
 
                             <Typography
                                 sx={{
-                                    ...Theme.headings
+                                    ...Theme.headings,
+                                    color:Colors.black
                                 }}
                             >
                                 Your cart
@@ -296,7 +368,7 @@ function CartPage({ open, onClose }) {
 
                                 <Button
                                     sx={{
-                                        color: "#999",
+                                        color:Colors.black,
                                         ...Theme.font14Bold,
                                         textTransform: "none",
                                     }}
@@ -369,7 +441,7 @@ function CartPage({ open, onClose }) {
                                                 ...Theme.font14Regular,
                                                 fontSize: "14px !important",
                                                 lineHeight: 1.5,
-                                                color: "#333",
+                                                color:Colors.black,
                                             }}
                                         >
                                             {offer.description}
@@ -379,7 +451,7 @@ function CartPage({ open, onClose }) {
                                             sx={{
                                                 ...Theme.font14Regular,
                                                 fontSize: "14px !important",
-                                                color: "#555",
+                                               color:Colors.black,
                                                 mt: 0.8,
                                             }}
                                         >
@@ -430,7 +502,7 @@ function CartPage({ open, onClose }) {
                                     >
                                         <Typography
                                             sx={{
-                                                color: Colors.red,
+                                                color: Colors.orange,
                                                 ...Theme.font12Regular
                                             }}
                                         >
@@ -439,8 +511,8 @@ function CartPage({ open, onClose }) {
 
                                         <Button
                                             sx={{
-                                                color: "#999",
-                                                fontWeight: 700,
+                                              color:Colors.black,
+                                               
                                                 ...Theme.font14Bold,
                                                 textTransform:
                                                     "none",
@@ -489,17 +561,17 @@ function CartPage({ open, onClose }) {
                             products and buy some in the shop
                         </Typography>
 
-                        <Button
-                            variant="text"
-                            onClick={onClose}
-                            sx={{
-                                color: Colors.blue,
-                                ...Theme.font14SemiBold,
-                                textTransform: "none",
-                            }}
-                        >
-                            Return to shop →
-                        </Button>
+                       <Button
+    variant="text"
+    onClick={() => navigate("/")}
+    sx={{
+        color: Colors.blue,
+        ...Theme.font14SemiBold,
+        textTransform: "none",
+    }}
+>
+    Return to shop →
+</Button>
                     </Box>
 
                 ) : (
@@ -524,7 +596,7 @@ function CartPage({ open, onClose }) {
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 1,
-                                    backgroundColor: "#dff0ce",
+                                    backgroundColor:Colors.background,
                                     borderRadius: 2,
                                     px: 2.5,
                                     py: 1.8,
@@ -759,195 +831,195 @@ function CartPage({ open, onClose }) {
                                         : 0;
 
                                     return (
-                                      <Box
-    key={item.id}
-    sx={{
-        display: "grid",
-        gridTemplateColumns: {
-            xs: "60px minmax(0, 1fr) auto",
-            sm: "70px minmax(0, 1fr) auto",
-        },
-        gap: {
-            xs: 1,
-            sm: 1.5,
-        },
-        alignItems: "center",
-        py: 1.5,
-        borderTop: "1px solid #e5e5e5",
-    }}
->
-    {/* Product Image */}
-    <Box
-        component="img"
-        src={
-            item.image_url ||
-            item.image_urls?.[0] ||
-            item.images?.[0] ||
-            ""
-        }
-        alt={item.name || "Product"}
-        sx={{
-            width: {
-                xs: 60,
-                sm: 70,
-            },
-            height: {
-                xs: 60,
-                sm: 70,
-            },
-            objectFit: "contain",
-            borderRadius: 1,
-            border: "1px solid #eaeaea",
-            backgroundColor: Colors.background,
-        }}
-    />
+                                        <Box
+                                            key={item.id}
+                                            sx={{
+                                                display: "grid",
+                                                gridTemplateColumns: {
+                                                    xs: "60px minmax(0, 1fr) auto",
+                                                    sm: "70px minmax(0, 1fr) auto",
+                                                },
+                                                gap: {
+                                                    xs: 1,
+                                                    sm: 1.5,
+                                                },
+                                                alignItems: "center",
+                                                py: 1.5,
+                                                borderTop: "1px solid #e5e5e5",
+                                            }}
+                                        >
+                                            {/* Product Image */}
+                                            <Box
+                                                component="img"
+                                                src={
+                                                    item.image_url ||
+                                                    item.image_urls?.[0] ||
+                                                    item.images?.[0] ||
+                                                    ""
+                                                }
+                                                alt={item.name || "Product"}
+                                                sx={{
+                                                    width: {
+                                                        xs: 60,
+                                                        sm: 70,
+                                                    },
+                                                    height: {
+                                                        xs: 60,
+                                                        sm: 70,
+                                                    },
+                                                    objectFit: "contain",
+                                                    borderRadius: 1,
+                                                    border: "1px solid #eaeaea",
+                                                    backgroundColor: Colors.background,
+                                                }}
+                                            />
 
-    {/* Product Details */}
-    <Box
-        sx={{
-            minWidth: 0,
-            overflow: "hidden",
-        }}
-    >
-        <Typography
-            noWrap
-            sx={{
-                ...Theme.font12Bold,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-            }}
-        >
-            {item.heading || "Product"}
-        </Typography>
+                                            {/* Product Details */}
+                                            <Box
+                                                sx={{
+                                                    minWidth: 0,
+                                                    overflow: "hidden",
+                                                }}
+                                            >
+                                                <Typography
+                                                    noWrap
+                                                    sx={{
+                                                        ...Theme.font12Bold,
+                                                        overflow: "hidden",
+                                                        textOverflow: "ellipsis",
+                                                    }}
+                                                >
+                                                    {item.heading || "Product"}
+                                                </Typography>
 
-        {/* Price */}
-        <Box
-            sx={{
-                display: "flex",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: {
-                    xs: 0.6,
-                    sm: 1,
-                },
-                mt: 0.5,
-            }}
-        >
-            <Typography
-                sx={{
-                    ...Theme.font12Bold,
-                    whiteSpace: "nowrap",
-                }}
-            >
-                {formatMoney(price)}
-            </Typography>
+                                                {/* Price */}
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        flexWrap: "wrap",
+                                                        gap: {
+                                                            xs: 0.6,
+                                                            sm: 1,
+                                                        },
+                                                        mt: 0.5,
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        sx={{
+                                                            ...Theme.font12Bold,
+                                                            whiteSpace: "nowrap",
+                                                        }}
+                                                    >
+                                                        {formatMoney(price)}
+                                                    </Typography>
 
-            {mrp > price && (
-                <Typography
-                    sx={{
-                        textDecoration: "line-through",
-                        color: "#666",
-                        ...Theme.font12Bold,
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    {formatMoney(mrp)}
-                </Typography>
-            )}
-        </Box>
+                                                    {mrp > price && (
+                                                        <Typography
+                                                            sx={{
+                                                                textDecoration: "line-through",
+                                                                color:Colors.black,
+                                                                ...Theme.font12Bold,
+                                                                whiteSpace: "nowrap",
+                                                            }}
+                                                        >
+                                                            {formatMoney(mrp)}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
 
-        {/* Discount */}
-        {discount > 0 && (
-            <Typography
-                sx={{
-                    color: Colors.red,
-                    ...Theme.font12Bold,
-                    mt: 0.3,
-                    whiteSpace: "nowrap",
-                }}
-            >
-                {discount}% OFF
-            </Typography>
-        )}
-    </Box>
+                                                {/* Discount */}
+                                                {discount > 0 && (
+                                                    <Typography
+                                                        sx={{
+                                                            color: Colors.orange,
+                                                            ...Theme.font12Bold,
+                                                            mt: 0.3,
+                                                            whiteSpace: "nowrap",
+                                                        }}
+                                                    >
+                                                        {discount}% OFF
+                                                    </Typography>
+                                                )}
+                                            </Box>
 
-    {/* Quantity */}
-    <Box
-        sx={{
-            display: "grid",
-            gridTemplateColumns: {
-                xs: "28px 32px 28px",
-                sm: "32px 36px 32px",
-            },
-            height: {
-                xs: 32,
-                sm: 36,
-            },
-            border: "1px solid #d6d6d6",
-            borderRadius: 2,
-            overflow: "hidden",
-            flexShrink: 0,
-        }}
-    >
-        <IconButton
-            aria-label="decrease quantity"
-            onClick={() =>
-                quantity === 1
-                    ? handleRemoveCartItem(item.id)
-                    : changeQuantity(item.id, -1)
-            }
-            sx={{
-                borderRadius: 0,
-                p: 0,
-            }}
-        >
-            <RemoveIcon
-                sx={{
-                    fontSize: {
-                        xs: 16,
-                        sm: 18,
-                    },
-                }}
-            />
-        </IconButton>
+                                            {/* Quantity */}
+                                            <Box
+                                                sx={{
+                                                    display: "grid",
+                                                    gridTemplateColumns: {
+                                                        xs: "28px 32px 28px",
+                                                        sm: "32px 36px 32px",
+                                                    },
+                                                    height: {
+                                                        xs: 32,
+                                                        sm: 36,
+                                                    },
+                                                    border: "1px solid #d6d6d6",
+                                                    borderRadius: 2,
+                                                    overflow: "hidden",
+                                                    flexShrink: 0,
+                                                }}
+                                            >
+                                                <IconButton
+                                                    aria-label="decrease quantity"
+                                                    onClick={() =>
+                                                        quantity === 1
+                                                            ? handleRemoveCartItem(item.id)
+                                                            : changeQuantity(item.id, -1)
+                                                    }
+                                                    sx={{
+                                                        borderRadius: 0,
+                                                        p: 0,
+                                                    }}
+                                                >
+                                                    <RemoveIcon
+                                                        sx={{
+                                                            fontSize: {
+                                                                xs: 16,
+                                                                sm: 18,
+                                                            },
+                                                        }}
+                                                    />
+                                                </IconButton>
 
-        <Typography
-            sx={{
-                display: "grid",
-                placeItems: "center",
-                borderLeft: "1px solid #d6d6d6",
-                borderRight: "1px solid #d6d6d6",
-                fontWeight: 700,
-                fontSize: {
-                    xs: 13,
-                    sm: 14,
-                },
-            }}
-        >
-            {quantity}
-        </Typography>
+                                                <Typography
+                                                    sx={{
+                                                        display: "grid",
+                                                        placeItems: "center",
+                                                        borderLeft: "1px solid #d6d6d6",
+                                                        borderRight: "1px solid #d6d6d6",
+                                                        fontWeight: 700,
+                                                        fontSize: {
+                                                            xs: 13,
+                                                            sm: 14,
+                                                        },
+                                                    }}
+                                                >
+                                                    {quantity}
+                                                </Typography>
 
-        <IconButton
-            aria-label="increase quantity"
-            onClick={() =>
-                changeQuantity(item.id, 1)
-            }
-            sx={{
-                borderRadius: 0,
-                p: 0,
-            }}
-        >
-            <AddIcon
-                sx={{
-                    fontSize: {
-                        xs: 16,
-                        sm: 18,
-                    },
-                }}
-            />
-        </IconButton>
-    </Box>
-</Box>
+                                                <IconButton
+                                                    aria-label="increase quantity"
+                                                    onClick={() =>
+                                                        changeQuantity(item.id, 1)
+                                                    }
+                                                    sx={{
+                                                        borderRadius: 0,
+                                                        p: 0,
+                                                    }}
+                                                >
+                                                    <AddIcon
+                                                        sx={{
+                                                            fontSize: {
+                                                                xs: 16,
+                                                                sm: 18,
+                                                            },
+                                                        }}
+                                                    />
+                                                </IconButton>
+                                            </Box>
+                                        </Box>
                                     );
                                 })}
                             </Box>
@@ -1064,7 +1136,7 @@ function CartPage({ open, onClose }) {
                                                 sx={{
                                                     textDecoration:
                                                         "line-through",
-                                                    color: "#555",
+                                                    color:Colors.black,
                                                 }}
                                             >
                                                 {formatMoney(
@@ -1087,7 +1159,7 @@ function CartPage({ open, onClose }) {
 
                                         <Typography
                                             sx={{
-                                                color: "#45a52a",
+                                                color:Colors.green,
                                                 fontWeight: 700,
                                             }}
                                         >
@@ -1144,11 +1216,11 @@ function CartPage({ open, onClose }) {
                             <Button
                                 fullWidth
                                 variant="contained"
-                                onClick={onClose}
+                                onClick={handlePayU}
                                 sx={{
                                     minHeight: 62,
                                     borderRadius: 4,
-                                    backgroundColor: Colors.profile,
+                                    backgroundColor: Colors.blue,
                                     textTransform: "none",
                                     boxShadow: "none",
                                     display: "flex",
@@ -1158,7 +1230,7 @@ function CartPage({ open, onClose }) {
                                     fontSize: 18,
                                     fontWeight: 700,
                                     "&:hover": {
-                                        backgroundColor: Colors.profile,
+                                        backgroundColor: Colors.blue,
                                         boxShadow: "none",
                                     },
                                 }}

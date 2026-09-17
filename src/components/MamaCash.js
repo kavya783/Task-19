@@ -67,12 +67,8 @@ const [showHistory, setShowHistory] = useState(false);
         {/* HEADER */}
         <Typography
           sx={{
-            fontSize: {
-              xs: "18px",
-              sm: "20px",
-              md: "22px",
-            },
-            fontWeight: 600,
+              ...Theme.font18Regular,
+           
             textAlign: "center",
             marginBottom: {
               xs: "25px",
@@ -98,13 +94,9 @@ const [showHistory, setShowHistory] = useState(false);
         >
           <Typography
             sx={{
-              fontSize: {
-                xs: "24px",
-                sm: "28px",
-                md: "32px",
-              },
-              fontWeight: 700,
-              color: Colors.profile,
+                ...Theme.headings,
+             
+              color: Colors.blue,
               marginBottom: "15px",
             }}
           >
@@ -113,12 +105,8 @@ const [showHistory, setShowHistory] = useState(false);
 
           <Typography
             sx={{
-              fontSize: {
-                xs: "12px",
-                sm: "14px",
-                md: "15px",
-              },
-              color: "#666",
+                ...Theme.font14SemiBold,
+              color:Colors.black,
               lineHeight: 1.6,
               marginBottom: "5px",
               padding: {
@@ -132,12 +120,8 @@ const [showHistory, setShowHistory] = useState(false);
 
           <Typography
             sx={{
-              fontSize: {
-                xs: "12px",
-                sm: "13px",
-                md: "14px",
-              },
-              color: "#666",
+                ...Theme.font14SemiBold,
+              color:Colors.black,
               lineHeight: 1.6,
             }}
           >
@@ -158,16 +142,16 @@ const [showHistory, setShowHistory] = useState(false);
   }
   sx={{
     marginTop: "20px",
-    backgroundColor: Colors.banner,
-    color: Colors.headings,
+    backgroundColor: Colors.blue,
+    color: Colors.background,
     textTransform: "none",
-    fontWeight: 600,
+   
     padding: {
       xs: "8px 20px",
       sm: "9px 25px",
     },
     "&:hover": {
-      backgroundColor: Colors.banner,
+      backgroundColor: Colors.blue,
     },
   }}
 >
@@ -183,8 +167,7 @@ const [showHistory, setShowHistory] = useState(false);
   >
     <Typography
       sx={{
-        fontWeight: 600,
-        fontSize: "16px",
+           ...Theme.font14SemiBold, 
         marginBottom: "8px",
       }}
     >
@@ -193,8 +176,8 @@ const [showHistory, setShowHistory] = useState(false);
 
     <Typography
       sx={{
-        color: "text.secondary",
-        fontSize: "14px",
+        color:Colors.black,
+           ...Theme.font14SemiBold,
       }}
     >
       There is no Mamacash history found. Visit ways to earn to get rewarded.
@@ -212,12 +195,7 @@ const [showHistory, setShowHistory] = useState(false);
           {/* TITLE */}
           <Typography
             sx={{
-              fontSize: {
-                xs: "20px",
-                sm: "23px",
-                md: "26px",
-              },
-              fontWeight: 600,
+                ...Theme.font18Bold,
               textAlign: "center",
               marginBottom: {
                 xs: "12px",
@@ -231,12 +209,8 @@ const [showHistory, setShowHistory] = useState(false);
           {/* DESCRIPTION */}
           <Typography
             sx={{
-              fontSize: {
-                xs: "13px",
-                sm: "14px",
-                md: "15px",
-              },
-              color: "#666",
+                 ...Theme.font14SemiBold,
+              color:Colors.black,
               textAlign: "center",
               lineHeight: 1.6,
               marginBottom: {
@@ -289,11 +263,8 @@ const [showHistory, setShowHistory] = useState(false);
             >
               <Typography
                 sx={{
-                  fontSize: {
-                    xs: "12px",
-                    sm: "13px",
-                  },
-                  color: "#777",
+                    ...Theme.font14SemiBold,
+                  color:Colors.black,
                   marginBottom: "6px",
                 }}
               >
@@ -302,12 +273,7 @@ const [showHistory, setShowHistory] = useState(false);
 
               <Typography
                 sx={{
-                  fontSize: {
-                    xs: "18px",
-                    sm: "20px",
-                    md: "22px",
-                  },
-                  fontWeight: 700,
+                    ...Theme.font20Bold,
                 }}
               >
                 100 Mamacash
@@ -330,11 +296,8 @@ const [showHistory, setShowHistory] = useState(false);
             >
               <Typography
                 sx={{
-                  fontSize: {
-                    xs: "12px",
-                    sm: "13px",
-                  },
-                  color: "#777",
+                    ...Theme.font14SemiBold,
+                  color:Colors.black,
                   marginBottom: "6px",
                 }}
               >
@@ -343,12 +306,7 @@ const [showHistory, setShowHistory] = useState(false);
 
               <Typography
                 sx={{
-                  fontSize: {
-                    xs: "18px",
-                    sm: "20px",
-                    md: "22px",
-                  },
-                  fontWeight: 700,
+                     ...Theme.font20Bold,
                 }}
               >
                 100 Mamacash

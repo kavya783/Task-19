@@ -1,4 +1,7 @@
+  
 import React, {
+  memo,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -28,41 +31,404 @@ import { Theme } from "../themes/GlobalStyles";
 import Colors from "../themes/colors";
 
 
+// ========================================
+// HELPERS
+// ========================================
+
+const normalizeText = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+
+
+const getProductsArray = (
+  productData,
+  initialProducts
+) => {
+  if (Array.isArray(productData)) {
+    return productData;
+  }
+
+  if (
+    Array.isArray(
+      productData?.products
+    )
+  ) {
+    return productData.products;
+  }
+
+  if (
+    Array.isArray(
+      productData?.products?.data
+    )
+  ) {
+    return productData.products.data;
+  }
+
+  if (
+    Array.isArray(
+      productData?.data
+    )
+  ) {
+    return productData.data;
+  }
+
+  if (
+    Array.isArray(
+      productData?.data?.products
+    )
+  ) {
+    return productData.data.products;
+  }
+
+  if (
+    Array.isArray(
+      productData?.data?.products?.data
+    )
+  ) {
+    return productData.data.products.data;
+  }
+
+  if (
+    Array.isArray(
+      productData?.data?.data
+    )
+  ) {
+    return productData.data.data;
+  }
+
+  return Array.isArray(initialProducts)
+    ? initialProducts
+    : [];
+};
+
+
+// ========================================
+// GET PRODUCT SEARCH VALUES
+// ========================================
+
+const getProductSearchValues = (
+  product
+) => {
+  const productData =
+    product?.product || {};
+
+  return [
+    product?.name,
+    product?.product_name,
+    product?.productName,
+    product?.title,
+    product?.product_title,
+    product?.productTitle,
+    product?.heading,
+
+    productData?.name,
+    productData?.heading,
+  ];
+};
+
+
+// ========================================
+// CATEGORY ITEM
+// ========================================
+
+const CategoryItem = memo(
+  function CategoryItem({
+    item,
+    isSelected,
+    onClick,
+    mobile = false,
+  }) {
+    const categoryName =
+      item?.heading?.trim() || "";
+
+    const handleClick = useCallback(() => {
+      if (categoryName) {
+        onClick(categoryName);
+      }
+    }, [
+      categoryName,
+      onClick,
+    ]);
+
+    return (
+      <Box
+        onClick={handleClick}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          cursor: "pointer",
+
+          width: mobile
+            ? "auto"
+            : 60,
+
+          minWidth: mobile
+            ? "75px"
+            : "auto",
+
+          minHeight: mobile
+            ? "auto"
+            : 30,
+
+          padding: mobile
+            ? "8px"
+            : 0,
+
+          py: mobile
+            ? "8px"
+            : 0,
+
+          px: mobile
+            ? "8px"
+            : 0,
+
+          borderRadius: "10px",
+
+          backgroundColor:
+            isSelected
+              ? Colors.background
+              : "transparent",
+
+          transition:
+            "background-color 0.3s ease",
+
+          "&:hover": {
+            backgroundColor:
+              Colors.background,
+          },
+        }}
+      >
+        {/* CATEGORY ICON */}
+
+        <Box
+          component="span"
+          role="img"
+          aria-label={categoryName}
+          sx={{
+            display: "block",
+
+            width: 42,
+            height: 42,
+
+            backgroundColor:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            WebkitMaskImage:
+              `url(${item?.image_url})`,
+
+            maskImage:
+              `url(${item?.image_url})`,
+
+            WebkitMaskRepeat:
+              "no-repeat",
+
+            maskRepeat:
+              "no-repeat",
+
+            WebkitMaskPosition:
+              "center",
+
+            maskPosition:
+              "center",
+
+            WebkitMaskSize:
+              "contain",
+
+            maskSize:
+              "contain",
+
+            transition:
+              "background-color 0.3s ease",
+          }}
+        />
+
+        {/* CATEGORY NAME */}
+
+        <Typography
+          sx={{
+            mt: mobile
+              ? 1
+              : 0.5,
+
+            textAlign: "center",
+
+            whiteSpace: "nowrap",
+
+            fontSize:
+              Theme.font12Regular,
+
+            color:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            fontWeight:
+              isSelected
+                ? 600
+                : 400,
+
+            transition:
+              "color 0.3s ease",
+          }}
+        >
+          {categoryName}
+        </Typography>
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// CATEGORY LIST
+// ========================================
+
+const CategoryList = memo(
+  function CategoryList({
+    categories,
+    selectedCategory,
+    onCategoryClick,
+    mobile = false,
+  }) {
+    const selectedKey =
+      normalizeText(
+        selectedCategory
+      );
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+
+          width: "100%",
+
+          justifyContent: mobile
+            ? "flex-start"
+            : "center",
+
+          alignItems: "center",
+
+          gap: mobile
+            ? 2
+            : {
+                sm: 2,
+                md: 3,
+                lg: 4,
+              },
+
+          overflowX: "auto",
+          overflowY: "hidden",
+
+          pb: mobile ? 2 : 1,
+
+          mt: 3,
+
+          WebkitOverflowScrolling:
+            "touch",
+
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+
+          msOverflowStyle:
+            "none",
+
+          scrollbarWidth:
+            "none",
+        }}
+      >
+        {categories.map((item) => {
+          const categoryName =
+            item?.heading?.trim() || "";
+
+          const categoryKey =
+            normalizeText(
+              categoryName
+            );
+
+          return (
+            <CategoryItem
+              key={item?.id}
+              item={item}
+              isSelected={
+                selectedKey ===
+                categoryKey
+              }
+              onClick={
+                onCategoryClick
+              }
+              mobile={mobile}
+            />
+          );
+        })}
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// MAIN COMPONENT
+// ========================================
+
 function OurMakeupBestSellers({
   products: initialProducts = [],
 }) {
   const dispatch = useDispatch();
 
 
+  // ========================================
+  // OPTIMIZED REDUX SELECTORS
+  // ========================================
 
-  // CATEGORY DATA
+  const OurMakeupBestsellersImages =
+    useSelector(
+      (state) =>
+        state.content
+          ?.OurMakeupBestsellersImages
+    );
+
+  const contentLoading =
+    useSelector(
+      (state) =>
+        state.content?.loading
+    );
+
+  const contentError =
+    useSelector(
+      (state) =>
+        state.content?.error
+    );
+
+  const productData =
+    useSelector(
+      (state) =>
+        state.product?.products
+    );
+
+  const productLoading =
+    useSelector(
+      (state) =>
+        state.product?.loading
+    );
+
+  const productError =
+    useSelector(
+      (state) =>
+        state.product?.error
+    );
 
 
-  const {
-    OurMakeupBestsellersImages,
-    loading: contentLoading,
-    error: contentError,
-  } = useSelector(
-    (state) => state.content
-  );
-
-
-
-  // PRODUCT DATA
-
-
-  const {
-    products: productData,
-    loading: productLoading,
-    error: productError,
-  } = useSelector(
-    (state) => state.product
-  );
-
-
-
-  // SELECTED CATEGORY
-
+  // ========================================
+  // STATE
+  // ========================================
 
   const [
     selectedCategory,
@@ -70,9 +436,9 @@ function OurMakeupBestSellers({
   ] = useState("");
 
 
-
-  // GET DATA
-
+  // ========================================
+  // API CALL
+  // ========================================
 
   useEffect(() => {
     dispatch(
@@ -85,510 +451,161 @@ function OurMakeupBestSellers({
   }, [dispatch]);
 
 
+  // ========================================
+  // CATEGORY DATA
+  // ========================================
 
-  // SET FIRST CATEGORY
-
-
-  useEffect(() => {
-    if (
-      Array.isArray(
-        OurMakeupBestsellersImages
-      ) &&
-      OurMakeupBestsellersImages.length > 0
-    ) {
-      const firstCategory =
-        OurMakeupBestsellersImages[0]
-          ?.heading
-          ?.trim();
-
-      if (firstCategory) {
-        setSelectedCategory(
-          firstCategory
-        );
-      }
-    }
+  const categories = useMemo(() => {
+    return Array.isArray(
+      OurMakeupBestsellersImages
+    )
+      ? OurMakeupBestsellersImages
+      : [];
   }, [
     OurMakeupBestsellersImages,
   ]);
 
 
+  // ========================================
+  // SET FIRST CATEGORY
+  // ========================================
 
-  // NORMALIZE TEXT
+  useEffect(() => {
+    if (!categories.length) {
+      return;
+    }
+
+    const firstCategory =
+      categories[0]
+        ?.heading
+        ?.trim();
+
+    if (firstCategory) {
+      setSelectedCategory(
+        (currentCategory) =>
+          currentCategory ||
+          firstCategory
+      );
+    }
+  }, [categories]);
 
 
-  const normalizeText = (
-    value = ""
-  ) => {
-    return String(value)
-      .trim()
-      .toLowerCase()
-      .replace(/[\s_-]+/g, "");
-  };
-
-
-
-  // GET PRODUCTS FROM API RESPONSE
-
+  // ========================================
+  // PRODUCTS
+  // ========================================
 
   const products = useMemo(() => {
-
-   
-    // DIRECT ARRAY
-   
-
-    if (
-      Array.isArray(productData)
-    ) {
-      return productData;
-    }
-
-
-   
-    // products: []
-   
-
-    if (
-      productData &&
-      Array.isArray(
-        productData.products
-      )
-    ) {
-      return productData.products;
-    }
-
-
-   
-    // products: {
-    //   data: []
-    // }
-   
-
-    if (
-      productData?.products &&
-      Array.isArray(
-        productData.products.data
-      )
-    ) {
-      return productData.products.data;
-    }
-
-
-   
-    // data: []
-   
-
-    if (
-      productData &&
-      Array.isArray(
-        productData.data
-      )
-    ) {
-      return productData.data;
-    }
-
-
-   
-    // data: {
-    //   products: []
-    // }
-   
-
-    if (
-      productData?.data &&
-      Array.isArray(
-        productData.data.products
-      )
-    ) {
-      return productData.data.products;
-    }
-
-
-   
-    // data: {
-    //   products: {
-    //      data: []
-    //   }
-    // }
-   
-
-    if (
-      productData?.data?.products &&
-      Array.isArray(
-        productData.data.products.data
-      )
-    ) {
-      return productData.data.products.data;
-    }
-
-
-   
-    // data: {
-    //   data: []
-    // }
-   
-
-    if (
-      productData?.data &&
-      Array.isArray(
-        productData.data.data
-      )
-    ) {
-      return productData.data.data;
-    }
-
-
-   
-    // FALLBACK
-   
-
-    if (
-      Array.isArray(
-        initialProducts
-      )
-    ) {
-      return initialProducts;
-    }
-
-
-    return [];
-
+    return getProductsArray(
+      productData,
+      initialProducts
+    );
   }, [
     productData,
     initialProducts,
   ]);
 
 
-
-  // MAKEUP CATEGORY MAP
-
-
-  // const makeupCategoryMap = {
-
-  //   lipstick: [
-  //     "lipstick",
-  //     "lipsticks",
-  //   ],
-
-  //   lipbalm: [
-  //     "lipbalm",
-  //     "lipbalms",
-  //     "lip balm",
-  //     "lip balms",
-  //   ],
-
-  //   lipgloss: [
-  //     "lipgloss",
-  //     "lipglosses",
-  //     "lip gloss",
-  //     "lip glosses",
-  //   ],
-
-  //   kajal: [
-  //     "kajal",
-  //     "kajals",
-  //   ],
-
-  //   eyeliner: [
-  //     "eyeliner",
-  //     "eyeliners",
-  //     "eye liner",
-  //     "eye liners",
-  //   ],
-
-  //   mascara: [
-  //     "mascara",
-  //     "mascaras",
-  //   ],
-
-  //   eyeshadow: [
-  //     "eyeshadow",
-  //     "eyeshadows",
-  //     "eye shadow",
-  //     "eye shadows",
-  //   ],
-
-  //   foundation: [
-  //     "foundation",
-  //     "foundations",
-  //   ],
-
-  //   concealer: [
-  //     "concealer",
-  //     "concealers",
-  //   ],
-
-  //   blush: [
-  //     "blush",
-  //     "blushes",
-  //   ],
-
-  //   compact: [
-  //     "compact",
-  //     "compacts",
-  //   ],
-
-  //   makeupremover: [
-  //     "makeupremover",
-  //     "makeupremovers",
-  //     "makeup remover",
-  //     "makeup removers",
-  //   ],
-
-  // };
-
-
-
+  // ========================================
   // SELECTED CATEGORY KEY
-
+  // ========================================
 
   const selectedCategoryKey =
-    normalizeText(
-      selectedCategory
+    useMemo(
+      () =>
+        normalizeText(
+          selectedCategory
+        ),
+      [selectedCategory]
     );
 
 
+  // ========================================
+  // NORMALIZED CATEGORY KEY
+  // ========================================
 
-  // SELECTED CATEGORY KEYWORDS
+  const categoryKey =
+    useMemo(() => {
+      if (
+        !selectedCategoryKey
+      ) {
+        return "";
+      }
 
-
-  // const selectedCategoryKeywords =
-  //   useMemo(() => {
-
-  //     const keywords =
-  //       makeupCategoryMap[
-  //         selectedCategoryKey
-  //       ];
-
-
-  //     if (
-  //       Array.isArray(
-  //         keywords
-  //       )
-  //     ) {
-  //       return keywords.map(
-  //         (keyword) =>
-  //           normalizeText(
-  //             keyword
-  //           )
-  //       );
-  //     }
+      return selectedCategoryKey.endsWith(
+        "s"
+      )
+        ? selectedCategoryKey.slice(
+            0,
+            -1
+          )
+        : selectedCategoryKey;
+    }, [
+      selectedCategoryKey,
+    ]);
 
 
-  //     return [
-  //       selectedCategoryKey,
-  //     ];
-
-  //   }, [
-  //     selectedCategoryKey,
-  //   ]);
-
-
-
-  // GET PRODUCT NAME
-
-
-  // const getProductName = (
-  //   product
-  // ) => {
-
-  //   if (!product) {
-  //     return "";
-  //   }
-
-
-   
-  //   // DIRECT NAME
-   
-
-  //   if (
-  //     typeof product.name ===
-  //     "string"
-  //   ) {
-  //     return product.name;
-  //   }
-
-
-   
-  //   // PRODUCT NAME
-   
-
-  //   if (
-  //     typeof product.product_name ===
-  //     "string"
-  //   ) {
-  //     return product.product_name;
-  //   }
-
-
-   
-  //   // PRODUCT NAME CAMEL CASE
-   
-
-  //   if (
-  //     typeof product.productName ===
-  //     "string"
-  //   ) {
-  //     return product.productName;
-  //   }
-
-
-   
-  //   // TITLE
-   
-
-  //   if (
-  //     typeof product.title ===
-  //     "string"
-  //   ) {
-  //     return product.title;
-  //   }
-
-
-   
-  //   // PRODUCT TITLE
-   
-
-  //   if (
-  //     typeof product.product_title ===
-  //     "string"
-  //   ) {
-  //     return product.product_title;
-  //   }
-
-
-  //   if (
-  //     typeof product.productTitle ===
-  //     "string"
-  //   ) {
-  //     return product.productTitle;
-  //   }
-
-
-   
-  //   // NESTED PRODUCT OBJECT
-   
-
-  //   if (
-  //     product.product &&
-  //     typeof product.product ===
-  //       "object"
-  //   ) {
-
-  //     return (
-  //       product.product.name ||
-  //       product.product.product_name ||
-  //       product.product.productName ||
-  //       product.product.title ||
-  //       ""
-  //     );
-
-  //   }
-
-
-  //   return "";
-  // };
-
-
-
+  // ========================================
   // FILTER PRODUCTS
-
+  // ========================================
 
   const filteredProducts = useMemo(() => {
-  if (!Array.isArray(products) || products.length === 0) {
-    return [];
-  }
-
-  if (!selectedCategory) {
-    return [];
-  }
-
-  const selectedKey = normalizeText(selectedCategory);
-
-  return products.filter((product) => {
-    const productName = normalizeText(
-      product?.name ||
-      product?.product_name ||
-      product?.productName ||
-      product?.title ||
-      product?.product_title ||
-      product?.productTitle ||
-      product?.product?.name ||
-      ""
-    );
-
-    const productHeading = normalizeText(
-      product?.heading ||
-      product?.product?.heading ||
-      ""
-    );
-
-    // Lipsticks -> lipstick
-    const categoryKey = selectedKey.endsWith("s")
-      ? selectedKey.slice(0, -1)
-      : selectedKey;
-
-    return (
-      productName.includes(categoryKey) ||
-      productHeading.includes(categoryKey)
-    );
-  });
-}, [products, selectedCategory]);
-
-
-
-  // DEBUG
-
-
-  console.log(
-    "MAKEUP PRODUCTS:",
-    products
-  );
-
-  console.log(
-    "SELECTED CATEGORY:",
-    selectedCategory
-  );
-
-  console.log(
-    "SELECTED CATEGORY KEY:",
-    selectedCategoryKey
-  );
-
-  console.log(
-    "FILTERED MAKEUP PRODUCTS:",
-    filteredProducts
-  );
-
-
-
-  // CATEGORY CLICK
-
-
-  const handleCategoryClick = (
-    heading
-  ) => {
-
-    if (!heading) {
-      return;
+    if (
+      !products.length ||
+      !categoryKey
+    ) {
+      return [];
     }
 
+    return products.filter(
+      (product) => {
+        const searchValues =
+          getProductSearchValues(
+            product
+          );
 
-    setSelectedCategory(
-      heading.trim()
+        return searchValues.some(
+          (value) =>
+            normalizeText(
+              value
+            ).includes(
+              categoryKey
+            )
+        );
+      }
     );
+  }, [
+    products,
+    categoryKey,
+  ]);
 
-  };
+
+  // ========================================
+  // CATEGORY CLICK
+  // ========================================
+
+  const handleCategoryClick =
+    useCallback((heading) => {
+      const trimmedHeading =
+        heading?.trim();
+
+      if (!trimmedHeading) {
+        return;
+      }
+
+      setSelectedCategory(
+        trimmedHeading
+      );
+    }, []);
 
 
-
+  // ========================================
   // LOADING
-
+  // ========================================
 
   if (
     contentLoading ||
     productLoading
   ) {
-
     return (
       <Box
         sx={{
@@ -602,19 +619,17 @@ function OurMakeupBestSellers({
         </Typography>
       </Box>
     );
-
   }
 
 
-
+  // ========================================
   // ERROR
-
+  // ========================================
 
   if (
     contentError ||
     productError
   ) {
-
     return (
       <Box
         sx={{
@@ -633,13 +648,12 @@ function OurMakeupBestSellers({
         </Typography>
       </Box>
     );
-
   }
 
 
-
-  // MAIN UI
-
+  // ========================================
+  // UI
+  // ========================================
 
   return (
     <Box
@@ -655,10 +669,7 @@ function OurMakeupBestSellers({
         },
       }}
     >
-
-      {/* ========================================
-          MAIN HEADING
-      ======================================== */}
+      {/* HEADING */}
 
       <Typography
         sx={{
@@ -676,9 +687,7 @@ function OurMakeupBestSellers({
       </Typography>
 
 
-      {/* ========================================
-          SUB HEADING
-      ======================================== */}
+      {/* SUB HEADING */}
 
       <Typography
         sx={{
@@ -690,403 +699,63 @@ function OurMakeupBestSellers({
           mt: 0.5,
         }}
       >
-        Enhance your natural beauty with
-        our makeup bestsellers
+        Enhance your natural beauty
+        with our makeup bestsellers
       </Typography>
 
 
-      {/* ========================================
-          DESKTOP CATEGORIES
-      ======================================== */}
+      {/* DESKTOP CATEGORY */}
 
       <Box
         sx={{
           display: {
             xs: "none",
-            sm: "flex",
+            sm: "block",
           },
-
-          justifyContent:
-            "center",
-
-          alignItems:
-            "center",
-
-          width: "100%",
-
-          gap: {
-            sm: 2,
-            md: 3,
-            lg: 4,
-          },
-
-          overflowX:
-            "auto",
-
-          overflowY:
-            "hidden",
-
-          pb: 1,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle:
-            "none",
-
-          scrollbarWidth:
-            "none",
         }}
       >
-
-        {Array.isArray(
-          OurMakeupBestsellersImages
-        ) &&
-          OurMakeupBestsellersImages.map(
-            (item) => {
-
-              const categoryName =
-                item?.heading?.trim() ||
-                "";
-
-
-              const isSelected =
-                normalizeText(
-                  selectedCategory
-                ) ===
-                normalizeText(
-                  categoryName
-                );
-
-
-              return (
-                <Box
-                  key={item.id}
-
-                  onClick={() =>
-                    handleCategoryClick(
-                      categoryName
-                    )
-                  }
-
-                  sx={{
-                    display: "flex",
-
-                    flexDirection:
-                      "column",
-
-                    alignItems:
-                      "center",
-
-                    justifyContent:
-                      "center",
-
-                    flexShrink: 0,
-
-                    cursor:
-                      "pointer",
-
-                    width: 60,
-
-                    minHeight: 30,
-
-                    py: 0,
-
-                    px: 0,
-
-                    borderRadius:
-                      "10px",
-
-                    backgroundColor:
-                      isSelected
-                        ? Colors.background
-                        : "transparent",
-
-                    transition:
-                      "all 0.3s ease",
-
-                    "&:hover": {
-                      backgroundColor:
-                        Colors.background,
-                    },
-                  }}
-                >
-
-                  <Box
-                    component="img"
-
-                    src={
-                      item.image_url
-                    }
-
-                    alt={
-                      item.heading ||
-                      "Makeup Category"
-                    }
-
-                    sx={{
-                      width: {
-                        sm: "32px",
-                        md: "36px",
-                      },
-
-                      height: {
-                        sm: "32px",
-                        md: "36px",
-                      },
-
-                      objectFit:
-                        "contain",
-
-                      borderRadius:
-                        "50%",
-
-                      filter:
-                        isSelected
-                          ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                          : "none",
-
-                      transition:
-                        "filter 0.3s ease",
-                    }}
-                  />
-
-                  <Typography
-                    sx={{
-                      mt: 0.5,
-
-                      textAlign:
-                        "center",
-
-                      whiteSpace:
-                        "nowrap",
-
-                      fontSize:
-                        Theme.font12Regular,
-
-                      color:
-                        isSelected
-                          ? Colors.blue
-                          : Colors.black,
-
-                      fontWeight:
-                        isSelected
-                          ? 600
-                          : 400,
-
-                      transition:
-                        "color 0.3s ease",
-                    }}
-                  >
-                    {item.heading}
-                  </Typography>
-
-                </Box>
-              );
-            }
-          )}
-
+        <CategoryList
+          categories={categories}
+          selectedCategory={
+            selectedCategory
+          }
+          onCategoryClick={
+            handleCategoryClick
+          }
+        />
       </Box>
 
 
-      {/* ========================================
-          MOBILE CATEGORIES
-      ======================================== */}
+      {/* MOBILE CATEGORY */}
 
       <Box
         sx={{
           display: {
-            xs: "flex",
+            xs: "block",
             sm: "none",
           },
-
-          width: "100%",
-
-          overflowX:
-            "auto",
-
-          overflowY:
-            "hidden",
-
-          gap: 2,
-
-          pb: 2,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle:
-            "none",
-
-          scrollbarWidth:
-            "none",
         }}
       >
-
-        {Array.isArray(
-          OurMakeupBestsellersImages
-        ) &&
-          OurMakeupBestsellersImages.map(
-            (item) => {
-
-              const categoryName =
-                item?.heading?.trim() ||
-                "";
-
-
-              const isSelected =
-                normalizeText(
-                  selectedCategory
-                ) ===
-                normalizeText(
-                  categoryName
-                );
-
-
-              return (
-                <Box
-                  key={item.id}
-
-                  onClick={() =>
-                    handleCategoryClick(
-                      categoryName
-                    )
-                  }
-
-                  sx={{
-                    display: "flex",
-
-                    flexDirection:
-                      "column",
-
-                    alignItems:
-                      "center",
-
-                    justifyContent:
-                      "center",
-
-                    flexShrink: 0,
-
-                    minWidth:
-                      "75px",
-
-                    cursor:
-                      "pointer",
-
-                    padding:
-                      "8px",
-
-                    borderRadius:
-                      "10px",
-
-                    backgroundColor:
-                      isSelected
-                        ? Colors.background
-                        : "transparent",
-
-                    transition:
-                      "all 0.3s ease",
-
-                    "&:hover": {
-                      backgroundColor:
-                        Colors.background,
-                    },
-                  }}
-                >
-
-                  <Box
-                    component="img"
-
-                    src={
-                      item.image_url
-                    }
-
-                    alt={
-                      item.heading ||
-                      "Makeup Category"
-                    }
-
-                    sx={{
-                      width: 42,
-
-                      height: 42,
-
-                      objectFit:
-                        "contain",
-
-                      borderRadius:
-                        "50%",
-
-                      filter:
-                        isSelected
-                          ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                          : "none",
-
-                      transition:
-                        "filter 0.3s ease",
-                    }}
-                  />
-
-                  <Typography
-                    sx={{
-                      mt: 1,
-
-                      fontSize:
-                        Theme.font12Regular,
-
-                      textAlign:
-                        "center",
-
-                      whiteSpace:
-                        "nowrap",
-
-                      color:
-                        isSelected
-                          ? Colors.blue
-                          : Colors.black,
-
-                      fontWeight:
-                        isSelected
-                          ? 600
-                          : 400,
-
-                      transition:
-                        "color 0.3s ease",
-                    }}
-                  >
-                    {item.heading}
-                  </Typography>
-
-                </Box>
-              );
-            }
-          )}
-
+        <CategoryList
+          categories={categories}
+          selectedCategory={
+            selectedCategory
+          }
+          onCategoryClick={
+            handleCategoryClick
+          }
+          mobile
+        />
       </Box>
 
 
-      {/* ========================================
-          SELECTED CATEGORY
-      ======================================== */}
+      {/* SELECTED CATEGORY */}
 
       <Box
         sx={{
           width: "100%",
 
-          maxWidth:
-            "1200px",
+          maxWidth: "1200px",
 
           mx: "auto",
 
@@ -1095,7 +764,6 @@ function OurMakeupBestSellers({
           mb: 3,
         }}
       >
-
         <Typography
           sx={{
             fontSize: {
@@ -1115,63 +783,48 @@ function OurMakeupBestSellers({
         >
           {selectedCategory}
         </Typography>
-
       </Box>
 
 
-      {/* ========================================
-          PRODUCTS
-      ======================================== */}
+      {/* PRODUCTS */}
 
       {filteredProducts.length > 0 ? (
-
         <Box
           sx={{
             width: "100%",
 
-            maxWidth:
-              "1200px",
+            maxWidth: "1200px",
 
             mx: "auto",
 
-            overflow:
-              "visible",
+            overflow: "visible",
           }}
         >
-
           <ProductCards
             products={
               filteredProducts
             }
           />
-
         </Box>
-
       ) : (
-
         <Box
           sx={{
             width: "100%",
 
-            maxWidth:
-              "1200px",
+            maxWidth: "1200px",
 
             mx: "auto",
 
             py: 5,
 
-            textAlign:
-              "center",
+            textAlign: "center",
 
-            borderRadius:
-              "10px",
+            borderRadius: "10px",
           }}
         >
-
           <Typography
             sx={{
-              color:
-                Colors.black,
+              color: Colors.black,
 
               fontSize:
                 Theme.font14Regular,
@@ -1181,14 +834,17 @@ function OurMakeupBestSellers({
             for{" "}
             {selectedCategory}
           </Typography>
-
         </Box>
-
       )}
-
     </Box>
   );
 }
 
 
-export default OurMakeupBestSellers;
+// ========================================
+// MEMOIZED EXPORT
+// ========================================
+
+export default memo(
+  OurMakeupBestSellers
+);

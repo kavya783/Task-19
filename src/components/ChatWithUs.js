@@ -80,7 +80,7 @@ function ChatWithUs() {
 
         <Box
           sx={{
-            backgroundColor: Colors.banner,
+            backgroundColor: Colors.background,
             padding: {
               xs: "15px 16px",
               sm: "20px",
@@ -89,11 +89,7 @@ function ChatWithUs() {
         >
           <Typography
             sx={{
-              fontSize: {
-                xs: "18px",
-                sm: Theme.font20Bold,
-              },
-              fontWeight: 700,
+              ...Theme.font20Bold,
               color: Colors.black,
             }}
           >
@@ -115,10 +111,7 @@ function ChatWithUs() {
           >
             <Typography
               sx={{
-                fontSize: {
-                  xs: "20px",
-                  sm: Theme.font20Bold,
-                },
+                ...Theme.font20Bold,
                 fontWeight: 700,
                 color: Colors.black,
                 marginBottom: "10px",
@@ -129,10 +122,7 @@ function ChatWithUs() {
 
             <Typography
               sx={{
-                fontSize: {
-                  xs: "14px",
-                  sm: Theme.font14Regular,
-                },
+                ...Theme.font20Bold,
                 color: Colors.black,
               }}
             >
@@ -257,17 +247,11 @@ function ChatWithUs() {
               onChange={handleChange}
               sx={{
                 "& .MuiInputBase-root": {
-                  fontSize: {
-                    xs: "14px",
-                    sm: "15px",
-                  },
+                 ...Theme.font16Bold,
                 },
 
                 "& .MuiInputLabel-root": {
-                  fontSize: {
-                    xs: "14px",
-                    sm: "15px",
-                  },
+                 ...Theme.font16Bold,
                 },
               }}
             />
@@ -294,21 +278,17 @@ function ChatWithUs() {
                   sm: "44px",
                 },
 
-                backgroundColor: Colors.banner,
-                color: Colors.headings,
+                backgroundColor: Colors.blue,
+                color: Colors.background,
 
                 fontFamily: Theme.font14Bold.fontFamily,
-                fontSize: {
-                  xs: "14px",
-                  sm: Theme.font14Bold.fontSize,
-                },
-
+                ...Theme.font16Bold,
                 fontWeight: Theme.font14Bold.fontWeight,
 
                 textTransform: "none",
 
                 "&:hover": {
-                  backgroundColor: Colors.banner,
+                  backgroundColor: Colors.blue,
                 },
               }}
             >

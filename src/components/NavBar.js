@@ -1,6 +1,18 @@
-import * as React from "react";
+import React, {
+    lazy,
+    Suspense,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
 import { useNavigate } from "react-router-dom";
-import { styled, alpha } from "@mui/material/styles";
+
+import {
+    styled,
+    alpha,
+} from "@mui/material/styles";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -11,7 +23,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import Badge from "@mui/material/Badge";
 
-import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -20,16 +31,32 @@ import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MoreIcon from "@mui/icons-material/MoreVert";
 
-import Login from "./UserLogin";
-import CartPage from "../pages/CartPage";
 import { toast } from "react-toastify";
+
 import Colors from "../themes/colors";
+import { Theme } from "../themes/GlobalStyles";
 
 import {
     getProductsDataActionInitiate,
 } from "../redux/actions/productActions";
-import { Theme } from "../themes/GlobalStyles";
 
+
+// =====================================================
+// LAZY LOAD HEAVY COMPONENTS
+// =====================================================
+
+const Login = lazy(
+    () => import("./UserLogin")
+);
+
+const CartPage = lazy(
+    () => import("../pages/CartPage")
+);
+
+
+// =====================================================
+// SEARCH STYLES
+// =====================================================
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -48,7 +75,9 @@ const Search = styled("div")(({ theme }) => ({
     },
 
     marginLeft: theme.spacing(2),
+
     width: "100%",
+
     maxWidth: "500px",
 
     [theme.breakpoints.up("sm")]: {
@@ -67,18 +96,25 @@ const Search = styled("div")(({ theme }) => ({
 
 const SearchIconWrapper = styled("div")(() => ({
     position: "absolute",
+
     left: "10px",
+
     top: "50%",
+
     transform: "translateY(-50%)",
 
     width: "28px",
+
     height: "28px",
 
     display: "flex",
+
     alignItems: "center",
+
     justifyContent: "center",
 
     zIndex: 2,
+
     pointerEvents: "none",
 
     "& .MuiSvgIcon-root": {
@@ -89,16 +125,25 @@ const SearchIconWrapper = styled("div")(() => ({
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: "inherit",
+
     width: "100%",
+
     height: "100%",
 
     "& .MuiInputBase-input": {
-        padding: theme.spacing(1, 1, 1, 0),
+        padding: theme.spacing(
+            1,
+            1,
+            1,
+            0
+        ),
 
         paddingLeft: "42px",
 
         width: "100%",
+
         height: "100%",
+
         boxSizing: "border-box",
 
         fontSize: "16px",
@@ -109,6 +154,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
+
+// =====================================================
+// STATIC DATA
+// =====================================================
 
 const bannerTexts = [
     "Buy Any 3 & Pay for 2 | Use Code : B3P2 | Shop Now",
@@ -126,17 +175,56 @@ const searchPlaceholders = [
 ];
 
 
+// =====================================================
+// CART CONSTANTS
+// =====================================================
+
+const GUEST_CART_KEY =
+    "mamaearth_cart_guest";
+
+const USER_STORAGE_KEY =
+    "user";
+
+
+// =====================================================
+// GET CART KEY
+// =====================================================
+
+const getCartKey = () => {
+    try {
+        const user = JSON.parse(
+            localStorage.getItem(
+                USER_STORAGE_KEY
+            ) || "null"
+        );
+
+        return user?.id
+            ? `mamaearth_cart_${user.id}`
+            : GUEST_CART_KEY;
+    } catch {
+        return GUEST_CART_KEY;
+    }
+};
+
+
+// =====================================================
 // GET PRODUCT IMAGE
+// =====================================================
+
 const getProductImage = (product) => {
     if (
-        Array.isArray(product?.image_urls) &&
+        Array.isArray(
+            product?.image_urls
+        ) &&
         product.image_urls.length > 0
     ) {
         return product.image_urls[0];
     }
 
     if (
-        Array.isArray(product?.images) &&
+        Array.isArray(
+            product?.images
+        ) &&
         product.images.length > 0
     ) {
         return product.images[0];
@@ -150,87 +238,162 @@ const getProductImage = (product) => {
 };
 
 
+// =====================================================
+// COMPONENT
+// =====================================================
+
 function NavBar() {
     const navigate = useNavigate();
+
     const dispatch = useDispatch();
 
-    const [anchorEl, setAnchorEl] = useState(null);
 
-    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+    // =================================================
+    // MENU STATES
+    // =================================================
+
+    const [anchorEl, setAnchorEl] =
         useState(null);
 
-    const [currentText, setCurrentText] = useState(0);
-
-    const [currentSearch, setCurrentSearch] = useState(0);
-
-
-    // IMPORTANT: Typing text kosam state
-    const [searchText, setSearchText] = useState("");
-
-    // ACTUAL SEARCH INPUT
-    const [searchInput, setSearchInput] = useState("");
+    const [
+        mobileMoreAnchorEl,
+        setMobileMoreAnchorEl,
+    ] = useState(null);
 
 
-    const [isLoggedIn, setIsLoggedIn] = useState(
-        Boolean(localStorage.getItem("token"))
-    );
+    // =================================================
+    // BANNER STATES
+    // =================================================
+
+    const [currentText, setCurrentText] =
+        useState(0);
+
+    const [currentSearch, setCurrentSearch] =
+        useState(0);
 
 
-    const [loginOpen, setLoginOpen] = useState(false);
+    // =================================================
+    // SEARCH STATES
+    // =================================================
 
-    const [cartOpen, setCartOpen] = useState(false);
+    const [searchText, setSearchText] =
+        useState("");
 
-
-    const [cartItems, setCartItems] = useState(() => {
-        try {
-            return JSON.parse(
-                localStorage.getItem("mamaearth_cart") || "[]"
-            );
-        } catch {
-            return [];
-        }
-    });
+    const [searchInput, setSearchInput] =
+        useState("");
 
 
+    // =================================================
+    // AUTH STATES
+    // =================================================
+
+    const [isLoggedIn, setIsLoggedIn] =
+        useState(() =>
+            Boolean(
+                localStorage.getItem("token")
+            )
+        );
+
+
+    const [loginOpen, setLoginOpen] =
+        useState(false);
+
+
+    // =================================================
+    // CART STATES
+    // =================================================
+
+    const [cartOpen, setCartOpen] =
+        useState(false);
+
+
+    const [cartItems, setCartItems] =
+        useState(() => {
+            try {
+                const cartKey =
+                    getCartKey();
+
+                return JSON.parse(
+                    localStorage.getItem(
+                        cartKey
+                    ) || "[]"
+                );
+            } catch {
+                return [];
+            }
+        });
+
+
+    // =================================================
     // PRODUCTS FROM REDUX
-    const {
-        products: productData = [],
-    } = useSelector((state) => state.product);
+    // =================================================
 
-
-    const products = useMemo(() => (
-        Array.isArray(productData)
-            ? productData
-            : productData?.products || []
-    ), [productData]);
-
-
-    const cartItemCount = cartItems.reduce(
-        (total, item) =>
-            total + (Number(item.quantity) || 1),
-        0
+    const productData = useSelector(
+        (state) =>
+            state.product?.products
     );
 
 
-    const isMenuOpen = Boolean(anchorEl);
+    const products = useMemo(() => {
+        return Array.isArray(productData)
+            ? productData
+            : productData?.products || [];
+    }, [productData]);
+
+
+    // =================================================
+    // CART COUNT
+    // =================================================
+
+    const cartItemCount =
+        cartItems.reduce(
+            (total, item) =>
+                total +
+                (Number(
+                    item.quantity
+                ) || 1),
+            0
+        );
+
+
+    // =================================================
+    // MENU STATUS
+    // =================================================
+
+    const isMenuOpen =
+        Boolean(anchorEl);
 
     const isMobileMenuOpen =
-        Boolean(mobileMoreAnchorEl);
+        Boolean(
+            mobileMoreAnchorEl
+        );
 
 
-    // FETCH PRODUCTS FOR SEARCH
+    // =================================================
+    // FETCH PRODUCTS
+    // =================================================
+
     useEffect(() => {
         if (!products.length) {
-            dispatch(getProductsDataActionInitiate());
+            dispatch(
+                getProductsDataActionInitiate()
+            );
         }
-    }, [dispatch, products.length]);
+    }, [
+        dispatch,
+        products.length,
+    ]);
 
 
+    // =================================================
     // SEARCH RESULTS
+    // =================================================
+
     const searchResults = useMemo(() => {
-        const search = searchInput
-            .trim()
-            .toLowerCase();
+        const search =
+            searchInput
+                .trim()
+                .toLowerCase();
 
         if (!search) {
             return [];
@@ -238,33 +401,44 @@ function NavBar() {
 
         return products
             .filter((product) => {
-                const name = String(
-                    product?.name || ""
-                ).toLowerCase();
-
-                const heading = String(
-                    product?.heading || ""
-                ).toLowerCase();
-
-                const category = String(
-                    product?.category || ""
-                ).toLowerCase();
-
-                const description = String(
-                    product?.description || ""
-                ).toLowerCase();
-
-                const netContent = String(
-                    product?.net_content || ""
-                ).toLowerCase();
-
-                const benefits = Array.isArray(
-                    product?.benefits
-                )
-                    ? product.benefits.join(" ").toLowerCase()
-                    : String(
-                        product?.benefits || ""
+                const name =
+                    String(
+                        product?.name || ""
                     ).toLowerCase();
+
+                const heading =
+                    String(
+                        product?.heading || ""
+                    ).toLowerCase();
+
+                const category =
+                    String(
+                        product?.category || ""
+                    ).toLowerCase();
+
+                const description =
+                    String(
+                        product?.description ||
+                            ""
+                    ).toLowerCase();
+
+                const netContent =
+                    String(
+                        product?.net_content ||
+                            ""
+                    ).toLowerCase();
+
+                const benefits =
+                    Array.isArray(
+                        product?.benefits
+                    )
+                        ? product.benefits
+                              .join(" ")
+                              .toLowerCase()
+                        : String(
+                              product?.benefits ||
+                                  ""
+                          ).toLowerCase();
 
                 return (
                     name.includes(search) ||
@@ -276,156 +450,261 @@ function NavBar() {
                 );
             })
             .slice(0, 6);
-    }, [products, searchInput]);
+    }, [
+        products,
+        searchInput,
+    ]);
 
+
+    // =================================================
+    // TOP BANNER ROTATION
+    // =================================================
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentText(
-                (prev) =>
-                    (prev + 1) % bannerTexts.length
-            );
-        }, 3000);
+        const interval =
+            setInterval(() => {
+                setCurrentText(
+                    (prev) =>
+                        (prev + 1) %
+                        bannerTexts.length
+                );
+            }, 3000);
 
-        return () => clearInterval(interval);
+        return () =>
+            clearInterval(interval);
     }, []);
 
 
+    // =================================================
+    // SEARCH PLACEHOLDER ANIMATION
+    // =================================================
+
     useEffect(() => {
         const text =
-            searchPlaceholders[currentSearch];
+            searchPlaceholders[
+                currentSearch
+            ];
 
         let index = 0;
+
         let deleting = false;
 
         let typingInterval;
+
         let deleteInterval;
+
         let waitTimeout;
 
 
-        // First clear old text
         setSearchText("");
 
 
-        // Type letters one by one
-        typingInterval = setInterval(() => {
-            if (!deleting) {
-                index++;
+        typingInterval =
+            setInterval(() => {
+                if (!deleting) {
+                    index++;
 
-                setSearchText(
-                    text.slice(0, index)
-                );
+                    setSearchText(
+                        text.slice(
+                            0,
+                            index
+                        )
+                    );
 
+                    if (
+                        index ===
+                        text.length
+                    ) {
+                        clearInterval(
+                            typingInterval
+                        );
 
-                // Full word typed
-                if (index === text.length) {
-                    clearInterval(typingInterval);
+                        waitTimeout =
+                            setTimeout(
+                                () => {
+                                    deleting =
+                                        true;
 
+                                    deleteInterval =
+                                        setInterval(
+                                            () => {
+                                                index--;
 
-                    // Wait 3 seconds
-                    waitTimeout = setTimeout(() => {
-                        deleting = true;
+                                                setSearchText(
+                                                    text.slice(
+                                                        0,
+                                                        index
+                                                    )
+                                                );
 
+                                                if (
+                                                    index ===
+                                                    0
+                                                ) {
+                                                    clearInterval(
+                                                        deleteInterval
+                                                    );
 
-                        // Delete letters one by one
-                        deleteInterval = setInterval(() => {
-                            index--;
-
-                            setSearchText(
-                                text.slice(0, index)
+                                                    setCurrentSearch(
+                                                        (
+                                                            prev
+                                                        ) =>
+                                                            (
+                                                                prev +
+                                                                1
+                                                            ) %
+                                                            searchPlaceholders.length
+                                                    );
+                                                }
+                                            },
+                                            80
+                                        );
+                                },
+                                3000
                             );
-
-
-                            // Full word deleted
-                            if (index === 0) {
-                                clearInterval(
-                                    deleteInterval
-                                );
-
-                                setCurrentSearch(
-                                    (prev) =>
-                                        (prev + 1) %
-                                        searchPlaceholders.length
-                                );
-                            }
-                        }, 80);
-                    }, 3000);
+                    }
                 }
-            }
-        }, 100);
+            }, 100);
 
 
-        // Cleanup
         return () => {
-            clearInterval(typingInterval);
-            clearInterval(deleteInterval);
-            clearTimeout(waitTimeout);
+            clearInterval(
+                typingInterval
+            );
+
+            clearInterval(
+                deleteInterval
+            );
+
+            clearTimeout(
+                waitTimeout
+            );
         };
     }, [currentSearch]);
 
 
-    const handleProfileMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // =================================================
+    // MENU HANDLERS
+    // =================================================
+
+    const handleProfileMenuOpen =
+        (event) => {
+            setAnchorEl(
+                event.currentTarget
+            );
+        };
 
 
-    const handleMobileMenuClose = () => {
-        setMobileMoreAnchorEl(null);
-    };
+    const handleMobileMenuClose =
+        () => {
+            setMobileMoreAnchorEl(
+                null
+            );
+        };
 
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+
         handleMobileMenuClose();
     };
 
 
-    const handleMobileMenuOpen = (event) => {
-        setMobileMoreAnchorEl(
-            event.currentTarget
-        );
-    };
+    const handleMobileMenuOpen =
+        (event) => {
+            setMobileMoreAnchorEl(
+                event.currentTarget
+            );
+        };
 
+
+    // =================================================
+    // LOGIN
+    // =================================================
 
     const handleLogin = () => {
         handleMenuClose();
+
         setLoginOpen(true);
     };
 
 
+    // =================================================
+    // PROFILE
+    // =================================================
+
     const handleMyProfile = () => {
         handleMenuClose();
+
         navigate("/ProfilePage");
     };
 
 
+    // =================================================
+    // LOGOUT
+    // =================================================
+
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        localStorage.removeItem(
+            "token"
+        );
+
+        localStorage.removeItem(
+            "user"
+        );
 
         setIsLoggedIn(false);
+
+
+        const guestCart =
+            JSON.parse(
+                localStorage.getItem(
+                    GUEST_CART_KEY
+                ) || "[]"
+            );
+
+        setCartItems(
+            guestCart
+        );
+
 
         handleMenuClose();
 
         navigate("/");
 
-        toast.success("Logout Successfully");
+        toast.success(
+            "Logout Successfully"
+        );
     };
 
+
+    // =================================================
+    // LOGIN CLOSE
+    // =================================================
 
     const handleLoginClose = () => {
         setLoginOpen(false);
     };
 
 
+    // =================================================
+    // SYNC CART
+    // =================================================
+
     const syncCartItems = () => {
         try {
-            setCartItems(
+            const cartKey =
+                getCartKey();
+
+            const savedCart =
                 JSON.parse(
                     localStorage.getItem(
-                        "mamaearth_cart"
+                        cartKey
                     ) || "[]"
-                )
+                );
+
+            setCartItems(
+                savedCart
             );
         } catch {
             setCartItems([]);
@@ -433,16 +712,29 @@ function NavBar() {
     };
 
 
+    // =================================================
+    // CART EVENTS
+    // =================================================
+
     useEffect(() => {
-        const handleCartUpdate = () => {
-            syncCartItems();
-        };
+        const handleCartUpdate =
+            () => {
+                syncCartItems();
+            };
 
 
-        const handleCartOpen = () => {
-            syncCartItems();
-            setCartOpen(true);
-        };
+        const handleCartOpen =
+            () => {
+                syncCartItems();
+
+                setCartOpen(true);
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "cart:open"
+                    )
+                );
+            };
 
 
         window.addEventListener(
@@ -470,37 +762,64 @@ function NavBar() {
     }, []);
 
 
+    // =================================================
+    // CART OPEN
+    // =================================================
+
     const handleCartOpen = () => {
         syncCartItems();
+
         setCartOpen(true);
     };
 
 
+    // =================================================
+    // LOGIN SUCCESS
+    // =================================================
+
     const handleLoginSuccess = () => {
         setIsLoggedIn(true);
+
         setLoginOpen(false);
+
+        syncCartItems();
     };
 
 
-    // SEARCH RESULT CLICK
-    const handleSearchProductClick = (product) => {
-        setSearchInput("");
-        navigate(`/products/${product.id}`);
-    };
+    // =================================================
+    // SEARCH PRODUCT CLICK
+    // =================================================
 
+    const handleSearchProductClick =
+        (product) => {
+            setSearchInput("");
 
-    // ENTER KEY SEARCH
-    const handleSearchKeyDown = (event) => {
-        if (
-            event.key === "Enter" &&
-            searchResults.length > 0
-        ) {
-            handleSearchProductClick(
-                searchResults[0]
+            navigate(
+                `/products/${product.id}`
             );
-        }
-    };
+        };
 
+
+    // =================================================
+    // ENTER SEARCH
+    // =================================================
+
+    const handleSearchKeyDown =
+        (event) => {
+            if (
+                event.key === "Enter" &&
+                searchResults.length > 0
+            ) {
+                handleSearchProductClick(
+                    searchResults[0]
+                );
+            }
+        };
+
+
+    // =================================================
+    // MENU IDS
+    // =================================================
 
     const menuId =
         "primary-search-account-menu";
@@ -508,6 +827,10 @@ function NavBar() {
     const mobileMenuId =
         "primary-search-account-menu-mobile";
 
+
+    // =================================================
+    // DESKTOP MENU
+    // =================================================
 
     const renderMenu = (
         <Menu
@@ -523,10 +846,16 @@ function NavBar() {
             id={menuId}
             keepMounted
             open={isMenuOpen}
-            onClose={handleMenuClose}
+            onClose={
+                handleMenuClose
+            }
         >
             {!isLoggedIn && (
-                <MenuItem onClick={handleLogin}>
+                <MenuItem
+                    onClick={
+                        handleLogin
+                    }
+                >
                     Login
                 </MenuItem>
             )}
@@ -535,14 +864,17 @@ function NavBar() {
             {isLoggedIn && (
                 <>
                     <MenuItem
-                        onClick={handleMyProfile}
+                        onClick={
+                            handleMyProfile
+                        }
                     >
                         My Profile
                     </MenuItem>
 
-
                     <MenuItem
-                        onClick={handleLogout}
+                        onClick={
+                            handleLogout
+                        }
                     >
                         Logout
                     </MenuItem>
@@ -552,9 +884,15 @@ function NavBar() {
     );
 
 
+    // =================================================
+    // MOBILE MENU
+    // =================================================
+
     const renderMobileMenu = (
         <Menu
-            anchorEl={mobileMoreAnchorEl}
+            anchorEl={
+                mobileMoreAnchorEl
+            }
             anchorOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -565,11 +903,19 @@ function NavBar() {
                 vertical: "top",
                 horizontal: "right",
             }}
-            open={isMobileMenuOpen}
-            onClose={handleMobileMenuClose}
+            open={
+                isMobileMenuOpen
+            }
+            onClose={
+                handleMobileMenuClose
+            }
         >
             {!isLoggedIn && (
-                <MenuItem onClick={handleLogin}>
+                <MenuItem
+                    onClick={
+                        handleLogin
+                    }
+                >
                     <IconButton
                         size="large"
                         color="inherit"
@@ -587,7 +933,9 @@ function NavBar() {
             {isLoggedIn && (
                 <>
                     <MenuItem
-                        onClick={handleMyProfile}
+                        onClick={
+                            handleMyProfile
+                        }
                     >
                         <IconButton
                             size="large"
@@ -603,7 +951,9 @@ function NavBar() {
 
 
                     <MenuItem
-                        onClick={handleLogout}
+                        onClick={
+                            handleLogout
+                        }
                     >
                         <IconButton
                             size="large"
@@ -622,19 +972,30 @@ function NavBar() {
     );
 
 
-    return (
-        <Box sx={{ flexGrow: 1 }}>
+    // =================================================
+    // UI
+    // =================================================
 
+    return (
+        <Box
+            sx={{
+                flexGrow: 1,
+            }}
+        >
 
             {/* TOP BANNER */}
+
             <Box
                 sx={{
                     width: "100%",
                     height: "48px",
-                    backgroundColor: Colors.blue,
+                    backgroundColor:
+                        Colors.blue,
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    alignItems:
+                        "center",
+                    justifyContent:
+                        "center",
                     overflow: "hidden",
                     px: 2,
                 }}
@@ -648,16 +1009,23 @@ function NavBar() {
                             md: "16px",
                         },
                         fontWeight: 500,
-                        textAlign: "center",
-                        whiteSpace: "nowrap",
+                        textAlign:
+                            "center",
+                        whiteSpace:
+                            "nowrap",
                     }}
                 >
-                    {bannerTexts[currentText]}
+                    {
+                        bannerTexts[
+                            currentText
+                        ]
+                    }
                 </Typography>
             </Box>
 
 
             {/* NAVBAR */}
+
             <AppBar
                 position="static"
                 sx={{
@@ -688,8 +1056,8 @@ function NavBar() {
                     }}
                 >
 
-
                     {/* LOGO */}
+
                     <Box
                         component="img"
                         src="/images/Logo.webp"
@@ -703,20 +1071,27 @@ function NavBar() {
                                 sm: 140,
                                 md: 160,
                             },
+
                             height: "auto",
+
                             display: "block",
+
                             flexShrink: 0,
+
                             mr: {
                                 xs: 0,
                                 sm: 1,
                                 md: 2,
                             },
-                            cursor: "pointer",
+
+                            cursor:
+                                "pointer",
                         }}
                     />
 
 
                     {/* SEARCH */}
+
                     <Search
                         sx={{
                             flexGrow: 1,
@@ -748,39 +1123,56 @@ function NavBar() {
 
                             height: "50px",
 
-                            backgroundColor: Colors.background,
+                            backgroundColor:
+                                Colors.background,
 
-                            color: Colors.black,
+                            color:
+                                Colors.black,
 
-                            border: "1px solid #8e7373",
+                            border:
+                                "1px solid #8e7373",
 
                             borderRadius: 8,
 
-                            position: "relative",
+                            position:
+                                "relative",
 
                             display: "flex",
-                            alignItems: "center",
+
+                            alignItems:
+                                "center",
                         }}
                     >
+
                         {/* SEARCH ICON */}
+
                         <SearchIconWrapper>
                             <SearchIcon />
                         </SearchIconWrapper>
 
+
                         {/* SEARCH INPUT */}
+
                         <StyledInputBase
-                            value={searchInput}
+                            value={
+                                searchInput
+                            }
                             placeholder={
                                 searchInput
                                     ? ""
                                     : searchText
                             }
                             inputProps={{
-                                "aria-label": "search",
+                                "aria-label":
+                                    "search",
                             }}
-                            onChange={(event) =>
+                            onChange={(
+                                event
+                            ) =>
                                 setSearchInput(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             onKeyDown={
@@ -788,42 +1180,53 @@ function NavBar() {
                             }
                         />
 
+
                         {/* SEARCH RESULTS */}
+
                         {searchInput.trim() && (
                             <Box
                                 sx={{
-                                    position: "absolute",
+                                    position:
+                                        "absolute",
 
                                     top: "calc(100% + 8px)",
 
-                                    // Mobile lo search box ni konchem wider cheyyadaniki
                                     width: {
                                         xs: "calc(100vw - 20px)",
                                         sm: "100%",
                                     },
+
                                     left: {
                                         xs: "25%",
                                         sm: 0,
                                     },
+
                                     transform: {
                                         xs: "translateX(-50%)",
                                         sm: "none",
                                     },
+
                                     right: {
                                         xs: "auto",
                                         sm: 0,
                                     },
+
                                     mr: 0,
-                                    backgroundColor: Colors.background,
 
-                                    color: Colors.black,
+                                    backgroundColor:
+                                        Colors.background,
 
-                                    borderRadius: 1.5,
+                                    color:
+                                        Colors.black,
+
+                                    borderRadius:
+                                        1.5,
 
                                     boxShadow:
                                         "0 4px 15px rgba(0,0,0,0.18)",
 
-                                    border: "1px solid #e5e5e5",
+                                    border:
+                                        "1px solid #e5e5e5",
 
                                     zIndex: 1500,
 
@@ -832,151 +1235,189 @@ function NavBar() {
                                         sm: 420,
                                     },
 
-                                    overflowY: "auto",
+                                    overflowY:
+                                        "auto",
 
-                                    boxSizing: "border-box",
+                                    boxSizing:
+                                        "border-box",
                                 }}
                             >
-                                {searchResults.length > 0 ? (
-                                    searchResults.map((product) => {
-                                        const image =
-                                            getProductImage(product);
+                                {searchResults.length >
+                                0 ? (
+                                    searchResults.map(
+                                        (
+                                            product
+                                        ) => {
+                                            const image =
+                                                getProductImage(
+                                                    product
+                                                );
 
-                                        const price =
-                                            product?.sale_price ||
-                                            product?.price ||
-                                            0;
+                                            const price =
+                                                product?.sale_price ||
+                                                product?.price ||
+                                                0;
 
-                                        return (
-                                            <Box
-                                                key={product.id}
-                                                onClick={() =>
-                                                    handleSearchProductClick(
-                                                        product
-                                                    )
-                                                }
-                                                sx={{
-                                                    display: "flex",
-
-                                                    alignItems:
-                                                        "center",
-
-                                                    gap: 1.5,
-
-                                                    p: 1.2,
-
-                                                    cursor: "pointer",
-
-                                                    borderBottom:
-                                                        "1px solid #eeeeee",
-
-                                                    "&:hover": {
-                                                        backgroundColor:
-                                                            Colors.background,
-                                                    },
-                                                }}
-                                            >
-                                                {/* PRODUCT IMAGE */}
+                                            return (
                                                 <Box
-                                                    component="img"
-                                                    src={image}
-                                                    alt={
-                                                        product?.name ||
-                                                        "Product"
+                                                    key={
+                                                        product.id
+                                                    }
+                                                    onClick={() =>
+                                                        handleSearchProductClick(
+                                                            product
+                                                        )
                                                     }
                                                     sx={{
-                                                        width: 58,
-                                                        height: 58,
+                                                        display:
+                                                            "flex",
 
-                                                        objectFit:
-                                                            "contain",
+                                                        alignItems:
+                                                            "center",
 
-                                                        borderRadius: 1,
+                                                        gap: 1.5,
 
-                                                        border:
+                                                        p: 1.2,
+
+                                                        cursor:
+                                                            "pointer",
+
+                                                        borderBottom:
                                                             "1px solid #eeeeee",
 
-                                                        flexShrink: 0,
-
-                                                        backgroundColor: Colors.background,
-
-                                                    }}
-                                                />
-
-                                                {/* PRODUCT DETAILS */}
-                                                <Box
-                                                    sx={{
-                                                        minWidth: 0,
-                                                        flex: 1,
+                                                        "&:hover":
+                                                            {
+                                                                backgroundColor:
+                                                                    Colors.background,
+                                                            },
                                                     }}
                                                 >
-                                                    <Typography
+
+                                                    {/* PRODUCT IMAGE */}
+
+                                                    <Box
+                                                        component="img"
+                                                        src={
+                                                            image
+                                                        }
+                                                        alt={
+                                                            product?.name ||
+                                                            "Product"
+                                                        }
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        width="58"
+                                                        height="58"
                                                         sx={{
-                                                            ...Theme.font14Bold,
-                                                            lineHeight: 1.3,
+                                                            width: 58,
+                                                            height: 58,
+                                                            objectFit:
+                                                                "contain",
+                                                            borderRadius:
+                                                                1,
+                                                            border:
+                                                                "1px solid #eeeeee",
+                                                            flexShrink:
+                                                                0,
+                                                            backgroundColor:
+                                                                Colors.background,
+                                                        }}
+                                                    />
 
-                                                            overflow: "hidden",
 
-                                                            textOverflow:
-                                                                "ellipsis",
+                                                    {/* PRODUCT DETAILS */}
 
-                                                            display:
-                                                                "-webkit-box",
-
-                                                            WebkitLineClamp: 2,
-
-                                                            WebkitBoxOrient:
-                                                                "vertical",
+                                                    <Box
+                                                        sx={{
+                                                            minWidth:
+                                                                0,
+                                                            flex: 1,
                                                         }}
                                                     >
-                                                        {product?.heading ||
-                                                            product?.name ||
-                                                            "Product"}
-                                                    </Typography>
+                                                        <Typography
+                                                            sx={{
+                                                                ...Theme.font14Bold,
+
+                                                                lineHeight:
+                                                                    1.3,
+
+                                                                overflow:
+                                                                    "hidden",
+
+                                                                textOverflow:
+                                                                    "ellipsis",
+
+                                                                display:
+                                                                    "-webkit-box",
+
+                                                                WebkitLineClamp:
+                                                                    2,
+
+                                                                WebkitBoxOrient:
+                                                                    "vertical",
+                                                            }}
+                                                        >
+                                                            {
+                                                                product?.heading ||
+                                                                product?.name ||
+                                                                "Product"
+                                                            }
+                                                        </Typography>
+
+
+                                                        <Typography
+                                                            sx={{
+                                                                ...Theme.font14Bold,
+
+                                                                mt: 0.5,
+
+                                                                color:
+                                                                    Colors.blue,
+                                                            }}
+                                                        >
+                                                            ₹
+                                                            {Number(
+                                                                price
+                                                            ).toFixed(
+                                                                2
+                                                            )}
+                                                        </Typography>
+                                                    </Box>
+
+
+                                                    {/* VIEW */}
 
                                                     <Typography
                                                         sx={{
-                                                            ...Theme.font14Bold,
-
-                                                            mt: 0.5,
+                                                            fontSize: 12,
 
                                                             color:
-                                                                Colors.blue,
+                                                                "#777",
+
+                                                            flexShrink:
+                                                                0,
                                                         }}
                                                     >
-                                                        ₹
-                                                        {Number(
-                                                            price
-                                                        ).toFixed(2)}
+                                                        View
                                                     </Typography>
+
                                                 </Box>
-
-                                                {/* VIEW */}
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: 12,
-
-                                                        color: "#777",
-
-                                                        flexShrink: 0,
-                                                    }}
-                                                >
-                                                    View
-                                                </Typography>
-                                            </Box>
-                                        );
-                                    })
+                                            );
+                                        }
+                                    )
                                 ) : (
                                     <Box
                                         sx={{
                                             p: 2,
-                                            textAlign: "center",
+                                            textAlign:
+                                                "center",
                                         }}
                                     >
                                         <Typography
                                             sx={{
                                                 fontSize: 14,
-                                                color: "#777",
+                                                color:
+                                                    "#777",
                                             }}
                                         >
                                             No products found
@@ -985,10 +1426,12 @@ function NavBar() {
                                 )}
                             </Box>
                         )}
+
                     </Search>
 
 
                     {/* DESKTOP PROFILE + CART */}
+
                     <Box
                         sx={{
                             display: {
@@ -996,7 +1439,8 @@ function NavBar() {
                                 sm: "flex",
                             },
 
-                            alignItems: "center",
+                            alignItems:
+                                "center",
 
                             ml: {
                                 sm: "auto",
@@ -1004,8 +1448,8 @@ function NavBar() {
                         }}
                     >
 
-
                         {/* PROFILE */}
+
                         <IconButton
                             size="large"
                             aria-label="account"
@@ -1017,7 +1461,8 @@ function NavBar() {
                                 handleProfileMenuOpen
                             }
                             sx={{
-                                color: "#333333",
+                                color:
+                                    "#333333",
                             }}
                         >
                             <AccountCircle />
@@ -1031,6 +1476,7 @@ function NavBar() {
 
 
                         {/* CART */}
+
                         <IconButton
                             size="large"
                             aria-label="shopping cart"
@@ -1038,7 +1484,8 @@ function NavBar() {
                                 handleCartOpen
                             }
                             sx={{
-                                color: "#333333",
+                                color:
+                                    "#333333",
                                 position:
                                     "relative",
                             }}
@@ -1050,20 +1497,22 @@ function NavBar() {
                                 color="error"
                                 sx={{
                                     "& .MuiBadge-badge":
-                                    {
-                                        fontSize: 10,
-                                        minWidth: 18,
-                                        height: 18,
-                                    },
+                                        {
+                                            fontSize: 10,
+                                            minWidth: 18,
+                                            height: 18,
+                                        },
                                 }}
                             >
                                 <ShoppingCartIcon />
                             </Badge>
                         </IconButton>
+
                     </Box>
 
 
                     {/* MOBILE MENU */}
+
                     <Box
                         sx={{
                             display: {
@@ -1071,7 +1520,8 @@ function NavBar() {
                                 sm: "none",
                             },
 
-                            marginLeft: "auto",
+                            marginLeft:
+                                "auto",
                         }}
                     >
                         <IconButton
@@ -1085,41 +1535,56 @@ function NavBar() {
                                 handleMobileMenuOpen
                             }
                             sx={{
-                                color: "#333333",
+                                color:
+                                    "#333333",
                             }}
                         >
                             <MoreIcon />
                         </IconButton>
                     </Box>
 
-
                 </Toolbar>
             </AppBar>
 
 
             {/* MENUS */}
+
             {renderMobileMenu}
 
             {renderMenu}
 
 
-            {/* CART */}
-            <CartPage
-                open={cartOpen}
-                onClose={() =>
-                    setCartOpen(false)
-                }
-            />
+            {/* CART - LOAD ONLY WHEN OPEN */}
+
+            {cartOpen && (
+                <Suspense fallback={null}>
+                    <CartPage
+                        open={cartOpen}
+                        onClose={() =>
+                            setCartOpen(
+                                false
+                            )
+                        }
+                    />
+                </Suspense>
+            )}
 
 
-            {/* LOGIN POPUP */}
-            <Login
-                open={loginOpen}
-                onClose={handleLoginClose}
-                onLoginSuccess={
-                    handleLoginSuccess
-                }
-            />
+            {/* LOGIN - LOAD ONLY WHEN OPEN */}
+
+            {loginOpen && (
+                <Suspense fallback={null}>
+                    <Login
+                        open={loginOpen}
+                        onClose={
+                            handleLoginClose
+                        }
+                        onLoginSuccess={
+                            handleLoginSuccess
+                        }
+                    />
+                </Suspense>
+            )}
 
         </Box>
     );

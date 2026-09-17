@@ -1,4 +1,6 @@
+
 import React, {
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -25,39 +27,492 @@ import {
 
 import ProductCards from "./ProductCards";
 
-import { Theme } from "../themes/GlobalStyles";
+import {
+  Theme,
+} from "../themes/GlobalStyles";
+
 import Colors from "../themes/colors";
 
 
+// ========================================
+// NORMALIZE CATEGORY
+// ========================================
+
+const normalizeCategory = (
+  category = ""
+) =>
+  String(category)
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+
+
+// ========================================
+// BABY CATEGORY MAP
+// ========================================
+
+const BABY_CATEGORY_MAP = {
+  shampoo: [
+    "babyshampoo",
+  ],
+
+  babyshampoo: [
+    "babyshampoo",
+  ],
+
+  babywash: [
+    "babywash",
+  ],
+
+  babysoap: [
+    "babysoap",
+  ],
+
+  babycream: [
+    "babycream",
+  ],
+
+  bodylotion: [
+    "bodylotion",
+  ],
+
+  babyoil: [
+    "babyoil",
+  ],
+
+  diaper: [
+    "diaper",
+  ],
+
+  babycare: [
+    "babycare",
+  ],
+};
+
+
+// ========================================
+// GET PRODUCT CATEGORY
+// ========================================
+
+const getProductCategory = (
+  product
+) => {
+
+  if (
+    typeof product?.category ===
+    "string"
+  ) {
+    return normalizeCategory(
+      product.category
+    );
+  }
+
+
+  if (
+    product?.category &&
+    typeof product.category ===
+      "object"
+  ) {
+
+    return normalizeCategory(
+      product.category.name ||
+        product.category.heading ||
+        product.category.title ||
+        ""
+    );
+  }
+
+
+  if (
+    typeof product?.category_name ===
+    "string"
+  ) {
+    return normalizeCategory(
+      product.category_name
+    );
+  }
+
+
+  return "";
+};
+
+
+// ========================================
+// CATEGORY ITEM
+// ========================================
+
+const CategoryItem = memo(
+  function CategoryItem({
+    item,
+    selectedCategory,
+    onClick,
+    mobile = false,
+  }) {
+
+    const categoryName =
+      item?.heading?.trim() || "";
+
+
+    const normalizedCategoryName =
+      useMemo(
+        () =>
+          normalizeCategory(
+            categoryName
+          ),
+        [categoryName]
+      );
+
+
+    const normalizedSelectedCategory =
+      useMemo(
+        () =>
+          normalizeCategory(
+            selectedCategory
+          ),
+        [selectedCategory]
+      );
+
+
+    const isSelected =
+      normalizedSelectedCategory ===
+      normalizedCategoryName;
+
+
+    const handleClick =
+      useCallback(() => {
+
+        onClick(categoryName);
+
+      }, [
+        onClick,
+        categoryName,
+      ]);
+
+
+    return (
+      <Box
+        onClick={handleClick}
+        sx={{
+          display: "flex",
+
+          flexDirection:
+            "column",
+
+          alignItems:
+            "center",
+
+          justifyContent:
+            "center",
+
+          flexShrink: 0,
+
+          cursor:
+            "pointer",
+
+          ...(mobile
+            ? {
+                minWidth:
+                  "75px",
+
+                padding:
+                  "8px",
+              }
+            : {
+                width: 70,
+
+                minHeight:
+                  30,
+
+                py: 0,
+
+                px: 0,
+              }),
+
+          borderRadius:
+            "10px",
+
+          backgroundColor:
+            isSelected
+              ? Colors.background
+              : "transparent",
+
+          transition:
+            "background-color 0.3s ease",
+
+          "&:hover": {
+            backgroundColor:
+              Colors.background,
+          },
+        }}
+      >
+
+        {/* CATEGORY IMAGE */}
+
+        <Box
+          component="span"
+          role="img"
+          aria-label={
+            categoryName ||
+            "Category"
+          }
+          sx={{
+            display:
+              "block",
+
+            width: mobile
+              ? 42
+              : {
+                  sm: "32px",
+                  md: "36px",
+                },
+
+            height: mobile
+              ? 42
+              : {
+                  sm: "32px",
+                  md: "36px",
+                },
+
+            backgroundColor:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            WebkitMaskImage:
+              `url(${item?.image_url})`,
+
+            maskImage:
+              `url(${item?.image_url})`,
+
+            WebkitMaskRepeat:
+              "no-repeat",
+
+            maskRepeat:
+              "no-repeat",
+
+            WebkitMaskPosition:
+              "center",
+
+            maskPosition:
+              "center",
+
+            WebkitMaskSize:
+              "contain",
+
+            maskSize:
+              "contain",
+
+            transition:
+              "background-color 0.3s ease",
+          }}
+        />
+
+
+        {/* CATEGORY NAME */}
+
+        <Typography
+          sx={{
+            mt: mobile
+              ? 1
+              : 0.5,
+
+            textAlign:
+              "center",
+
+            whiteSpace:
+              "nowrap",
+
+            fontSize:
+              Theme.font12Regular,
+
+            color:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            fontWeight:
+              isSelected
+                ? 600
+                : 400,
+
+            transition:
+              "color 0.3s ease",
+          }}
+        >
+          {categoryName}
+        </Typography>
+
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// CATEGORY LIST
+// ========================================
+
+const CategoryList = memo(
+  function CategoryList({
+    categories,
+    selectedCategory,
+    onCategoryClick,
+    mobile = false,
+  }) {
+
+    return (
+      <Box
+        sx={{
+          display: mobile
+            ? {
+                xs: "flex",
+                sm: "none",
+              }
+            : {
+                xs: "none",
+                sm: "flex",
+              },
+
+          width:
+            "100%",
+
+          ...(mobile
+            ? {
+                overflowX:
+                  "auto",
+
+                overflowY:
+                  "hidden",
+
+                gap: 2,
+
+                pb: 2,
+
+                mt: 3,
+              }
+            : {
+                justifyContent:
+                  "center",
+
+                alignItems:
+                  "center",
+
+                gap: {
+                  sm: 2,
+                  md: 3,
+                  lg: 4,
+                },
+
+                overflowX:
+                  "auto",
+
+                overflowY:
+                  "hidden",
+
+                pb: 1,
+
+                mt: 3,
+              }),
+
+          WebkitOverflowScrolling:
+            "touch",
+
+          "&::-webkit-scrollbar": {
+            display:
+              "none",
+          },
+
+          msOverflowStyle:
+            "none",
+
+          scrollbarWidth:
+            "none",
+        }}
+      >
+
+        {categories.map(
+          (item) => (
+
+            <CategoryItem
+              key={item.id}
+
+              item={item}
+
+              selectedCategory={
+                selectedCategory
+              }
+
+              onClick={
+                onCategoryClick
+              }
+
+              mobile={mobile}
+            />
+
+          )
+        )}
+
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// MAIN COMPONENT
+// ========================================
+
 function OurBabyBestsellers() {
 
-  const dispatch = useDispatch();
+  const dispatch =
+    useDispatch();
 
 
   // ========================================
-  // CATEGORY DATA
+  // CONTENT SELECTORS
   // ========================================
 
-  const {
-    OurBabyBestsellersImages,
-    loading: contentLoading,
-    error: contentError,
-  } = useSelector(
-    (state) => state.content
-  );
+  const OurBabyBestsellersImages =
+    useSelector(
+      (state) =>
+        state.content
+          ?.OurBabyBestsellersImages
+    );
+
+  const contentLoading =
+    useSelector(
+      (state) =>
+        state.content?.loading
+    );
+
+  const contentError =
+    useSelector(
+      (state) =>
+        state.content?.error
+    );
 
 
   // ========================================
-  // PRODUCT DATA
+  // PRODUCT SELECTORS
   // ========================================
 
-  const {
-    products: productData,
-    loading: productLoading,
-    error: productError,
-  } = useSelector(
-    (state) => state.product
-  );
+  const productData =
+    useSelector(
+      (state) =>
+        state.product?.products
+    );
+
+  const productLoading =
+    useSelector(
+      (state) =>
+        state.product?.loading
+    );
+
+  const productError =
+    useSelector(
+      (state) =>
+        state.product?.error
+    );
 
 
   // ========================================
@@ -67,7 +522,9 @@ function OurBabyBestsellers() {
   const [
     selectedCategory,
     setSelectedCategory,
-  ] = useState("Baby Wash");
+  ] = useState(
+    "Baby Wash"
+  );
 
 
   // ========================================
@@ -91,124 +548,57 @@ function OurBabyBestsellers() {
   // NORMALIZE PRODUCTS
   // ========================================
 
-  const products = useMemo(() => {
+  const products =
+    useMemo(() => {
 
-    if (Array.isArray(productData)) {
-      return productData;
-    }
-
-    if (
-      productData &&
-      Array.isArray(productData.products)
-    ) {
-      return productData.products;
-    }
-
-    if (
-      productData &&
-      productData.data &&
-      Array.isArray(productData.data.products)
-    ) {
-      return productData.data.products;
-    }
-
-    return [];
-
-  }, [productData]);
+      if (
+        Array.isArray(productData)
+      ) {
+        return productData;
+      }
 
 
-  // ========================================
-  // NORMALIZE CATEGORY
-  // ========================================
-
-  const normalizeCategory = (
-    category = ""
-  ) => {
-
-    return String(category)
-      .trim()
-      .toLowerCase()
-      .replace(/[\s_-]+/g, "");
-
-  };
+      if (
+        productData &&
+        Array.isArray(
+          productData.products
+        )
+      ) {
+        return productData.products;
+      }
 
 
-  // ========================================
-  // BABY CATEGORY MAP
-  // ========================================
+      if (
+        productData?.data &&
+        Array.isArray(
+          productData.data.products
+        )
+      ) {
+        return productData.data.products;
+      }
 
-  /*
-    IMPORTANT:
 
-    Content heading -> Database category
+      return [];
 
-    Shampoo      -> Baby Shampoo
-    Baby Shampoo -> Baby Shampoo
-    Baby Wash    -> Baby Wash
-    Baby Soap    -> Baby Soap
-    Baby Cream   -> Baby Cream
-    Baby Lotion  -> Baby Lotion
-    Baby Oil     -> Baby Oil
-    Diaper       -> Diaper
-    Baby Care    -> Baby Care
-  */
-
-  const babyCategoryMap = useMemo(() => ({
-
-    // Image heading "Shampoo"
-    // should show ONLY "Baby Shampoo"
-    shampoo: [
-      "babyshampoo",
-    ],
-
-    // If image heading is "Baby Shampoo"
-    babyshampoo: [
-      "babyshampoo",
-    ],
-
-    babywash: [
-      "babywash",
-    ],
-
-    babysoap: [
-      "babysoap",
-    ],
-
-    babycream: [
-      "babycream",
-    ],
-
-   
-    bodylotion: [
-      "bodylotion",
-    ],
-
-    babyoil: [
-      "babyoil",
-    ],
-
-    diaper: [
-      "diaper",
-    ],
-
-    babycare: [
-      "babycare",
-    ],
-
-  }), []);
+    }, [
+      productData,
+    ]);
 
 
   // ========================================
   // SELECTED CATEGORY KEY
   // ========================================
 
-  const selectedCategoryKey = useMemo(() => {
-
-    return normalizeCategory(
-      selectedCategory
+  const selectedCategoryKey =
+    useMemo(
+      () =>
+        normalizeCategory(
+          selectedCategory
+        ),
+      [
+        selectedCategory,
+      ]
     );
-
-  }, [selectedCategory]);
 
 
   // ========================================
@@ -216,182 +606,87 @@ function OurBabyBestsellers() {
   // ========================================
 
   const selectedCategoryValues =
-    useMemo(() => {
-
-      return (
-        babyCategoryMap[
+    useMemo(
+      () =>
+        BABY_CATEGORY_MAP[
           selectedCategoryKey
-        ] || []
-      );
-
-    }, [
-      selectedCategoryKey,
-      babyCategoryMap,
-    ]);
-
-
-  // ========================================
-  // GET PRODUCT CATEGORY
-  // ========================================
-
-  const getProductCategory = useCallback((
-    product
-  ) => {
-
-    // category as string
-
-    if (
-      typeof product?.category ===
-      "string"
-    ) {
-
-      return normalizeCategory(
-        product.category
-      );
-
-    }
-
-
-    // category as object
-
-    if (
-      product?.category &&
-      typeof product.category ===
-      "object"
-    ) {
-
-      return normalizeCategory(
-        product.category.name ||
-        product.category.heading ||
-        product.category.title ||
-        ""
-      );
-
-    }
-
-
-    // category_name
-
-    if (
-      typeof product?.category_name ===
-      "string"
-    ) {
-
-      return normalizeCategory(
-        product.category_name
-      );
-
-    }
-
-
-    return "";
-
-  }, []);
+        ] || [],
+      [
+        selectedCategoryKey,
+      ]
+    );
 
 
   // ========================================
   // FILTER PRODUCTS
   // ========================================
 
-  const filteredProducts = useMemo(() => {
+  const filteredProducts =
+    useMemo(() => {
 
-    if (
-      !products ||
-      products.length === 0
-    ) {
-
-      return [];
-
-    }
-
-
-    return products.filter(
-      (product) => {
-
-        const productCategory =
-          getProductCategory(
-            product
-          );
-
-
-        // ====================================
-        // BABY SHAMPOO
-        // ====================================
-
-        /*
-          When "Shampoo" image is clicked:
-
-          selectedCategoryKey = "shampoo"
-
-          allowed category =
-          "babyshampoo"
-
-          Therefore normal "shampoo"
-          products will NOT be shown.
-        */
-
-        if (
-          selectedCategoryKey ===
-          "shampoo"
-        ) {
-
-          return (
-            productCategory ===
-            "babyshampoo"
-          );
-
-        }
-
-
-        // ====================================
-        // BABY SHAMPOO
-        // ====================================
-
-        if (
-          selectedCategoryKey ===
-          "babyshampoo"
-        ) {
-
-          return (
-            productCategory ===
-            "babyshampoo"
-          );
-
-        }
-
-
-        // ====================================
-        // OTHER BABY CATEGORIES
-        // ====================================
-
-        return selectedCategoryValues.includes(
-          productCategory
-        );
-
+      if (
+        products.length === 0 ||
+        selectedCategoryValues.length ===
+          0
+      ) {
+        return [];
       }
-    );
 
-  }, [
-    products,
-    selectedCategoryKey,
-    selectedCategoryValues,
-    getProductCategory,
-  ]);
+
+      return products.filter(
+        (product) => {
+
+          const productCategory =
+            getProductCategory(
+              product
+            );
+
+
+          return selectedCategoryValues.includes(
+            productCategory
+          );
+        }
+      );
+
+    }, [
+      products,
+      selectedCategoryValues,
+    ]);
 
 
   // ========================================
   // CATEGORY CLICK
   // ========================================
 
-  const handleCategoryClick = (
-    heading
-  ) => {
+  const handleCategoryClick =
+    useCallback(
+      (heading) => {
 
-    setSelectedCategory(
-      heading
+        setSelectedCategory(
+          heading
+        );
+
+      },
+      []
     );
 
-  };
+
+  // ========================================
+  // CATEGORY DATA
+  // ========================================
+
+  const categories =
+    useMemo(() => {
+
+      return Array.isArray(
+        OurBabyBestsellersImages
+      )
+        ? OurBabyBestsellersImages
+        : [];
+
+    }, [
+      OurBabyBestsellersImages,
+    ]);
 
 
   // ========================================
@@ -408,7 +703,8 @@ function OurBabyBestsellers() {
         sx={{
           width: "100%",
           py: 5,
-          textAlign: "center",
+          textAlign:
+            "center",
         }}
       >
 
@@ -418,7 +714,6 @@ function OurBabyBestsellers() {
 
       </Box>
     );
-
   }
 
 
@@ -436,24 +731,23 @@ function OurBabyBestsellers() {
         sx={{
           width: "100%",
           py: 5,
-          textAlign: "center",
+          textAlign:
+            "center",
         }}
       >
 
         <Typography
           sx={{
-            color: Colors.red,
+            color:
+              Colors.red,
           }}
         >
-
           {contentError ||
             productError}
-
         </Typography>
 
       </Box>
     );
-
   }
 
 
@@ -462,11 +756,12 @@ function OurBabyBestsellers() {
   // ========================================
 
   return (
-
     <Box
       sx={{
         width: "100%",
+
         py: 3,
+
         px: {
           xs: 2,
           sm: 3,
@@ -475,423 +770,97 @@ function OurBabyBestsellers() {
       }}
     >
 
-
-      {/* ========================================
+      {/* ====================================
           HEADING
-      ======================================== */}
+      ==================================== */}
 
       <Typography
         sx={{
-          textAlign: "center",
+          textAlign:
+            "center",
+
           fontSize:
             Theme.font24SemiBold,
         }}
       >
-
         Our{" "}
-
         <strong>
           Baby
         </strong>{" "}
-
         Bestsellers
-
       </Typography>
 
 
-      {/* ========================================
+      {/* ====================================
           SUB HEADING
-      ======================================== */}
+      ==================================== */}
 
       <Typography
         sx={{
-          textAlign: "center",
+          textAlign:
+            "center",
+
           fontSize:
             Theme.font12Regular,
+
           mt: 0.5,
         }}
       >
-
-        Give your little one the care they deserve
-
+        Give your little one the
+        care they deserve
       </Typography>
 
 
-      {/* ========================================
+      {/* ====================================
           DESKTOP CATEGORIES
-      ======================================== */}
+      ==================================== */}
 
-      <Box
-        sx={{
-          display: {
-            xs: "none",
-            sm: "flex",
-          },
+      <CategoryList
+        categories={
+          categories
+        }
 
-          justifyContent: "center",
+        selectedCategory={
+          selectedCategory
+        }
 
-          alignItems: "center",
-
-          width: "100%",
-
-          gap: {
-            sm: 2,
-            md: 3,
-            lg: 4,
-          },
-
-          overflowX: "auto",
-
-          overflowY: "hidden",
-
-          pb: 1,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle: "none",
-
-          scrollbarWidth: "none",
-        }}
-      >
-
-        {OurBabyBestsellersImages?.map(
-          (item) => {
-
-            const categoryName =
-              item.heading?.trim();
+        onCategoryClick={
+          handleCategoryClick
+        }
+      />
 
 
-            const isSelected =
-              selectedCategory
-                .toLowerCase() ===
-              categoryName?.toLowerCase();
-
-
-            return (
-
-              <Box
-                key={item.id}
-
-                onClick={() =>
-                  handleCategoryClick(
-                    categoryName
-                  )
-                }
-
-                sx={{
-                  display: "flex",
-
-                  flexDirection:
-                    "column",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
-
-                  flexShrink: 0,
-
-                  cursor: "pointer",
-
-                  width: 70,
-
-                  minHeight: 30,
-
-                  py: 0,
-
-                  px: 0,
-
-                  borderRadius:
-                    "10px",
-
-                  backgroundColor:
-                    isSelected
-                      ? Colors.background
-                      : "transparent",
-
-                  transition:
-                    "all 0.3s ease",
-
-                  "&:hover": {
-                    backgroundColor:
-                      Colors.background,
-                  },
-                }}
-              >
-
-
-                {/* CATEGORY IMAGE */}
-
-                <Box
-                  component="img"
-
-                  src={item.image_url}
-
-                  alt={item.heading}
-
-                  sx={{
-                    width: {
-                      sm: "32px",
-                      md: "36px",
-                    },
-
-                    height: {
-                      sm: "32px",
-                      md: "36px",
-                    },
-
-                    objectFit:
-                      "contain",
-
-                    borderRadius:
-                      "50%",
-
-                    filter:
-                      isSelected
-                        ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                        : "none",
-
-                    transition:
-                      "filter 0.3s ease",
-                  }}
-                />
-
-
-                {/* CATEGORY NAME */}
-
-                <Typography
-                  sx={{
-                    mt: 0.5,
-
-                    textAlign:
-                      "center",
-
-                    whiteSpace:
-                      "nowrap",
-
-                    fontSize:
-                      Theme.font12Regular,
-
-                    color:
-                      isSelected
-                        ? Colors.blue
-                        : Colors.black,
-
-                    fontWeight:
-                      isSelected
-                        ? 600
-                        : 400,
-
-                    transition:
-                      "color 0.3s ease",
-                  }}
-                >
-
-                  {item.heading}
-
-                </Typography>
-
-              </Box>
-
-            );
-
-          }
-        )}
-
-      </Box>
-
-
-      {/* ========================================
+      {/* ====================================
           MOBILE CATEGORIES
-      ======================================== */}
+      ==================================== */}
 
-      <Box
-        sx={{
-          display: {
-            xs: "flex",
-            sm: "none",
-          },
+      <CategoryList
+        categories={
+          categories
+        }
 
-          width: "100%",
+        selectedCategory={
+          selectedCategory
+        }
 
-          overflowX: "auto",
+        onCategoryClick={
+          handleCategoryClick
+        }
 
-          overflowY: "hidden",
-
-          gap: 2,
-
-          pb: 2,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle: "none",
-
-          scrollbarWidth: "none",
-        }}
-      >
-
-        {OurBabyBestsellersImages?.map(
-          (item) => {
-
-            const categoryName =
-              item.heading?.trim();
+        mobile
+      />
 
 
-            const isSelected =
-              selectedCategory
-                .toLowerCase() ===
-              categoryName?.toLowerCase();
-
-
-            return (
-
-              <Box
-                key={item.id}
-
-                onClick={() =>
-                  handleCategoryClick(
-                    categoryName
-                  )
-                }
-
-                sx={{
-                  display: "flex",
-
-                  flexDirection:
-                    "column",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
-
-                  flexShrink: 0,
-
-                  minWidth: "75px",
-
-                  cursor: "pointer",
-
-                  padding: "8px",
-
-                  borderRadius:
-                    "10px",
-
-                  backgroundColor:
-                    isSelected
-                      ? Colors.background
-                      : "transparent",
-
-                  transition:
-                    "all 0.3s ease",
-
-                  "&:hover": {
-                    backgroundColor:
-                      Colors.background,
-                  },
-                }}
-              >
-
-
-                {/* CATEGORY IMAGE */}
-
-                <Box
-                  component="img"
-
-                  src={item.image_url}
-
-                  alt={item.heading}
-
-                  sx={{
-                    width: 42,
-
-                    height: 42,
-
-                    objectFit:
-                      "contain",
-
-                    borderRadius:
-                      "50%",
-
-                    filter:
-                      isSelected
-                        ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                        : "none",
-
-                    transition:
-                      "filter 0.3s ease",
-                  }}
-                />
-
-
-                {/* CATEGORY NAME */}
-
-                <Typography
-                  sx={{
-                    mt: 1,
-
-                    fontSize:
-                      Theme.font12Regular,
-
-                    textAlign:
-                      "center",
-
-                    whiteSpace:
-                      "nowrap",
-
-                    color:
-                      isSelected
-                        ? Colors.blue
-                        : Colors.black,
-
-                    fontWeight:
-                      isSelected
-                        ? 600
-                        : 400,
-
-                    transition:
-                      "color 0.3s ease",
-                  }}
-                >
-
-                  {item.heading}
-
-                </Typography>
-
-              </Box>
-
-            );
-
-          }
-        )}
-
-      </Box>
-
-
-      {/* ========================================
+      {/* ====================================
           SELECTED CATEGORY
-      ======================================== */}
+      ==================================== */}
 
       <Box
         sx={{
           width: "100%",
 
-          maxWidth: "1200px",
+          maxWidth:
+            "1200px",
 
           mx: "auto",
 
@@ -906,22 +875,24 @@ function OurBabyBestsellers() {
             fontSize:
               Theme.font20Bold,
 
-            textAlign: "left",
+            textAlign:
+              "left",
 
-            ml: 5,
+            ml: {
+              xs: 0,
+              sm: 5,
+            },
           }}
         >
-
           {selectedCategory}
-
         </Typography>
 
       </Box>
 
 
-      {/* ========================================
+      {/* ====================================
           PRODUCTS
-      ======================================== */}
+      ==================================== */}
 
       {filteredProducts.length > 0 ? (
 
@@ -929,11 +900,13 @@ function OurBabyBestsellers() {
           sx={{
             width: "100%",
 
-            maxWidth: "1200px",
+            maxWidth:
+              "1200px",
 
             mx: "auto",
 
-            overflow: "visible",
+            overflow:
+              "visible",
           }}
         >
 
@@ -951,15 +924,18 @@ function OurBabyBestsellers() {
           sx={{
             width: "100%",
 
-            maxWidth: "1200px",
+            maxWidth:
+              "1200px",
 
             mx: "auto",
 
             py: 5,
 
-            textAlign: "center",
+            textAlign:
+              "center",
 
-            borderRadius: "10px",
+            borderRadius:
+              "10px",
           }}
         >
 
@@ -972,12 +948,8 @@ function OurBabyBestsellers() {
                 Theme.font14Regular,
             }}
           >
-
-            No products available
-            for{" "}
-
+            No products available for{" "}
             {selectedCategory}
-
           </Typography>
 
         </Box>
@@ -985,10 +957,14 @@ function OurBabyBestsellers() {
       )}
 
     </Box>
-
   );
-
 }
 
 
-export default OurBabyBestsellers;
+// ========================================
+// MEMOIZED EXPORT
+// ========================================
+
+export default memo(
+  OurBabyBestsellers
+);

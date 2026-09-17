@@ -1,4 +1,7 @@
+
 import React, {
+  memo,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -28,52 +31,436 @@ import { Theme } from "../themes/GlobalStyles";
 import Colors from "../themes/colors";
 
 
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
+const normalizeCategory = (category = "") => {
+  return String(category)
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+};
+
+
+// ========================================
+// CATEGORY MAP
+// ========================================
+
+const FACE_CATEGORY_MAP = {
+  facewash: [
+    "facewash",
+    "facewashes",
+  ],
+
+  sunscreen: [
+    "sunscreen",
+  ],
+
+  facemask: [
+    "facemask",
+    "facemasks",
+  ],
+
+  facemasks: [
+    "facemask",
+    "facemasks",
+  ],
+
+  facecream: [
+    "facecream",
+  ],
+
+  moisturizer: [
+    "moisturizer",
+    "moisturiser",
+  ],
+
+  scrub: [
+    "scrub",
+    "facescrub",
+  ],
+
+  serum: [
+    "serum",
+  ],
+};
+
+
+// ========================================
+// GET PRODUCT CATEGORY
+// ========================================
+
+const getProductCategory = (product) => {
+
+  if (
+    typeof product?.category ===
+    "string"
+  ) {
+    return product.category;
+  }
+
+  return (
+    product?.category?.name ||
+    product?.category?.heading ||
+    ""
+  );
+};
+
+
+// ========================================
+// CATEGORY ITEM
+// ========================================
+
+const CategoryItem = memo(
+  function CategoryItem({
+    item,
+    isSelected,
+    onClick,
+    mobile = false,
+  }) {
+
+    const categoryName =
+      item?.heading?.trim() || "";
+
+
+    const handleClick =
+      useCallback(() => {
+
+        if (categoryName) {
+          onClick(categoryName);
+        }
+
+      }, [
+        categoryName,
+        onClick,
+      ]);
+
+
+    return (
+      <Box
+        onClick={handleClick}
+        sx={{
+          display: "flex",
+
+          flexDirection: "column",
+
+          alignItems: "center",
+
+          justifyContent: "center",
+
+          flexShrink: 0,
+
+          cursor: "pointer",
+
+          width: mobile
+            ? "auto"
+            : 50,
+
+          minWidth: mobile
+            ? "75px"
+            : "auto",
+
+          minHeight: mobile
+            ? "auto"
+            : 30,
+
+          padding: mobile
+            ? "8px"
+            : 0,
+
+          borderRadius: "10px",
+
+          backgroundColor:
+            isSelected
+              ? Colors.background
+              : "transparent",
+
+          transition:
+            "background-color 0.3s ease",
+
+          "&:hover": {
+            backgroundColor:
+              Colors.background,
+          },
+        }}
+      >
+
+        {/* CATEGORY IMAGE */}
+
+        <Box
+          component="span"
+          role="img"
+          aria-label={categoryName}
+          sx={{
+            display: "block",
+
+            width: mobile
+              ? 42
+              : {
+                  sm: 32,
+                  md: 36,
+                },
+
+            height: mobile
+              ? 42
+              : {
+                  sm: 32,
+                  md: 36,
+                },
+
+            backgroundColor:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            WebkitMaskImage:
+              `url(${item?.image_url})`,
+
+            maskImage:
+              `url(${item?.image_url})`,
+
+            WebkitMaskRepeat:
+              "no-repeat",
+
+            maskRepeat:
+              "no-repeat",
+
+            WebkitMaskPosition:
+              "center",
+
+            maskPosition:
+              "center",
+
+            WebkitMaskSize:
+              "contain",
+
+            maskSize:
+              "contain",
+
+            transition:
+              "background-color 0.3s ease",
+          }}
+        />
+
+
+        {/* CATEGORY NAME */}
+
+        <Typography
+          sx={{
+            mt: mobile
+              ? 1
+              : 0.5,
+
+            textAlign: "center",
+
+            whiteSpace: "nowrap",
+
+            fontSize:
+              Theme.font12Regular,
+
+            color:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            fontWeight:
+              isSelected
+                ? 600
+                : 400,
+
+            transition:
+              "color 0.3s ease",
+          }}
+        >
+          {categoryName}
+        </Typography>
+
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// CATEGORY LIST
+// ========================================
+
+const CategoryList = memo(
+  function CategoryList({
+    categories,
+    selectedCategory,
+    onCategoryClick,
+    mobile = false,
+  }) {
+
+    const selectedKey =
+      useMemo(
+        () =>
+          normalizeCategory(
+            selectedCategory
+          ),
+        [selectedCategory]
+      );
+
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+
+          justifyContent:
+            mobile
+              ? "flex-start"
+              : "center",
+
+          alignItems: "center",
+
+          width: "100%",
+
+          gap: mobile
+            ? 2
+            : {
+                sm: 2,
+                md: 3,
+                lg: 4,
+              },
+
+          overflowX: "auto",
+
+          overflowY: "hidden",
+
+          pb: mobile
+            ? 2
+            : 1,
+
+          mt: 3,
+
+          WebkitOverflowScrolling:
+            "touch",
+
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+
+          msOverflowStyle:
+            "none",
+
+          scrollbarWidth:
+            "none",
+        }}
+      >
+
+        {categories.map(
+          (item) => {
+
+            const categoryName =
+              item?.heading?.trim() ||
+              "";
+
+            const isSelected =
+              selectedKey ===
+              normalizeCategory(
+                categoryName
+              );
+
+
+            return (
+              <CategoryItem
+                key={item.id}
+                item={item}
+                isSelected={
+                  isSelected
+                }
+                onClick={
+                  onCategoryClick
+                }
+                mobile={mobile}
+              />
+            );
+          }
+        )}
+
+      </Box>
+    );
+  }
+);
+
+
+// ========================================
+// MAIN COMPONENT
+// ========================================
+
 function OurFaceBestsellers({
   products: initialProducts = [],
 }) {
 
-  const dispatch = useDispatch();
+  const dispatch =
+    useDispatch();
 
 
- 
-  // CATEGORY DATA
- 
+  // ========================================
+  // CONTENT DATA
+  // ========================================
 
-  const {
-    OurFaceBestsellersImages,
-    loading: contentLoading,
-    error: contentError,
-  } = useSelector(
-    (state) => state.content
-  );
+  const OurFaceBestsellersImages =
+    useSelector(
+      (state) =>
+        state.content
+          ?.OurFaceBestsellersImages
+    );
+
+  const contentLoading =
+    useSelector(
+      (state) =>
+        state.content?.loading
+    );
+
+  const contentError =
+    useSelector(
+      (state) =>
+        state.content?.error
+    );
 
 
- 
+  // ========================================
   // PRODUCT DATA
- 
+  // ========================================
 
-  const {
-    products: productData,
-    loading: productLoading,
-    error: productError,
-  } = useSelector(
-    (state) => state.product
-  );
+  const productData =
+    useSelector(
+      (state) =>
+        state.product?.products
+    );
+
+  const productLoading =
+    useSelector(
+      (state) =>
+        state.product?.loading
+    );
+
+  const productError =
+    useSelector(
+      (state) =>
+        state.product?.error
+    );
 
 
- 
-  // SELECTED CATEGORY
- 
+  // ========================================
+  // STATE
+  // ========================================
 
   const [
     selectedCategory,
     setSelectedCategory,
-  ] = useState("Facewash");
+  ] = useState(
+    "Facewash"
+  );
 
 
- 
-  // GET DATA
- 
+  // ========================================
+  // API CALLS
+  // ========================================
 
   useEffect(() => {
 
@@ -88,165 +475,135 @@ function OurFaceBestsellers({
   }, [dispatch]);
 
 
- 
+  // ========================================
   // NORMALIZE PRODUCTS
- 
+  // ========================================
 
-  const products = useMemo(() => {
+  const products =
+    useMemo(() => {
 
-    if (Array.isArray(productData)) {
-      return productData;
-    }
+      if (
+        Array.isArray(
+          productData
+        )
+      ) {
+        return productData;
+      }
 
-    if (
-      productData &&
-      Array.isArray(productData.products)
-    ) {
-      return productData.products;
-    }
+      return Array.isArray(
+        initialProducts
+      )
+        ? initialProducts
+        : [];
 
-    if (
-      productData &&
-      productData.data &&
-      Array.isArray(productData.data.products)
-    ) {
-      return productData.data.products;
-    }
-
-    return initialProducts;
-
-  }, [
-    productData,
-    initialProducts,
-  ]);
+    }, [
+      productData,
+      initialProducts,
+    ]);
 
 
- 
-  // NORMALIZE CATEGORY
- 
-
-  const normalizeCategory = (
-    category = ""
-  ) => {
-
-    return String(category)
-      .toLowerCase()
-      .replace(/[\s_-]+/g, "");
-  };
-
-
- 
-  // CATEGORY MATCHING
- 
-
-  const faceCategoryMap = useMemo(() => ({
-
-    facewash: [
-      "facewash",
-      "facewashes",
-    ],
-
-    sunscreen: [
-      "sunscreen",
-    ],
-
-    facemask: [
-      "facemask",
-      "facemasks",
-    ],
-
-    facemasks: [
-      "facemask",
-      "facemasks",
-    ],
-
-    facecream: [
-      "facecream",
-    ],
-
-    moisturizer: [
-      "moisturizer",
-      "moisturiser",
-    ],
-
-    scrub: [
-      "scrub",
-      "facescrub",
-    ],
-
-    serum: [
-      "serum",
-    ],
-
-  }), []);
-
-
- 
+  // ========================================
   // SELECTED CATEGORY KEY
- 
+  // ========================================
 
   const selectedCategoryKey =
-    normalizeCategory(
-      selectedCategory
+    useMemo(
+      () =>
+        normalizeCategory(
+          selectedCategory
+        ),
+      [selectedCategory]
     );
 
 
- 
+  // ========================================
   // FILTER PRODUCTS
- 
+  // ========================================
 
   const filteredProducts =
     useMemo(() => {
+
+      if (
+        products.length === 0 ||
+        !selectedCategoryKey
+      ) {
+        return [];
+      }
+
+
       const selectedCategoryValues =
-        faceCategoryMap[
+        FACE_CATEGORY_MAP[
           selectedCategoryKey
         ] || [
           selectedCategoryKey,
         ];
+
 
       return products.filter(
         (product) => {
 
           const productCategory =
             normalizeCategory(
-              typeof product?.category === "string"
-                ? product.category
-                : product?.category?.name ||
-                  product?.category?.heading
+              getProductCategory(
+                product
+              )
             );
+
 
           return selectedCategoryValues.includes(
             productCategory
           );
-
         }
       );
 
     }, [
       products,
       selectedCategoryKey,
-      faceCategoryMap,
     ]);
 
 
- 
+  // ========================================
   // CATEGORY CLICK
- 
+  // ========================================
 
-  const handleCategoryClick = (
-    heading
-  ) => {
+  const handleCategoryClick =
+    useCallback(
+      (heading) => {
 
-    setSelectedCategory(
-      heading
+        if (!heading) {
+          return;
+        }
+
+        setSelectedCategory(
+          heading.trim()
+        );
+
+      },
+      []
     );
 
-  };
+
+  // ========================================
+  // CATEGORY DATA
+  // ========================================
+
+  const categories =
+    useMemo(() => {
+
+      return Array.isArray(
+        OurFaceBestsellersImages
+      )
+        ? OurFaceBestsellersImages
+        : [];
+
+    }, [
+      OurFaceBestsellersImages,
+    ]);
 
 
- 
+  // ========================================
   // LOADING
- 
+  // ========================================
 
   if (
     contentLoading ||
@@ -257,8 +614,11 @@ function OurFaceBestsellers({
       <Box
         sx={{
           width: "100%",
+
           py: 5,
-          textAlign: "center",
+
+          textAlign:
+            "center",
         }}
       >
         <Typography>
@@ -266,13 +626,12 @@ function OurFaceBestsellers({
         </Typography>
       </Box>
     );
-
   }
 
 
- 
+  // ========================================
   // ERROR
- 
+  // ========================================
 
   if (
     contentError ||
@@ -283,13 +642,17 @@ function OurFaceBestsellers({
       <Box
         sx={{
           width: "100%",
+
           py: 5,
-          textAlign: "center",
+
+          textAlign:
+            "center",
         }}
       >
         <Typography
           sx={{
-            color: Colors.red,
+            color:
+              Colors.red,
           }}
         >
           {contentError ||
@@ -297,20 +660,20 @@ function OurFaceBestsellers({
         </Typography>
       </Box>
     );
-
   }
 
 
- 
+  // ========================================
   // MAIN UI
- 
+  // ========================================
 
   return (
-
     <Box
       sx={{
         width: "100%",
+
         py: 3,
+
         px: {
           xs: 2,
           sm: 3,
@@ -319,13 +682,12 @@ function OurFaceBestsellers({
       }}
     >
 
-      {/* ========================================
-          HEADING
-      ======================================== */}
+      {/* HEADING */}
 
       <Typography
         sx={{
           textAlign: "center",
+
           fontSize:
             Theme.font24SemiBold,
         }}
@@ -338,383 +700,101 @@ function OurFaceBestsellers({
       </Typography>
 
 
-      {/* ========================================
-          SUB HEADING
-      ======================================== */}
+      {/* SUB HEADING */}
 
       <Typography
         sx={{
           textAlign: "center",
+
           fontSize:
             Theme.font12Regular,
+
           mt: 0.5,
         }}
       >
-        Formulated with love and the goodness
-        of natural ingredients
+        Formulated with love and
+        the goodness of natural
+        ingredients
       </Typography>
 
 
-      {/* ========================================
-          DESKTOP CATEGORIES
-      ======================================== */}
+      {/* DESKTOP CATEGORIES */}
 
       <Box
         sx={{
           display: {
             xs: "none",
-            sm: "flex",
+            sm: "block",
           },
-
-          justifyContent: "center",
-          alignItems: "center",
-
-          width: "100%",
-
-          gap: {
-            sm: 2,
-            md: 3,
-            lg: 4,
-          },
-
-          overflowX: "auto",
-          overflowY: "hidden",
-
-          pb: 1,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
         }}
       >
 
-        {OurFaceBestsellersImages.map(
-          (item) => {
-
-            const categoryName =
-              item.heading?.trim();
-
-            const isSelected =
-              selectedCategory
-                .toLowerCase() ===
-              categoryName?.toLowerCase();
-
-            return (
-
-              <Box
-                key={item.id}
-                onClick={() =>
-                  handleCategoryClick(
-                    categoryName
-                  )
-                }
-                sx={{
-                  display: "flex",
-
-                  flexDirection:
-                    "column",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
-
-                  flexShrink: 0,
-
-                  cursor: "pointer",
-
-                  width: 50,
-
-                  minHeight: 30,
-
-                  py: 0,
-
-                  px: 0,
-
-                  borderRadius:
-                    "10px",
-
-                  backgroundColor:
-                    isSelected
-                      ? Colors.background
-                      : "transparent",
-
-                  transition:
-                    "all 0.3s ease",
-
-                  "&:hover": {
-                    backgroundColor:
-                      Colors.background,
-                  },
-                }}
-              >
-
-                {/* CATEGORY IMAGE */}
-
-                <Box
-                  component="img"
-                  src={item.image_url}
-                  alt={item.heading}
-                  sx={{
-                    width: {
-                      sm: "32px",
-                      md: "36px",
-                    },
-
-                    height: {
-                      sm: "32px",
-                      md: "36px",
-                    },
-
-                    objectFit:
-                      "contain",
-
-                    borderRadius:
-                      "50%",
-
-                    filter:
-                      isSelected
-                        ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                        : "none",
-
-                    transition:
-                      "filter 0.3s ease",
-                  }}
-                />
-
-
-                {/* CATEGORY NAME */}
-
-                <Typography
-                  sx={{
-                    mt: 0.5,
-
-                    textAlign:
-                      "center",
-
-                    whiteSpace:
-                      "nowrap",
-
-                    fontSize:
-                      Theme.font12Regular,
-
-                    color:
-                      isSelected
-                        ? Colors.blue
-                        : Colors.black,
-
-                    fontWeight:
-                      isSelected
-                        ? 600
-                        : 400,
-
-                    transition:
-                      "color 0.3s ease",
-                  }}
-                >
-                  {item.heading}
-                </Typography>
-
-              </Box>
-            );
-
+        <CategoryList
+          categories={categories}
+          selectedCategory={
+            selectedCategory
           }
-        )}
+          onCategoryClick={
+            handleCategoryClick
+          }
+        />
 
       </Box>
 
 
-      {/* ========================================
-          MOBILE CATEGORIES
-      ======================================== */}
+      {/* MOBILE CATEGORIES */}
 
       <Box
         sx={{
           display: {
-            xs: "flex",
+            xs: "block",
             sm: "none",
           },
-
-          width: "100%",
-
-          overflowX: "auto",
-          overflowY: "hidden",
-
-          gap: 2,
-
-          pb: 2,
-
-          mt: 3,
-
-          WebkitOverflowScrolling:
-            "touch",
-
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
         }}
       >
 
-        {OurFaceBestsellersImages.map(
-          (item) => {
-
-            const categoryName =
-              item.heading?.trim();
-
-            const isSelected =
-              selectedCategory
-                .toLowerCase() ===
-              categoryName?.toLowerCase();
-
-            return (
-
-              <Box
-                key={item.id}
-                onClick={() =>
-                  handleCategoryClick(
-                    categoryName
-                  )
-                }
-                sx={{
-                  display: "flex",
-
-                  flexDirection:
-                    "column",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
-
-                  flexShrink: 0,
-
-                  minWidth: "75px",
-
-                  cursor: "pointer",
-
-                  padding: "8px",
-
-                  borderRadius:
-                    "10px",
-
-                  backgroundColor:
-                    isSelected
-                      ? Colors.background
-                      : "transparent",
-
-                  transition:
-                    "all 0.3s ease",
-
-                  "&:hover": {
-                    backgroundColor:
-                      Colors.background,
-                  },
-                }}
-              >
-
-                {/* CATEGORY IMAGE */}
-
-                <Box
-                  component="img"
-                  src={item.image_url}
-                  alt={item.heading}
-                  sx={{
-                    width: 42,
-
-                    height: 42,
-
-                    objectFit:
-                      "contain",
-
-                    borderRadius:
-                      "50%",
-
-                    filter:
-                      isSelected
-                        ? "brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(900%) hue-rotate(165deg) brightness(90%) contrast(90%)"
-                        : "none",
-
-                    transition:
-                      "filter 0.3s ease",
-                  }}
-                />
-
-
-                {/* CATEGORY NAME */}
-
-                <Typography
-                  sx={{
-                    mt: 1,
-
-                    fontSize:
-                      Theme.font12Regular,
-
-                    textAlign:
-                      "center",
-
-                    whiteSpace:
-                      "nowrap",
-
-                    color:
-                      isSelected
-                        ? Colors.blue
-                        : Colors.black,
-
-                    fontWeight:
-                      isSelected
-                        ? 600
-                        : 400,
-
-                    transition:
-                      "color 0.3s ease",
-                  }}
-                >
-                  {item.heading}
-                </Typography>
-
-              </Box>
-            );
-
+        <CategoryList
+          categories={categories}
+          selectedCategory={
+            selectedCategory
           }
-        )}
+          onCategoryClick={
+            handleCategoryClick
+          }
+          mobile
+        />
 
       </Box>
 
 
-      {/* ========================================
-          SELECTED CATEGORY
-      ======================================== */}
+      {/* SELECTED CATEGORY */}
 
       <Box
         sx={{
           width: "100%",
+
           maxWidth: "1200px",
 
           mx: "auto",
 
           mt: 4,
+
           mb: 3,
         }}
       >
 
         <Typography
           sx={{
-            fontSize:Theme.font20Bold,
-           textAlign: "left",
-           ml:5
+            fontSize:
+              Theme.font20Bold,
+
+            textAlign:
+              "left",
+
+            ml: {
+              xs: 0,
+              sm: 5,
+            },
           }}
         >
           {selectedCategory}
@@ -723,18 +803,20 @@ function OurFaceBestsellers({
       </Box>
 
 
-      {/* ========================================
-          PRODUCTS
-      ======================================== */}
+      {/* PRODUCTS */}
 
       {filteredProducts.length > 0 ? (
 
         <Box
           sx={{
             width: "100%",
+
             maxWidth: "1200px",
+
             mx: "auto",
-            overflow: "visible",
+
+            overflow:
+              "visible",
           }}
         >
 
@@ -748,22 +830,21 @@ function OurFaceBestsellers({
 
       ) : (
 
-        /* ========================================
-            NO PRODUCTS
-        ======================================== */
-
         <Box
           sx={{
             width: "100%",
+
             maxWidth: "1200px",
 
             mx: "auto",
 
             py: 5,
 
-            textAlign: "center",
+            textAlign:
+              "center",
 
-            borderRadius: "10px",
+            borderRadius:
+              "10px",
           }}
         >
 
@@ -779,7 +860,6 @@ function OurFaceBestsellers({
             No products available
             for{" "}
             {selectedCategory}
-
           </Typography>
 
         </Box>
@@ -791,4 +871,6 @@ function OurFaceBestsellers({
 }
 
 
-export default OurFaceBestsellers;
+export default memo(
+  OurFaceBestsellers
+);

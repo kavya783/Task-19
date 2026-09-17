@@ -63,21 +63,13 @@ function Referrals() {
           width: "100%",
           boxSizing: "border-box",
 
-          /*
-           * MOBILE + TABLET
-           * Video first
-           * Content below video
-           */
+         
           flexDirection: {
             xs: "column",
             sm: "column",
             md: "column",
             lg: "row",
           },
-
-          /*
-           * Mobile + tablet center video/content
-           */
           "@media (max-width: 1199px)": {
             alignItems: "center",
           },
@@ -148,9 +140,6 @@ function Referrals() {
 
             boxSizing: "border-box",
 
-            /*
-             * Mobile + tablet
-             */
             alignItems: {
               xs: "stretch",
               sm: "stretch",
@@ -170,12 +159,7 @@ function Referrals() {
 
           <Typography
             sx={{
-              fontSize: {
-                xs: "18px",
-                sm: "19px",
-                md: "20px",
-                lg: Theme.headings,
-              },
+              ...Theme.font20Bold,
 
               lineHeight: 1.5,
 
@@ -192,16 +176,10 @@ function Referrals() {
 
           <Typography
             sx={{
-              fontSize: {
-                xs: "13px",
-                sm: "14px",
-                md: "14px",
-                lg: Theme.font14SemiBold,
-              },
-
+              ...Theme.font16SemiBold,
               lineHeight: 1.6,
 
-              color: "#555",
+              color:Colors.black,
 
               textAlign: "left",
             }}
@@ -219,7 +197,7 @@ function Referrals() {
           >
             <Typography
               sx={{
-                fontSize: Theme.font12SemiBold,
+                fontSize: Theme.font14Bold,
                 mb: 1,
                 color: Colors.black,
               }}
@@ -253,15 +231,7 @@ function Referrals() {
                 sx={{
                   flex: 1,
                   minWidth: 0,
-
-                  fontSize: {
-                    xs: "13px",
-                    sm: "14px",
-                    md: "15px",
-                  },
-
-                  fontWeight: 700,
-
+                   ...Theme.font14Bold,
                   color: Colors.black,
 
                   overflow: "hidden",
@@ -296,8 +266,8 @@ function Referrals() {
             {copied && (
               <Typography
                 sx={{
-                  fontSize: "12px",
-                  color: "#00a99d",
+                   ...Theme.font14Regular,
+                  color:Colors.blue,
                   marginTop: "5px",
                 }}
               >
@@ -337,26 +307,19 @@ function Referrals() {
             >
               <Typography
                 sx={{
-                  fontSize: {
-                    xs: "14px",
-                    sm: "15px",
-                    md: "16px",
-                  },
-
-                  fontWeight: 700,
-
-                  color: "#333",
+                  ...Theme.font16Bold,
+                  color:Colors.black,
                 }}
               >
                 Want to know{" "}
-                <span style={{ color: Colors.banner }}>
+                <span style={{ color: Colors.blue }}>
                   How it Works?
                 </span>
               </Typography>
 
               <ExpandMoreIcon
                 sx={{
-                  color: "#333",
+                  color:Colors.black,
 
                   transform: showHowItWorks
                     ? "rotate(180deg)"
@@ -386,12 +349,7 @@ function Referrals() {
               >
                 <Typography
                   sx={{
-                    fontWeight: 600,
-
-                    fontSize: {
-                      xs: "15px",
-                      sm: "16px",
-                    },
+                   ...Theme.font14Bold,
                   }}
                 >
                   How It Works?
@@ -423,12 +381,7 @@ function Referrals() {
 
                   <Typography
                     sx={{
-                      fontSize: {
-                        xs: "13px",
-                        sm: "14px",
-                        md: "14px",
-                      },
-
+                       ...Theme.font14SemiBold,
                       lineHeight: 1.5,
                     }}
                   >
@@ -462,12 +415,7 @@ function Referrals() {
 
                   <Typography
                     sx={{
-                      fontSize: {
-                        xs: "13px",
-                        sm: "14px",
-                        md: "14px",
-                      },
-
+                        ...Theme.font14SemiBold,
                       lineHeight: 1.5,
                     }}
                   >
@@ -501,12 +449,7 @@ function Referrals() {
 
                   <Typography
                     sx={{
-                      fontSize: {
-                        xs: "13px",
-                        sm: "14px",
-                        md: "14px",
-                      },
-
+                        ...Theme.font14SemiBold,
                       lineHeight: 1.5,
                     }}
                   >
@@ -537,19 +480,14 @@ function Referrals() {
           >
             <ShareIcon
               sx={{
-                fontSize: {
-                  xs: "20px",
-                  sm: "21px",
-                  md: "22px",
-                },
-
-                color: Colors.banner,
+               ...Theme.font14Bold,
+                color: Colors.blue,
               }}
             />
 
             <Typography
               sx={{
-                color: Colors.banner,
+                color: Colors.blue,
 
                 fontSize: {
                   xs: "14px",
@@ -557,7 +495,7 @@ function Referrals() {
                   md: "16px",
                 },
 
-                fontWeight: 700,
+              
 
                 whiteSpace: "nowrap",
               }}
@@ -596,9 +534,9 @@ function Referrals() {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: "#5dc680",
+                backgroundColor:Colors.green,
 
-                color: "#fff",
+                color:Colors.background,
 
                 textTransform: "none",
 
@@ -615,7 +553,7 @@ function Referrals() {
                 maxWidth: "100%",
 
                 "&:hover": {
-                  backgroundColor: "#4caf6b",
+                  backgroundColor:Colors.green,
                   boxShadow: "none",
                 },
               }}
@@ -624,26 +562,17 @@ function Referrals() {
                 sx={{
                   mr: 1,
 
-                  fontSize: {
-                    xs: "20px",
-                    sm: "21px",
-                    md: "22px",
-                  },
+                  ...Theme.font14Bold,
                 }}
               />
 
               <Typography
                 component="span"
                 sx={{
-                  color: "#fff",
+                  color: Colors.background,
 
-                  fontSize: {
-                    xs: "12px",
-                    sm: "13px",
-                    md: "14px",
-                  },
-
-                  fontWeight: 600,
+                 ...Theme.font18Bold,
+                 
 
                   whiteSpace: "nowrap",
                 }}

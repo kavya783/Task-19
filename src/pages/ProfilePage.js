@@ -165,7 +165,7 @@ function ProfilePage() {
   const sidebarItemSx = (section) => ({
     backgroundColor:
       selectedSection === section
-        ? Colors.profile
+        ? Colors.blue
         : "transparent",
 
     padding: "15px 16px",
@@ -175,7 +175,7 @@ function ProfilePage() {
     transition: "background-color 0.2s ease",
 
     "&:hover": {
-      backgroundColor: Colors.profile,
+      backgroundColor: Colors.blue,
     },
 
     "& .MuiListItemIcon-root": {
@@ -274,8 +274,8 @@ function ProfilePage() {
       sx={{
         color:
           selectedSection === "chat"
-            ? Colors.red
-            : Colors.banner,
+            ? Colors.blue
+            : Colors.blue,
 
         fontSize: "17px",
         fontWeight: 600,
@@ -362,7 +362,7 @@ function ProfilePage() {
 
           backgroundColor:
             selectedSection === "orders"
-              ? Colors.banner
+              ? Colors.blue
               : Colors.background,
 
           display: "flex",
@@ -401,7 +401,7 @@ function ProfilePage() {
 
             color:
               selectedSection === "orders"
-                ? Colors.background
+                ? Colors.blue
                 : Colors.black,
 
             fontWeight:
@@ -456,7 +456,7 @@ function ProfilePage() {
 
             whiteSpace: "nowrap",
 
-            color: Colors.black,
+            color: Colors.blue,
           }}
         >
           MamaCash
@@ -475,7 +475,7 @@ function ProfilePage() {
 
           backgroundColor:
             selectedSection === "trackorders"
-              ? Colors.banner
+              ? Colors.blue
               : Colors.background,
 
           display: "flex",
@@ -514,7 +514,7 @@ function ProfilePage() {
 
             color:
               selectedSection === "trackorders"
-                ? Colors.background
+                ? Colors.blue
                 : Colors.black,
 
             fontWeight:
@@ -541,7 +541,7 @@ function ProfilePage() {
 
           backgroundColor:
             selectedSection === "referrals"
-              ? Colors.banner
+              ? Colors.blue
               : Colors.background,
 
           display: "flex",
@@ -565,7 +565,7 @@ function ProfilePage() {
 
             color:
               selectedSection === "referrals"
-                ? Colors.background
+                ? Colors.blue
                 : Colors.black,
 
             transition: "color 0.2s ease",
@@ -580,7 +580,7 @@ function ProfilePage() {
 
             color:
               selectedSection === "referrals"
-                ? Colors.background
+                ?Colors.blue
                 : Colors.black,
 
             fontWeight:

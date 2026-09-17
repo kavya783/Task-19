@@ -1,14 +1,28 @@
 
-import * as types
-  from "../actions/actionTypes";
+import * as types from "../actions/actionTypes";
 
 
 const initialState = {
 
+  // ========================================
+  // PRODUCTS
+  // ========================================
+
   products: [],
 
-  // Admin Panel Categories
+  productsLoaded: false,
+
+
+  // ========================================
+  // ADMIN PANEL CATEGORIES
+  // ========================================
+
   categories: [],
+
+
+  // ========================================
+  // LOADING / ERROR
+  // ========================================
 
   loading: false,
 
@@ -17,6 +31,11 @@ const initialState = {
   error: null,
 
   categoryError: null,
+
+
+  // ========================================
+  // CREATED PRODUCT
+  // ========================================
 
   createdProduct: null,
 };
@@ -38,7 +57,9 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: true,
+
         error: null,
       };
 
@@ -47,6 +68,7 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: false,
 
         createdProduct:
@@ -60,7 +82,9 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: false,
+
         error: action.payload,
       };
 
@@ -73,7 +97,9 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: true,
+
         error: null,
       };
 
@@ -82,11 +108,14 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: false,
 
         products: Array.isArray(action.payload)
           ? action.payload
           : action.payload?.products || [],
+
+        productsLoaded: true,
 
         error: null,
       };
@@ -96,7 +125,9 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: false,
+
         error: action.payload,
       };
 
@@ -109,7 +140,9 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: true,
+
         error: null,
       };
 
@@ -121,9 +154,10 @@ const productReducer = (
 
         loading: false,
 
-        products: (Array.isArray(state.products)
-          ? state.products
-          : []
+        products: (
+          Array.isArray(state.products)
+            ? state.products
+            : []
         ).map(
           (product) =>
             String(product.id) ===
@@ -155,7 +189,9 @@ const productReducer = (
 
       return {
         ...state,
+
         loading: true,
+
         error: null,
       };
 
@@ -170,8 +206,8 @@ const productReducer = (
         products:
           state.products.filter(
             (product) =>
-              product.id !==
-              action.payload
+              String(product.id) !==
+              String(action.payload)
           ),
 
         error: null,
