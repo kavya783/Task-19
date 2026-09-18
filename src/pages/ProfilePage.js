@@ -58,7 +58,7 @@ function ProfilePage() {
     email: user?.email || "",
   });
 
- 
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -79,7 +79,7 @@ function ProfilePage() {
     setIsEditing(true);
   };
 
-  
+
 
   const handleCancel = () => {
     setFormData({
@@ -146,7 +146,7 @@ function ProfilePage() {
       } else {
         toast.error(
           error.response?.data?.message ||
-            "Failed to update profile"
+          "Failed to update profile"
         );
       }
     }
@@ -160,7 +160,7 @@ function ProfilePage() {
     window.location.href = "/";
   };
 
-  
+
 
   const sidebarItemSx = (section) => ({
     backgroundColor:
@@ -187,913 +187,775 @@ function ProfilePage() {
     <>
       <NavBar />
 
-     
-
-     <Box
-  sx={{
-    display: {
-      xs: "block",
-      sm: "none",
-    },
-
-    width: "100%",
-    minHeight: "100vh",
-    backgroundColor: Colors.background,
-    overflowX: "hidden",
-  }}
->
- 
-
-  <Box
-    sx={{
-      height: "70px",
-
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-
-      padding: "0 18px",
-
-      borderBottom: "1px solid #eee",
-
-      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-
-      boxSizing: "border-box",
-
-      gap: "10px",
-    }}
-  >
-    {/* LEFT HEADER */}
-
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        minWidth: 0,
-      }}
-    >
-      {selectedSection !== "profile" && (
-        <ArrowBackIcon
-          onClick={() => setSelectedSection("profile")}
-          sx={{
-            fontSize: "25px",
-            cursor: "pointer",
-            flexShrink: 0,
-          }}
-        />
-      )}
-
-      <Typography
-        sx={{
-          fontSize: "23px",
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {selectedSection === "profile"
-          ? "Your profile"
-          : selectedSection === "orders"
-          ? "Your orders"
-          : selectedSection === "referrals"
-          ? "Referrals"
-          : selectedSection === "trackorders"
-          ? "Track Orders"
-          : selectedSection === "chat"
-          ? "Chat with us"
-          : "Your profile"}
-      </Typography>
-    </Box>
-
-    {/* CHAT */}
-
-    <Typography
-      onClick={() => setSelectedSection("chat")}
-      sx={{
-        color:
-          selectedSection === "chat"
-            ? Colors.blue
-            : Colors.blue,
-
-        fontSize: "17px",
-        fontWeight: 600,
-
-        cursor: "pointer",
-        whiteSpace: "nowrap",
-
-        flexShrink: 0,
-      }}
-    >
-      Chat with us
-    </Typography>
-  </Box>
 
 
-  <Box
-    sx={{
-      width: "100%",
-      overflow: "hidden",
-
-      backgroundColor: Colors.background,
-
-      padding: "15px 0 10px",
-
-      boxSizing: "border-box",
-    }}
-  >
-    {/* GREETING */}
-
-    {selectedSection === "profile" && (
       <Box
         sx={{
-          padding: "0 20px",
-          marginBottom: "20px",
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: Theme.font18Regular,
-            lineHeight: 1.4,
+          display: {
+            xs: "block",
+            sm: "none",
+          },
 
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Hello, {user?.email || user?.name || "User"}
-        </Typography>
-      </Box>
-    )}
-
-    {/* SWIPER */}
-
-    <Box
-      sx={{
-        display: "flex",
-
-        gap: "10px",
-
-        overflowX: "auto",
-        overflowY: "hidden",
-
-        padding: "0 20px 10px",
-
-        "&::-webkit-scrollbar": {
-          display: "none",
-        },
-
-        scrollbarWidth: "none",
-        msOverflowStyle: "none",
-
-        WebkitOverflowScrolling: "touch",
-      }}
-    >
-      {/* ================= YOUR ORDERS ================= */}
-
-      <Box
-        onClick={() => setSelectedSection("orders")}
-        sx={{
-          minWidth: "145px",
-          height: "55px",
-
-          borderRadius: "30px",
-
-          backgroundColor:
-            selectedSection === "orders"
-              ? Colors.blue
-              : Colors.background,
-
-          display: "flex",
-          alignItems: "center",
-
-          gap: "8px",
-
-          padding: "0 15px",
-
-          boxSizing: "border-box",
-
-          cursor: "pointer",
-          flexShrink: 0,
-
-          transition: "all 0.2s ease",
-        }}
-      >
-        <Inventory2OutlinedIcon
-          sx={{
-            width: "30px",
-
-            color:
-              selectedSection === "orders"
-                ? Colors.background
-                : Colors.black,
-
-            transition: "color 0.2s ease",
-          }}
-        />
-
-        <Typography
-          sx={{
-            fontSize: Theme.font12Regular,
-
-            whiteSpace: "nowrap",
-
-            color:
-              selectedSection === "orders"
-                ? Colors.blue
-                : Colors.black,
-
-            fontWeight:
-              selectedSection === "orders"
-                ? 600
-                : 400,
-
-            transition: "color 0.2s ease",
-          }}
-        >
-          Your Orders
-        </Typography>
-      </Box>
-
-      {/* ================= MAMACASH ================= */}
-
-      <Box
-        onClick={() => navigate("/mamacash")}
-        sx={{
-          minWidth: "135px",
-          height: "55px",
-
-          borderRadius: "30px",
-
+          width: "100%",
+          minHeight: "100vh",
           backgroundColor: Colors.background,
-
-          display: "flex",
-          alignItems: "center",
-
-          gap: "8px",
-
-          padding: "0 15px",
-
-          boxSizing: "border-box",
-
-          cursor: "pointer",
-          flexShrink: 0,
-
-          transition: "all 0.2s ease",
+          overflowX: "hidden",
         }}
       >
-        <AccountBalanceWalletOutlinedIcon
-          sx={{
-            width: "30px",
-            color: Colors.black,
-          }}
-        />
 
-        <Typography
-          sx={{
-            fontSize: Theme.font12Regular,
-
-            whiteSpace: "nowrap",
-
-            color: Colors.blue,
-          }}
-        >
-          MamaCash
-        </Typography>
-      </Box>
-
-      {/* ================= TRACK ORDERS ================= */}
-
-      <Box
-        onClick={() => setSelectedSection("trackorders")}
-        sx={{
-          minWidth: "145px",
-          height: "55px",
-
-          borderRadius: "30px",
-
-          backgroundColor:
-            selectedSection === "trackorders"
-              ? Colors.blue
-              : Colors.background,
-
-          display: "flex",
-          alignItems: "center",
-
-          gap: "8px",
-
-          padding: "0 15px",
-
-          boxSizing: "border-box",
-
-          cursor: "pointer",
-          flexShrink: 0,
-
-          transition: "all 0.2s ease",
-        }}
-      >
-        <LocalShippingOutlinedIcon
-          sx={{
-            width: "30px",
-
-            color:
-              selectedSection === "trackorders"
-                ? Colors.background
-                : Colors.black,
-
-            transition: "color 0.2s ease",
-          }}
-        />
-
-        <Typography
-          sx={{
-            fontSize: Theme.font12Regular,
-
-            whiteSpace: "nowrap",
-
-            color:
-              selectedSection === "trackorders"
-                ? Colors.blue
-                : Colors.black,
-
-            fontWeight:
-              selectedSection === "trackorders"
-                ? 600
-                : 400,
-
-            transition: "color 0.2s ease",
-          }}
-        >
-          Track Orders
-        </Typography>
-      </Box>
-
-      {/* ================= REFERRALS ================= */}
-
-      <Box
-        onClick={() => setSelectedSection("referrals")}
-        sx={{
-          minWidth: "120px",
-          height: "55px",
-
-          borderRadius: "30px",
-
-          backgroundColor:
-            selectedSection === "referrals"
-              ? Colors.blue
-              : Colors.background,
-
-          display: "flex",
-          alignItems: "center",
-
-          gap: "8px",
-
-          padding: "0 15px",
-
-          boxSizing: "border-box",
-
-          cursor: "pointer",
-          flexShrink: 0,
-
-          transition: "all 0.2s ease",
-        }}
-      >
-        <CardGiftcardOutlinedIcon
-          sx={{
-            width: "30px",
-
-            color:
-              selectedSection === "referrals"
-                ? Colors.blue
-                : Colors.black,
-
-            transition: "color 0.2s ease",
-          }}
-        />
-
-        <Typography
-          sx={{
-            fontSize: Theme.font12Regular,
-
-            whiteSpace: "nowrap",
-
-            color:
-              selectedSection === "referrals"
-                ?Colors.blue
-                : Colors.black,
-
-            fontWeight:
-              selectedSection === "referrals"
-                ? 600
-                : 400,
-
-            transition: "color 0.2s ease",
-          }}
-        >
-          Referrals
-        </Typography>
-      </Box>
-
-      {/* ================= CONTACT US ================= */}
-
-      <Box
-        onClick={() => {
-          window.location.href =
-            "https://support.mamaearth.in/support/home";
-        }}
-        sx={{
-          minWidth: "125px",
-          height: "55px",
-
-          borderRadius: "30px",
-
-          backgroundColor: Colors.background,
-
-          display: "flex",
-          alignItems: "center",
-
-          gap: "8px",
-
-          padding: "0 15px",
-
-          boxSizing: "border-box",
-
-          cursor: "pointer",
-          flexShrink: 0,
-        }}
-      >
-        <PhoneOutlinedIcon
-          sx={{
-            width: "30px",
-            color: Colors.black,
-          }}
-        />
-
-        <Typography
-          sx={{
-            fontSize: Theme.font12Regular,
-
-            whiteSpace: "nowrap",
-
-            color: Colors.black,
-          }}
-        >
-          Contact Us
-        </Typography>
-      </Box>
-
-      {/* ================= LOGOUT ================= */}
-
-      <Box
-        onClick={handleLogout}
-        sx={{
-          minWidth: "120px",
-          height: "55px",
-
-          borderRadius: "30px",
-
-          backgroundColor: Colors.background,
-
-          display: "flex",
-          alignItems: "center",
-
-          gap: "8px",
-
-          padding: "0 15px",
-
-          boxSizing: "border-box",
-
-          cursor: "pointer",
-          flexShrink: 0,
-        }}
-      >
-        <LogoutIcon
-          sx={{
-            width: "30px",
-            color:Colors.black,
-          }}
-        />
-
-        <Typography
-          sx={{
-            fontSize: Theme.font12Regular,
-
-            whiteSpace: "nowrap",
-            color:Colors.black
-          }}
-        >
-          Log out
-        </Typography>
-      </Box>
-    </Box>
-  </Box>
-
-
-
-  <Box
-    sx={{
-      width: "100%",
-
-      padding: "10px 20px 30px",
-
-      boxSizing: "border-box",
-
-      overflow: "hidden",
-    }}
-  >
-
-
-    {selectedSection === "profile" && (
-      <>
-        {/* ACCOUNT DETAILS */}
 
         <Box
           sx={{
-            marginBottom: "18px",
+            height: "70px",
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+
+            padding: "0 18px",
+
+            borderBottom: "1px solid #eee",
+
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+
+            boxSizing: "border-box",
+
+            gap: "10px",
           }}
         >
+          {/* LEFT HEADER */}
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              minWidth: 0,
+            }}
+          >
+            {selectedSection !== "profile" && (
+              <ArrowBackIcon
+                onClick={() => setSelectedSection("profile")}
+                sx={{
+                  fontSize: "25px",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              />
+            )}
+
+            <Typography
+              sx={{
+                fontSize: "23px",
+                fontWeight: 700,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {selectedSection === "profile"
+                ? "Your profile"
+                : selectedSection === "orders"
+                  ? "Your orders"
+                  : selectedSection === "referrals"
+                    ? "Referrals"
+                    : selectedSection === "trackorders"
+                      ? "Track Orders"
+                      : selectedSection === "chat"
+                        ? "Chat with us"
+                        : "Your profile"}
+            </Typography>
+          </Box>
+
+          {/* CHAT */}
+
+          <Typography
+            onClick={() => setSelectedSection("chat")}
+            sx={{
+              color:
+                selectedSection === "chat"
+                  ? Colors.blue
+                  : Colors.blue,
+
+              fontSize: "17px",
+              fontWeight: 600,
+
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+
+              flexShrink: 0,
+            }}
+          >
+            Chat with us
+          </Typography>
+        </Box>
+
+
+        <Box
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+
+            backgroundColor: Colors.background,
+
+            padding: "15px 0 10px",
+
+            boxSizing: "border-box",
+          }}
+        >
+          {/* GREETING */}
+
+          {selectedSection === "profile" && (
+            <Box
+              sx={{
+                padding: "0 20px",
+                marginBottom: "20px",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: Theme.font18Regular,
+                  lineHeight: 1.4,
+
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Hello, {user?.email || user?.name || "User"}
+              </Typography>
+            </Box>
+          )}
+
+          {/* SWIPER */}
+
           <Box
             sx={{
               display: "flex",
 
-              justifyContent: "space-between",
-              alignItems: "center",
-
               gap: "10px",
+
+              overflowX: "auto",
+              overflowY: "hidden",
+
+              padding: "0 20px 10px",
+
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+
+              WebkitOverflowScrolling: "touch",
             }}
           >
-            <Typography
+            {/* ================= YOUR ORDERS ================= */}
+
+            <Box
+              onClick={() => setSelectedSection("orders")}
               sx={{
-                fontSize: "16px",
-                fontWeight: 700,
+                minWidth: "145px",
+                height: "55px",
+
+                borderRadius: "30px",
+
+                backgroundColor:
+                  selectedSection === "orders"
+                    ? Colors.blue
+                    : Colors.background,
+
+                display: "flex",
+                alignItems: "center",
+
+                gap: "8px",
+
+                padding: "0 15px",
+
+                boxSizing: "border-box",
+
+                cursor: "pointer",
+                flexShrink: 0,
+
+                transition: "all 0.2s ease",
               }}
             >
-              Account details
-            </Typography>
-
-            {!isEditing && (
-              <Button
-                variant="text"
-                startIcon={<EditOutlinedIcon />}
-                onClick={handleEdit}
+              <Inventory2OutlinedIcon
                 sx={{
-                  textTransform: "none",
+                  width: "30px",
 
-                  color: Colors.black,
+                  color:
+                    selectedSection === "orders"
+                      ? Colors.background
+                      : Colors.black,
 
-                  fontWeight: 600,
+                  transition: "color 0.2s ease",
+                }}
+              />
 
-                  fontSize: "13px",
+              <Typography
+                sx={{
+                  fontSize: Theme.font12Regular,
 
-                  minWidth: "auto",
+                  whiteSpace: "nowrap",
 
-                  padding: "4px 6px",
+                  color:
+                    selectedSection === "orders"
+                      ? Colors.blue
+                      : Colors.black,
+
+                  fontWeight:
+                    selectedSection === "orders"
+                      ? 600
+                      : 400,
+
+                  transition: "color 0.2s ease",
                 }}
               >
-                Edit
-              </Button>
-            )}
+                Your Orders
+              </Typography>
+            </Box>
+
+            {/* ================= MAMACASH ================= */}
+
+            <Box
+              onClick={() => navigate("/mamacash")}
+              sx={{
+                minWidth: "135px",
+                height: "55px",
+
+                borderRadius: "30px",
+
+                backgroundColor: Colors.background,
+
+                display: "flex",
+                alignItems: "center",
+
+                gap: "8px",
+
+                padding: "0 15px",
+
+                boxSizing: "border-box",
+
+                cursor: "pointer",
+                flexShrink: 0,
+
+                transition: "all 0.2s ease",
+              }}
+            >
+              <AccountBalanceWalletOutlinedIcon
+                sx={{
+                  width: "30px",
+                  color: Colors.black,
+                }}
+              />
+
+              <Typography
+                sx={{
+                  fontSize: Theme.font12Regular,
+
+                  whiteSpace: "nowrap",
+
+                  color: Colors.blue,
+                }}
+              >
+                MamaCash
+              </Typography>
+            </Box>
+
+            {/* ================= TRACK ORDERS ================= */}
+
+            <Box
+              onClick={() => setSelectedSection("trackorders")}
+              sx={{
+                minWidth: "145px",
+                height: "55px",
+
+                borderRadius: "30px",
+
+                backgroundColor:
+                  selectedSection === "trackorders"
+                    ? Colors.blue
+                    : Colors.background,
+
+                display: "flex",
+                alignItems: "center",
+
+                gap: "8px",
+
+                padding: "0 15px",
+
+                boxSizing: "border-box",
+
+                cursor: "pointer",
+                flexShrink: 0,
+
+                transition: "all 0.2s ease",
+              }}
+            >
+              <LocalShippingOutlinedIcon
+                sx={{
+                  width: "30px",
+
+                  color:
+                    selectedSection === "trackorders"
+                      ? Colors.background
+                      : Colors.black,
+
+                  transition: "color 0.2s ease",
+                }}
+              />
+
+              <Typography
+                sx={{
+                  fontSize: Theme.font12Regular,
+
+                  whiteSpace: "nowrap",
+
+                  color:
+                    selectedSection === "trackorders"
+                      ? Colors.blue
+                      : Colors.black,
+
+                  fontWeight:
+                    selectedSection === "trackorders"
+                      ? 600
+                      : 400,
+
+                  transition: "color 0.2s ease",
+                }}
+              >
+                Track Orders
+              </Typography>
+            </Box>
+
+            {/* ================= REFERRALS ================= */}
+
+            <Box
+              onClick={() => setSelectedSection("referrals")}
+              sx={{
+                minWidth: "120px",
+                height: "55px",
+
+                borderRadius: "30px",
+
+                backgroundColor:
+                  selectedSection === "referrals"
+                    ? Colors.blue
+                    : Colors.background,
+
+                display: "flex",
+                alignItems: "center",
+
+                gap: "8px",
+
+                padding: "0 15px",
+
+                boxSizing: "border-box",
+
+                cursor: "pointer",
+                flexShrink: 0,
+
+                transition: "all 0.2s ease",
+              }}
+            >
+              <CardGiftcardOutlinedIcon
+                sx={{
+                  width: "30px",
+
+                  color:
+                    selectedSection === "referrals"
+                      ? Colors.blue
+                      : Colors.black,
+
+                  transition: "color 0.2s ease",
+                }}
+              />
+
+              <Typography
+                sx={{
+                  fontSize: Theme.font12Regular,
+
+                  whiteSpace: "nowrap",
+
+                  color:
+                    selectedSection === "referrals"
+                      ? Colors.blue
+                      : Colors.black,
+
+                  fontWeight:
+                    selectedSection === "referrals"
+                      ? 600
+                      : 400,
+
+                  transition: "color 0.2s ease",
+                }}
+              >
+                Referrals
+              </Typography>
+            </Box>
+
+            {/* ================= CONTACT US ================= */}
+
+            <Box
+              onClick={() => {
+                window.location.href =
+                  "https://support.mamaearth.in/support/home";
+              }}
+              sx={{
+                minWidth: "125px",
+                height: "55px",
+
+                borderRadius: "30px",
+
+                backgroundColor: Colors.background,
+
+                display: "flex",
+                alignItems: "center",
+
+                gap: "8px",
+
+                padding: "0 15px",
+
+                boxSizing: "border-box",
+
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <PhoneOutlinedIcon
+                sx={{
+                  width: "30px",
+                  color: Colors.black,
+                }}
+              />
+
+              <Typography
+                sx={{
+                  fontSize: Theme.font12Regular,
+
+                  whiteSpace: "nowrap",
+
+                  color: Colors.black,
+                }}
+              >
+                Contact Us
+              </Typography>
+            </Box>
+
+            {/* ================= LOGOUT ================= */}
+
+            <Box
+              onClick={handleLogout}
+              sx={{
+                minWidth: "120px",
+                height: "55px",
+
+                borderRadius: "30px",
+
+                backgroundColor: Colors.background,
+
+                display: "flex",
+                alignItems: "center",
+
+                gap: "8px",
+
+                padding: "0 15px",
+
+                boxSizing: "border-box",
+
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <LogoutIcon
+                sx={{
+                  width: "30px",
+                  color: Colors.black,
+                }}
+              />
+
+              <Typography
+                sx={{
+                  fontSize: Theme.font12Regular,
+
+                  whiteSpace: "nowrap",
+                  color: Colors.black
+                }}
+              >
+                Log out
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
-        {/* PROFILE CARD */}
 
-        <Paper
-          elevation={0}
-          sx={{
-            width: "100%",
-
-            border: "1px solid #e0e0e0",
-
-            borderRadius: "5px",
-
-            overflow: "hidden",
-
-            boxSizing: "border-box",
-          }}
-        >
-          {/* NAME */}
-
-          <Box
-            sx={{
-              padding: "13px 15px",
-
-              borderBottom: "1px solid #e0e0e0",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "13px",
-
-                fontWeight: 600,
-
-                marginBottom: "5px",
-              }}
-            >
-              Name
-            </Typography>
-
-            {isEditing ? (
-              <TextField
-                fullWidth
-                size="small"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter your name"
-              />
-            ) : (
-              <Typography
-                sx={{
-                  fontSize: "14px",
-
-                  wordBreak: "break-word",
-                }}
-              >
-                {user?.name || "Not provided"}
-              </Typography>
-            )}
-          </Box>
-
-          {/* EMAIL */}
-
-          <Box
-            sx={{
-              padding: "13px 15px",
-
-              borderBottom: "1px solid #e0e0e0",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "13px",
-
-                fontWeight: 600,
-
-                marginBottom: "5px",
-              }}
-            >
-              E-mail
-            </Typography>
-
-            {isEditing ? (
-              <TextField
-                fullWidth
-                size="small"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-              />
-            ) : (
-              <Typography
-                sx={{
-                  fontSize: "14px",
-
-                  wordBreak: "break-word",
-                }}
-              >
-                {user?.email || "Not provided"}
-              </Typography>
-            )}
-          </Box>
-
-          {/* PHONE */}
-
-          <Box
-            sx={{
-              padding: "13px 15px",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "13px",
-
-                fontWeight: 600,
-
-                marginBottom: "5px",
-              }}
-            >
-              Phone
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: "14px",
-
-                wordBreak: "break-word",
-              }}
-            >
-              {user?.phone || "Not provided"}
-            </Typography>
-          </Box>
-        </Paper>
-
-        {/* EDIT BUTTONS */}
-
-        {isEditing && (
-          <Box
-            sx={{
-              display: "flex",
-
-              justifyContent: "flex-end",
-
-              gap: 1,
-
-              marginTop: "15px",
-
-              width: "100%",
-
-              boxSizing: "border-box",
-            }}
-          >
-            <Button
-              variant="outlined"
-              startIcon={<CloseOutlinedIcon />}
-              onClick={handleCancel}
-              sx={{
-                textTransform: "none",
-
-                fontSize: "13px",
-              }}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              variant="contained"
-              startIcon={<SaveOutlinedIcon />}
-              onClick={handleSave}
-              sx={{
-                textTransform: "none",
-
-                backgroundColor: Colors.profile,
-
-                fontSize: "13px",
-
-                "&:hover": {
-                  backgroundColor: Colors.profile,
-                },
-              }}
-            >
-              Save
-            </Button>
-          </Box>
-        )}
-
-      
 
         <Box
           sx={{
             width: "100%",
 
-            backgroundColor: Colors.card,
-
-            borderRadius: "14px",
-
-            marginTop: "35px",
-
-            padding: "22px 16px",
-
-            display: "flex",
-
-            flexDirection: "column",
-
-            alignItems: "center",
-
-            gap: "25px",
+            padding: "10px 20px 30px",
 
             boxSizing: "border-box",
 
             overflow: "hidden",
           }}
         >
-          {/* LEFT SECTION */}
 
-          <Box
-            sx={{
-              width: "100%",
 
-              display: "flex",
-
-              flexDirection: "column",
-
-              alignItems: "center",
-
-              textAlign: "center",
-
-              boxSizing: "border-box",
-            }}
-          >
-            {/* PLANT + LOGO */}
-
-            <Box
-              sx={{
-                display: "flex",
-
-                alignItems: "center",
-
-                justifyContent: "center",
-
-                gap: "5px",
-
-                marginBottom: "15px",
-
-                width: "100%",
-              }}
-            >
-              <Box
-                component="img"
-                src="/images/Plant.avif"
-                alt="Plant"
-                sx={{
-                  width: "75px",
-
-                  maxWidth: "25vw",
-
-                  height: "auto",
-
-                  flexShrink: 0,
-                }}
-              />
+          {selectedSection === "profile" && (
+            <>
+              {/* ACCOUNT DETAILS */}
 
               <Box
-                component="img"
-                src="/images/Plantname.webp"
-                alt="We plant goodness"
                 sx={{
-                  width: "140px",
-
-                  maxWidth: "45vw",
-
-                  height: "auto",
-
-                  flexShrink: 1,
+                  marginBottom: "18px",
                 }}
-              />
-            </Box>
+              >
+                <Box
+                  sx={{
+                    display: "flex",
 
-            {/* TEXT */}
+                    justifyContent: "space-between",
+                    alignItems: "center",
 
-            <Typography
-              sx={{
-                fontSize: "13px",
+                    gap: "10px",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "16px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Account details
+                  </Typography>
 
-                lineHeight: 1.5,
+                  {!isEditing && (
+                    <Button
+                      variant="text"
+                      startIcon={<EditOutlinedIcon />}
+                      onClick={handleEdit}
+                      sx={{
+                        textTransform: "none",
 
-                marginBottom: "18px",
+                        color: Colors.black,
 
-                padding: "0 5px",
-              }}
-            >
-              <strong>
-                Your first plant is ready to be planted.
-              </strong>
-            </Typography>
+                        fontWeight: 600,
 
-            {/* QR + DOWNLOAD */}
+                        fontSize: "13px",
 
-            <Box
-              sx={{
-                width: "100%",
+                        minWidth: "auto",
 
-                display: "flex",
+                        padding: "4px 6px",
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </Box>
+              </Box>
 
-                flexDirection: "column",
+              {/* PROFILE CARD */}
 
-                alignItems: "center",
-
-                justifyContent: "center",
-
-                gap: "15px",
-
-                boxSizing: "border-box",
-              }}
-            >
-              {/* QR */}
-
-              <Box
-                component="img"
-                src="/images/Qrcode.png"
-                alt="Download app QR code"
+              <Paper
+                elevation={0}
                 sx={{
-                  width: "90px",
+                  width: "100%",
 
-                  height: "90px",
+                  border: "1px solid #e0e0e0",
 
-                  objectFit: "contain",
+                  borderRadius: "5px",
 
-                  flexShrink: 0,
+                  overflow: "hidden",
+
+                  boxSizing: "border-box",
                 }}
-              />
+              >
+                {/* NAME */}
 
-              {/* DOWNLOAD CONTENT */}
+                <Box
+                  sx={{
+                    padding: "13px 15px",
+
+                    borderBottom: "1px solid #e0e0e0",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "13px",
+
+                      fontWeight: 600,
+
+                      marginBottom: "5px",
+                    }}
+                  >
+                    Name
+                  </Typography>
+
+                  {isEditing ? (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Enter your name"
+                    />
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontSize: "14px",
+
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {user?.name || "Not provided"}
+                    </Typography>
+                  )}
+                </Box>
+
+                {/* EMAIL */}
+
+                <Box
+                  sx={{
+                    padding: "13px 15px",
+
+                    borderBottom: "1px solid #e0e0e0",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "13px",
+
+                      fontWeight: 600,
+
+                      marginBottom: "5px",
+                    }}
+                  >
+                    E-mail
+                  </Typography>
+
+                  {isEditing ? (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Enter your email"
+                    />
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontSize: "14px",
+
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {user?.email || "Not provided"}
+                    </Typography>
+                  )}
+                </Box>
+
+                {/* PHONE */}
+
+                <Box
+                  sx={{
+                    padding: "13px 15px",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "13px",
+
+                      fontWeight: 600,
+
+                      marginBottom: "5px",
+                    }}
+                  >
+                    Phone
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {user?.phone || "Not provided"}
+                  </Typography>
+                </Box>
+              </Paper>
+
+              {/* EDIT BUTTONS */}
+
+              {isEditing && (
+                <Box
+                  sx={{
+                    display: "flex",
+
+                    justifyContent: "flex-end",
+
+                    gap: 1,
+
+                    marginTop: "15px",
+
+                    width: "100%",
+
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    startIcon={<CloseOutlinedIcon />}
+                    onClick={handleCancel}
+                    sx={{
+                      textTransform: "none",
+
+                      fontSize: "13px",
+                    }}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    variant="contained"
+                    startIcon={<SaveOutlinedIcon />}
+                    onClick={handleSave}
+                    sx={{
+                      textTransform: "none",
+
+                      backgroundColor: Colors.profile,
+
+                      fontSize: "13px",
+
+                      "&:hover": {
+                        backgroundColor: Colors.profile,
+                      },
+                    }}
+                  >
+                    Save
+                  </Button>
+                </Box>
+              )}
+
+
 
               <Box
                 sx={{
                   width: "100%",
+
+                  backgroundColor: Colors.card,
+
+                  borderRadius: "14px",
+
+                  marginTop: "35px",
+
+                  padding: "22px 16px",
 
                   display: "flex",
 
@@ -1101,370 +963,502 @@ function ProfilePage() {
 
                   alignItems: "center",
 
-                  justifyContent: "center",
+                  gap: "25px",
 
                   boxSizing: "border-box",
+
+                  overflow: "hidden",
                 }}
               >
-                <Typography
-                  sx={{
-                    width: "100%",
-
-                    fontSize: "13px",
-
-                    fontWeight: 600,
-
-                    lineHeight: 1.5,
-
-                    marginBottom: "12px",
-
-                    textAlign: "center",
-
-                    wordBreak: "break-word",
-                  }}
-                >
-                  Download the APP to Track Your Plant and Get
-                  notifications on offers and delivery.
-                </Typography>
-
-                {/* STORE BUTTONS */}
+                {/* LEFT SECTION */}
 
                 <Box
                   sx={{
+                    width: "100%",
+
                     display: "flex",
 
                     flexDirection: "column",
 
                     alignItems: "center",
 
-                    justifyContent: "center",
+                    textAlign: "center",
 
-                    gap: "8px",
-
-                    width: "100%",
+                    boxSizing: "border-box",
                   }}
                 >
-                  <Box
-                    component="img"
-                    src="/images/google-play-logo_2.avif"
-                    alt="Get it on Google Play"
-                    sx={{
-                      width: "135px",
-
-                      maxWidth: "100%",
-
-                      height: "auto",
-
-                      display: "block",
-
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      window.open(
-                        "https://mamaearth.app.link/PfknblCuTOb",
-                        "_blank"
-                      );
-                    }}
-                  />
+                  {/* PLANT + LOGO */}
 
                   <Box
-                    component="img"
-                    src="/images/apple-store-logo_2.avif"
-                    alt="Download on the App Store"
                     sx={{
-                      width: "135px",
+                      display: "flex",
 
-                      maxWidth: "100%",
+                      alignItems: "center",
 
-                      height: "auto",
+                      justifyContent: "center",
 
-                      display: "block",
+                      gap: "5px",
 
-                      cursor: "pointer",
+                      marginBottom: "15px",
+
+                      width: "100%",
                     }}
-                    onClick={() => {
-                      window.open(
-                        "https://mamaearth.app.link/PfknblCuTOb",
-                        "_blank"
-                      );
+                  >
+                    <Box
+                      component="img"
+                      src="/images/Plant.avif"
+                      alt="Plant"
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
+                      sx={{
+                        width: "100px",
+                        height: "auto",
+                      }}
+                    />
+                    <Box
+                      component="img"
+                      src="/images/Plantname.webp"
+                      alt="We plant goodness"
+                      loading="eager"
+                      decoding="async"
+                      sx={{
+                        width: "120px",
+                        height: "auto",
+                      }}
+                    />
+                  </Box>
+
+                  {/* TEXT */}
+
+                  <Typography
+                    sx={{
+                      fontSize: "13px",
+
+                      lineHeight: 1.5,
+
+                      marginBottom: "18px",
+
+                      padding: "0 5px",
                     }}
-                  />
+                  >
+                    <strong>
+                      Your first plant is ready to be planted.
+                    </strong>
+                  </Typography>
+
+                  {/* QR + DOWNLOAD */}
+
+                  <Box
+                    sx={{
+                      width: "100%",
+
+                      display: "flex",
+
+                      flexDirection: "column",
+
+                      alignItems: "center",
+
+                      justifyContent: "center",
+
+                      gap: "15px",
+
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    {/* QR */}
+
+                    <Box
+                      component="img"
+                      src="/images/Qrcode.png"
+                      alt="Download app QR code"
+                      sx={{
+                        width: "90px",
+
+                        height: "90px",
+
+                        objectFit: "contain",
+
+                        flexShrink: 0,
+                      }}
+                    />
+
+                    {/* DOWNLOAD CONTENT */}
+
+                    <Box
+                      sx={{
+                        width: "100%",
+
+                        display: "flex",
+
+                        flexDirection: "column",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          width: "100%",
+
+                          fontSize: "13px",
+
+                          fontWeight: 600,
+
+                          lineHeight: 1.5,
+
+                          marginBottom: "12px",
+
+                          textAlign: "center",
+
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        Download the APP to Track Your Plant and Get
+                        notifications on offers and delivery.
+                      </Typography>
+
+                      {/* STORE BUTTONS */}
+
+                      <Box
+                        sx={{
+                          display: "flex",
+
+                          flexDirection: "column",
+
+                          alignItems: "center",
+
+                          justifyContent: "center",
+
+                          gap: "8px",
+
+                          width: "100%",
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src="/images/google-play-logo_2.avif"
+                          alt="Get it on Google Play"
+                          sx={{
+                            width: "135px",
+
+                            maxWidth: "100%",
+
+                            height: "auto",
+
+                            display: "block",
+
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            window.open(
+                              "https://mamaearth.app.link/PfknblCuTOb",
+                              "_blank"
+                            );
+                          }}
+                        />
+
+                        <Box
+                          component="img"
+                          src="/images/apple-store-logo_2.avif"
+                          alt="Download on the App Store"
+                          sx={{
+                            width: "135px",
+
+                            maxWidth: "100%",
+
+                            height: "auto",
+
+                            display: "block",
+
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            window.open(
+                              "https://mamaearth.app.link/PfknblCuTOb",
+                              "_blank"
+                            );
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* RIGHT SECTION */}
+
+                <Box
+                  sx={{
+                    width: "100%",
+
+                    borderLeft: "none",
+
+                    borderTop: "1px dashed #b8d99d",
+
+                    paddingLeft: 0,
+
+                    paddingTop: "22px",
+
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "18px",
+
+                      fontWeight: 700,
+
+                      marginBottom: "20px",
+                    }}
+                  >
+                    Download Benefits
+                  </Typography>
+
+                  {/* OFFER */}
+
+                  <Box
+                    sx={{
+                      display: "flex",
+
+                      alignItems: "center",
+
+                      gap: "12px",
+
+                      marginBottom: "20px",
+
+                      width: "100%",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "48px",
+
+                        height: "48px",
+
+                        borderRadius: "50%",
+
+                        backgroundColor: "#fff",
+
+                        display: "flex",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src="/images/offersicon.avif"
+                        alt="Get Exciting Offers"
+                        sx={{
+                          width: "34px",
+
+                          height: "34px",
+                        }}
+                      />
+                    </Box>
+
+                    <Typography
+                      sx={{
+                        fontSize: "14px",
+
+                        fontWeight: 600,
+
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      Get Exciting Offers
+                    </Typography>
+                  </Box>
+
+                  {/* TRACK ORDERS */}
+
+                  <Box
+                    sx={{
+                      display: "flex",
+
+                      alignItems: "center",
+
+                      gap: "12px",
+
+                      marginBottom: "20px",
+
+                      width: "100%",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "48px",
+
+                        height: "48px",
+
+                        borderRadius: "50%",
+
+                        backgroundColor: "#fff",
+
+                        display: "flex",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src="/images/trackorder.svg"
+                        alt="Easy To Track Your Orders"
+                        sx={{
+                          width: "36px",
+
+                          height: "36px",
+                        }}
+                      />
+                    </Box>
+
+                    <Typography
+                      sx={{
+                        fontSize: "14px",
+
+                        fontWeight: 600,
+
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      Easy To Track Your Orders
+                    </Typography>
+                  </Box>
+
+                  {/* TRACK PLANT */}
+
+                  <Box
+                    sx={{
+                      display: "flex",
+
+                      alignItems: "center",
+
+                      gap: "12px",
+
+                      width: "100%",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "48px",
+
+                        height: "48px",
+
+                        borderRadius: "50%",
+
+                        backgroundColor: "#fff",
+
+                        display: "flex",
+
+                        alignItems: "center",
+
+                        justifyContent: "center",
+
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src="/images/trackPlant.avif"
+                        alt="Easy To Track Your Plant"
+                        sx={{
+                          width: "36px",
+
+                          height: "36px",
+                        }}
+                      />
+                    </Box>
+
+                    <Typography
+                      sx={{
+                        fontSize: "14px",
+
+                        fontWeight: 600,
+
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      Easy To Track Your Plant
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          </Box>
+            </>
+          )}
 
-          {/* RIGHT SECTION */}
+          {/* ================================================= */}
+          {/* ================= ORDERS ========================= */}
+          {/* ================================================= */}
 
-          <Box
-            sx={{
-              width: "100%",
-
-              borderLeft: "none",
-
-              borderTop: "1px dashed #b8d99d",
-
-              paddingLeft: 0,
-
-              paddingTop: "22px",
-
-              boxSizing: "border-box",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "18px",
-
-                fontWeight: 700,
-
-                marginBottom: "20px",
-              }}
-            >
-              Download Benefits
-            </Typography>
-
-            {/* OFFER */}
-
+          {selectedSection === "orders" && (
             <Box
               sx={{
-                display: "flex",
-
-                alignItems: "center",
-
-                gap: "12px",
-
-                marginBottom: "20px",
-
                 width: "100%",
+                boxSizing: "border-box",
               }}
             >
-              <Box
-                sx={{
-                  width: "48px",
-
-                  height: "48px",
-
-                  borderRadius: "50%",
-
-                  backgroundColor: "#fff",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  justifyContent: "center",
-
-                  flexShrink: 0,
-                }}
-              >
-                <Box
-                  component="img"
-                  src="/images/offersicon.avif"
-                  alt="Get Exciting Offers"
-                  sx={{
-                    width: "34px",
-
-                    height: "34px",
-                  }}
-                />
-              </Box>
-
-              <Typography
-                sx={{
-                  fontSize: "14px",
-
-                  fontWeight: 600,
-
-                  wordBreak: "break-word",
-                }}
-              >
-                Get Exciting Offers
-              </Typography>
+              <YourOrders />
             </Box>
+          )}
 
-            {/* TRACK ORDERS */}
+          {/* ================================================= */}
+          {/* ================= REFERRALS ====================== */}
+          {/* ================================================= */}
 
+          {selectedSection === "referrals" && (
             <Box
               sx={{
-                display: "flex",
-
-                alignItems: "center",
-
-                gap: "12px",
-
-                marginBottom: "20px",
-
                 width: "100%",
+                boxSizing: "border-box",
               }}
             >
-              <Box
-                sx={{
-                  width: "48px",
-
-                  height: "48px",
-
-                  borderRadius: "50%",
-
-                  backgroundColor: "#fff",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  justifyContent: "center",
-
-                  flexShrink: 0,
-                }}
-              >
-                <Box
-                  component="img"
-                  src="/images/trackorder.svg"
-                  alt="Easy To Track Your Orders"
-                  sx={{
-                    width: "36px",
-
-                    height: "36px",
-                  }}
-                />
-              </Box>
-
-              <Typography
-                sx={{
-                  fontSize: "14px",
-
-                  fontWeight: 600,
-
-                  wordBreak: "break-word",
-                }}
-              >
-                Easy To Track Your Orders
-              </Typography>
+              <Referrals />
             </Box>
+          )}
 
-            {/* TRACK PLANT */}
+          {/* ================================================= */}
+          {/* ================= TRACK ORDERS =================== */}
+          {/* ================================================= */}
 
+          {selectedSection === "trackorders" && (
             <Box
               sx={{
-                display: "flex",
-
-                alignItems: "center",
-
-                gap: "12px",
-
                 width: "100%",
+                boxSizing: "border-box",
               }}
             >
-              <Box
-                sx={{
-                  width: "48px",
-
-                  height: "48px",
-
-                  borderRadius: "50%",
-
-                  backgroundColor: "#fff",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  justifyContent: "center",
-
-                  flexShrink: 0,
-                }}
-              >
-                <Box
-                  component="img"
-                  src="/images/trackPlant.avif"
-                  alt="Easy To Track Your Plant"
-                  sx={{
-                    width: "36px",
-
-                    height: "36px",
-                  }}
-                />
-              </Box>
-
-              <Typography
-                sx={{
-                  fontSize: "14px",
-
-                  fontWeight: 600,
-
-                  wordBreak: "break-word",
-                }}
-              >
-                Easy To Track Your Plant
-              </Typography>
+              <TrackOrder />
             </Box>
-          </Box>
+          )}
+
+          {/* ================================================= */}
+          {/* ================= CHAT ============================ */}
+          {/* ================================================= */}
+
+          {selectedSection === "chat" && (
+            <Box
+              sx={{
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
+              <ChatWithUs />
+            </Box>
+          )}
         </Box>
-      </>
-    )}
-
-    {/* ================================================= */}
-    {/* ================= ORDERS ========================= */}
-    {/* ================================================= */}
-
-    {selectedSection === "orders" && (
-      <Box
-        sx={{
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
-        <YourOrders />
       </Box>
-    )}
 
-    {/* ================================================= */}
-    {/* ================= REFERRALS ====================== */}
-    {/* ================================================= */}
 
-    {selectedSection === "referrals" && (
-      <Box
-        sx={{
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
-        <Referrals />
-      </Box>
-    )}
-
-    {/* ================================================= */}
-    {/* ================= TRACK ORDERS =================== */}
-    {/* ================================================= */}
-
-    {selectedSection === "trackorders" && (
-      <Box
-        sx={{
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
-        <TrackOrder />
-      </Box>
-    )}
-
-    {/* ================================================= */}
-    {/* ================= CHAT ============================ */}
-    {/* ================================================= */}
-
-    {selectedSection === "chat" && (
-      <Box
-        sx={{
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
-        <ChatWithUs />
-      </Box>
-    )}
-  </Box>
-</Box>
-
-     
 
       <Box
         sx={{
@@ -1496,7 +1490,7 @@ function ProfilePage() {
           boxSizing: "border-box",
         }}
       >
-       
+
 
         <Paper
           elevation={0}
@@ -1753,7 +1747,7 @@ function ProfilePage() {
           </List>
         </Paper>
 
-        
+
 
         <Box
           sx={{
@@ -1763,7 +1757,7 @@ function ProfilePage() {
             boxSizing: "border-box",
           }}
         >
-     
+
 
           {selectedSection === "profile" && (
             <>
@@ -1838,7 +1832,7 @@ function ProfilePage() {
                 </Box>
               </Box>
 
-              
+
               <Paper
                 elevation={0}
                 sx={{
@@ -2013,7 +2007,7 @@ function ProfilePage() {
                 </Box>
               )}
 
-          
+
 
               <Box
                 sx={{
@@ -2035,7 +2029,7 @@ function ProfilePage() {
                   minHeight: "400px",
 
                   boxSizing: "border-box",
-                  mt:20
+                  mt: 20
                 }}
               >
                 {/* LEFT SECTION */}
@@ -2399,8 +2393,8 @@ function ProfilePage() {
             </>
           )}
 
-          
-        
+
+
 
           {selectedSection === "orders" && (
             <Box sx={{ width: "100%" }}>
@@ -2422,7 +2416,7 @@ function ProfilePage() {
             </Box>
           )}
 
-         
+
           {selectedSection === "trackorders" && (
             <Box sx={{ width: "100%" }}>
               <TrackOrder />
