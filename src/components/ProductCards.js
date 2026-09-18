@@ -1212,14 +1212,9 @@ function ProductCards({
   // PRODUCTS
 
 
-  const productList = useMemo(
-      () =>
-        Array.isArray(products)
-          ? products
-          : [],
-      [products]
-    );
-
+ const productList = Array.isArray(products)
+  ? products
+  : [];
 
   // NO PRODUCTS
 
@@ -1360,12 +1355,11 @@ function ProductCards({
           onClose={() =>
             setSnackbarOpen(false)
           }
-          severity={
-            snackbarMessage =
-              "Added to cart"
-              ? "success"
-              : "error"
-          }
+         severity={
+  snackbarMessage === "Added to cart"
+    ? "success"
+    : "error"
+}
           variant="filled"
           sx={{
             width: "100%",
