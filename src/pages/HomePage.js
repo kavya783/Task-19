@@ -149,7 +149,10 @@ const MobileFloatingCart = memo(
 
           position: "fixed",
 
-          bottom: 18,
+        bottom: {
+  xs: "12px",
+  sm: "18px",
+},
 
           left: "50%",
 
@@ -158,12 +161,19 @@ const MobileFloatingCart = memo(
 
           zIndex: 1199,
 
-          width: "200px",
+         width: {
+  xs: "calc(100% - 24px)",
+  sm: "200px",
+},
 
-          height: "58px",
+maxWidth: "200px",
 
-          backgroundColor:
-            "#08a9e6",
+height: {
+  xs: 54,
+  sm: 58,
+},
+
+          backgroundColor:Colors.blue,
 
           borderRadius: "40px",
 

@@ -79,7 +79,22 @@ const getProductImages = (product) => {
 
   return [];
 };
+// ========================================
+// OPTIMIZE CLOUDINARY IMAGE
+// ========================================
 
+const getOptimizedImageUrl = (url, width = 256) => {
+  if (!url) return "";
+
+  if (!url.includes("res.cloudinary.com")) {
+    return url;
+  }
+
+  return url.replace(
+    "/image/upload/",
+    `/image/upload/f_auto,q_auto,w_${width},h_${width},c_fill/`
+  );
+};
 
 // ========================================
 // GET CART QUANTITIES
@@ -143,11 +158,11 @@ const getProductPricing = (product) => {
 
   const calculatedDiscount =
     mrp > 0 &&
-    salePrice > 0 &&
-    salePrice < mrp
+      salePrice > 0 &&
+      salePrice < mrp
       ? Math.round(
-          ((mrp - salePrice) / mrp) * 100
-        )
+        ((mrp - salePrice) / mrp) * 100
+      )
       : 0;
 
   const discount =
@@ -178,27 +193,32 @@ const ProductCardItem = memo(
     onAddToCart,
     onQuantityChange,
   }) {
-    // ======================================
+  
     // PRODUCT IMAGES
-    // ======================================
+  
 
     const images = useMemo(
       () => getProductImages(product),
       [product]
     );
 
-    // ======================================
+  
     // CURRENT IMAGE
-    // ======================================
+  
 
     const currentImage =
       isHovered && images.length > 1
         ? images[1]
         : images[0] || "";
 
-    // ======================================
+    const optimizedImage = useMemo(
+      () => getOptimizedImageUrl(currentImage, 256),
+      [currentImage]
+    );
+
+  
     // PRICING
-    // ======================================
+  
 
     const {
       salePrice,
@@ -209,18 +229,18 @@ const ProductCardItem = memo(
       [product]
     );
 
-    // ======================================
+  
     // PRODUCT NAME
-    // ======================================
+  
 
     const productName =
       product?.name ||
       product?.heading ||
       "Product";
 
-    // ======================================
+  
     // BENEFITS
-    // ======================================
+  
 
     const benefits = Array.isArray(
       product?.benefits
@@ -228,9 +248,9 @@ const ProductCardItem = memo(
       ? product.benefits.join(" | ")
       : product?.benefits || "";
 
-    // ======================================
+  
     // CARD CLICK
-    // ======================================
+  
 
     const handleCardClick = useCallback(() => {
       onNavigate(product.id);
@@ -239,9 +259,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-    // ======================================
+  
     // MOUSE ENTER
-    // ======================================
+  
 
     const handleMouseEnter = useCallback(() => {
       if (images.length > 1) {
@@ -253,9 +273,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-    // ======================================
+  
     // MOUSE LEAVE
-    // ======================================
+  
 
     const handleMouseLeave = useCallback(() => {
       onMouseLeave(product.id);
@@ -264,9 +284,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-    // ======================================
+  
     // ADD TO CART
-    // ======================================
+  
 
     const handleAdd = useCallback(
       (event) => {
@@ -278,9 +298,9 @@ const ProductCardItem = memo(
       ]
     );
 
-    // ======================================
+  
     // DECREASE QUANTITY
-    // ======================================
+  
 
     const handleDecrease = useCallback(
       (event) => {
@@ -296,9 +316,9 @@ const ProductCardItem = memo(
       ]
     );
 
-    // ======================================
+  
     // INCREASE QUANTITY
-    // ======================================
+  
 
     const handleIncrease = useCallback(
       (event) => {
@@ -380,7 +400,7 @@ const ProductCardItem = memo(
 
               <CardMedia
                 component="img"
-                image={currentImage}
+                image={optimizedImage}
                 alt={productName}
                 loading="lazy"
                 decoding="async"
@@ -415,8 +435,7 @@ const ProductCardItem = memo(
                     "transform 0.2s ease",
 
                   "&:hover": {
-                    transform:
-                      "scale(1.03)",
+                    transform: "scale(1.03)",
                   },
                 }}
               />
@@ -876,23 +895,23 @@ function ProductCards({
 }) {
   const navigate = useNavigate();
 
-  // ========================================
+==
   // HOVER STATE
-  // ========================================
+==
 
   const [hoveredProducts, setHoveredProducts] =
     useState({});
 
-  // ========================================
+==
   // CART QUANTITIES
-  // ========================================
+==
 
   const [cartQuantities, setCartQuantities] =
     useState(getCartQuantities);
 
-  // ========================================
+==
   // SNACKBAR
-  // ========================================
+==
 
   const [snackbarOpen, setSnackbarOpen] =
     useState(false);
@@ -900,9 +919,9 @@ function ProductCards({
   const [snackbarMessage, setSnackbarMessage] =
     useState("");
 
-  // ========================================
+==
   // SYNC CART
-  // ========================================
+==
 
   const syncCartQuantities = useCallback(() => {
     setCartQuantities(
@@ -936,9 +955,9 @@ function ProductCards({
     syncCartQuantities,
   ]);
 
-  // ========================================
+==
   // NAVIGATE
-  // ========================================
+==
 
   const handleNavigate = useCallback(
     (productId) => {
@@ -949,9 +968,9 @@ function ProductCards({
     [navigate]
   );
 
-  // ========================================
+==
   // HOVER ENTER
-  // ========================================
+==
 
   const handleMouseEnter = useCallback(
     (productId) => {
@@ -971,9 +990,9 @@ function ProductCards({
     []
   );
 
-  // ========================================
+==
   // HOVER LEAVE
-  // ========================================
+==
 
   const handleMouseLeave = useCallback(
     (productId) => {
@@ -996,9 +1015,9 @@ function ProductCards({
     []
   );
 
-  // ========================================
+==
   // ADD TO CART
-  // ========================================
+==
 
   const handleAddToCart = useCallback(
     (event, product) => {
@@ -1093,9 +1112,9 @@ function ProductCards({
     []
   );
 
-  // ========================================
+==
   // CART QUANTITY CHANGE
-  // ========================================
+==
 
   const handleCartQuantityChange =
     useCallback(
@@ -1195,9 +1214,9 @@ function ProductCards({
       []
     );
 
-  // ========================================
+==
   // PRODUCTS
-  // ========================================
+==
 
   const productList = useMemo(
     () =>
@@ -1207,9 +1226,9 @@ function ProductCards({
     [products]
   );
 
-  // ========================================
+==
   // NO PRODUCTS
-  // ========================================
+==
 
   if (!productList.length) {
     return (
@@ -1235,9 +1254,9 @@ function ProductCards({
     );
   }
 
-  // ========================================
+==
   // UI
-  // ========================================
+==
 
   return (
     <>
@@ -1296,13 +1315,13 @@ function ProductCards({
                   product={product}
                   quantity={
                     cartQuantities[
-                      productId
+                    productId
                     ] || 0
                   }
                   isHovered={
                     Boolean(
                       hoveredProducts[
-                        productId
+                      productId
                       ]
                     )
                   }
@@ -1349,7 +1368,7 @@ function ProductCards({
           }
           severity={
             snackbarMessage ===
-            "Added to cart"
+              "Added to cart"
               ? "success"
               : "error"
           }
