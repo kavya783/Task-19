@@ -13,7 +13,7 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-     Snackbar,
+    Snackbar,
     Alert,
 } from "@mui/material";
 
@@ -139,9 +139,9 @@ function ProductDetailsPage() {
     const [locationLoading, setLocationLoading] = useState(false);
     const [locationData, setLocationData] = useState(null);
     const [locationError, setLocationError] = useState("");
- const [snackbarOpen, setSnackbarOpen] = useState(false);
- const [snackbarMessage, setSnackbarMessage] = useState("");
- const [cartQuantity, setCartQuantity] = useState(0);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [cartQuantity, setCartQuantity] = useState(0);
 
     // PRODUCTS
 
@@ -189,23 +189,23 @@ function ProductDetailsPage() {
     }, [id]);
 
     useEffect(() => {
-      const syncProductQuantity = () => {
-    try {
-        const cartKey = getCartKey();
+        const syncProductQuantity = () => {
+            try {
+                const cartKey = getCartKey();
 
-        const cart = JSON.parse(
-            localStorage.getItem(cartKey) || "[]"
-        );
+                const cart = JSON.parse(
+                    localStorage.getItem(cartKey) || "[]"
+                );
 
-        const cartItem = cart.find(
-            (item) => String(item.id) === String(id)
-        );
+                const cartItem = cart.find(
+                    (item) => String(item.id) === String(id)
+                );
 
-        setCartQuantity(Number(cartItem?.quantity) || 0);
-    } catch {
-        setCartQuantity(0);
-    }
-};
+                setCartQuantity(Number(cartItem?.quantity) || 0);
+            } catch {
+                setCartQuantity(0);
+            }
+        };
         syncProductQuantity();
         window.addEventListener("cart:update", syncProductQuantity);
 
@@ -316,12 +316,12 @@ function ProductDetailsPage() {
     );
     const calculatedDiscount =
         displayMrpValue > 0 &&
-        displaySalePrice > 0 &&
-        displaySalePrice < displayMrpValue
+            displaySalePrice > 0 &&
+            displaySalePrice < displayMrpValue
             ? Math.round(
                 ((displayMrpValue - displaySalePrice) /
                     displayMrpValue) *
-                    100
+                100
             )
             : 0;
     const displayDiscount =
@@ -423,98 +423,98 @@ function ProductDetailsPage() {
             setLocationLoading(false);
         }
     };
- // ADD TO CART
-const handleAddToCart = () => {
-    try {
-        const cartKey = getCartKey();
+    // ADD TO CART
+    const handleAddToCart = () => {
+        try {
+            const cartKey = getCartKey();
 
-        const existingCart = JSON.parse(
-            localStorage.getItem(cartKey) || "[]"
-        );
+            const existingCart = JSON.parse(
+                localStorage.getItem(cartKey) || "[]"
+            );
 
-        const productId = String(product.id);
+            const productId = String(product.id);
 
-        const cartIndex = existingCart.findIndex(
-            (item) => String(item.id) === productId
-        );
+            const cartIndex = existingCart.findIndex(
+                (item) => String(item.id) === productId
+            );
 
-        if (cartIndex >= 0) {
-            existingCart[cartIndex].quantity =
-                (Number(existingCart[cartIndex].quantity) || 1) + 1;
-        } else {
-            existingCart.push({
-                ...product,
-                quantity: 1,
-            });
+            if (cartIndex >= 0) {
+                existingCart[cartIndex].quantity =
+                    (Number(existingCart[cartIndex].quantity) || 1) + 1;
+            } else {
+                existingCart.push({
+                    ...product,
+                    quantity: 1,
+                });
+            }
+
+            localStorage.setItem(
+                cartKey,
+                JSON.stringify(existingCart)
+            );
+
+            window.dispatchEvent(
+                new CustomEvent("cart:update")
+            );
+
+            setCartQuantity(
+                cartIndex >= 0
+                    ? Number(existingCart[cartIndex].quantity) || 1
+                    : 1
+            );
+
+            setSnackbarMessage("Added to cart");
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error("Add to cart failed:", error);
+
+            setSnackbarMessage("Unable to add to cart");
+            setSnackbarOpen(true);
         }
+    };
 
-        localStorage.setItem(
-            cartKey,
-            JSON.stringify(existingCart)
-        );
+    const handleCartQuantityChange = (change) => {
+        try {
+            const cartKey = getCartKey();
 
-        window.dispatchEvent(
-            new CustomEvent("cart:update")
-        );
+            const existingCart = JSON.parse(
+                localStorage.getItem(cartKey) || "[]"
+            );
 
-        setCartQuantity(
-            cartIndex >= 0
-                ? Number(existingCart[cartIndex].quantity) || 1
-                : 1
-        );
+            const productId = String(product.id);
 
-        setSnackbarMessage("Added to cart");
-        setSnackbarOpen(true);
-    } catch (error) {
-        console.error("Add to cart failed:", error);
+            const cartIndex = existingCart.findIndex(
+                (item) => String(item.id) === productId
+            );
 
-        setSnackbarMessage("Unable to add to cart");
-        setSnackbarOpen(true);
-    }
-};
+            if (cartIndex < 0) return;
 
-const handleCartQuantityChange = (change) => {
-    try {
-        const cartKey = getCartKey();
+            const nextQuantity =
+                (Number(existingCart[cartIndex].quantity) || 1) + change;
 
-        const existingCart = JSON.parse(
-            localStorage.getItem(cartKey) || "[]"
-        );
+            if (nextQuantity <= 0) {
+                existingCart.splice(cartIndex, 1);
+            } else {
+                existingCart[cartIndex].quantity = nextQuantity;
+            }
 
-        const productId = String(product.id);
+            localStorage.setItem(
+                cartKey,
+                JSON.stringify(existingCart)
+            );
 
-        const cartIndex = existingCart.findIndex(
-            (item) => String(item.id) === productId
-        );
+            setCartQuantity(Math.max(0, nextQuantity));
 
-        if (cartIndex < 0) return;
-
-        const nextQuantity =
-            (Number(existingCart[cartIndex].quantity) || 1) + change;
-
-        if (nextQuantity <= 0) {
-            existingCart.splice(cartIndex, 1);
-        } else {
-            existingCart[cartIndex].quantity = nextQuantity;
+            window.dispatchEvent(
+                new CustomEvent("cart:update")
+            );
+        } catch (error) {
+            console.error(
+                "Cart quantity update failed:",
+                error
+            );
         }
-
-        localStorage.setItem(
-            cartKey,
-            JSON.stringify(existingCart)
-        );
-
-        setCartQuantity(Math.max(0, nextQuantity));
-
-        window.dispatchEvent(
-            new CustomEvent("cart:update")
-        );
-    } catch (error) {
-        console.error(
-            "Cart quantity update failed:",
-            error
-        );
-    }
-};
+    };
 
     // PINCODE CHANGE
 
@@ -794,107 +794,110 @@ const handleCartQuantityChange = (change) => {
                                     {/* ==================================================
                                         MAGNIFIER IMAGE AREA
                                     ================================================== */}
-                                  <Box
-    onMouseMove={handleMagnifierMove}
-    onMouseEnter={() => setShowMagnifier(true)}
-    onMouseLeave={() => {
-        if (window.innerWidth >= 1024) {
-            setShowMagnifier(false);
-        }
-    }}
+                                    <Box
+                                        onMouseMove={handleMagnifierMove}
+                                        onMouseEnter={() => setShowMagnifier(true)}
+                                        onMouseLeave={() => {
+                                            if (window.innerWidth >= 1024) {
+                                                setShowMagnifier(false);
+                                            }
+                                        }}
 
-    // MOBILE / TABLET
-    onPointerDown={(event) => {
-        if (window.innerWidth < 1024) {
-            event.currentTarget.setPointerCapture?.(event.pointerId);
-            setShowMagnifier(true);
-            handleMagnifierMove(event);
-        }
-    }}
-    onPointerMove={(event) => {
-        if (window.innerWidth < 1024) {
-            handleMagnifierMove(event);
-        }
-    }}
+                                        // MOBILE / TABLET
+                                        onPointerDown={(event) => {
+                                            if (window.innerWidth < 1024) {
+                                                event.currentTarget.setPointerCapture?.(event.pointerId);
+                                                setShowMagnifier(true);
+                                                handleMagnifierMove(event);
+                                            }
+                                        }}
+                                        onPointerMove={(event) => {
+                                            if (window.innerWidth < 1024) {
+                                                handleMagnifierMove(event);
+                                            }
+                                        }}
 
-    sx={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        cursor: "crosshair",
-        touchAction: "none",
-    }}
->
-    <Box
-        component="img"
-        src={images[selectedImage]}
-        alt={product.name || "Product"}
-        sx={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            display: "block",
-        }}
-    />
+                                        sx={{
+                                            position: "relative",
+                                            width: "100%",
+                                            height: "100%",
+                                            cursor: "crosshair",
+                                            touchAction: "none",
+                                        }}
+                                    >
+                                        <Box
+                                            component="img"
+                                            src={images[selectedImage]}
+                                            alt={product.name || "Product"}
+                                            loading="eager"
+                                            fetchPriority="high"
+                                            decoding="async"
+                                            sx={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "contain",
+                                                display: "block",
+                                            }}
+                                        />
 
-    {/* MOBILE MAGNIFIER */}
-    {showMagnifier && (
-        <Box
-            sx={{
-                display: { xs: "block", sm: "block" },
+                                        {/* MOBILE MAGNIFIER */}
+                                        {showMagnifier && (
+                                            <Box
+                                                sx={{
+                                                    display: { xs: "block", sm: "block" },
 
-                position: "absolute",
+                                                    position: "absolute",
 
-                // CLICK CHESINA EXACT PLACE
-                left: {
-                    xs: `${position.x}%`,
-                    sm: "calc(100% + 15px)",
-                },
+                                                    // CLICK CHESINA EXACT PLACE
+                                                    left: {
+                                                        xs: `${position.x}%`,
+                                                        sm: "calc(100% + 15px)",
+                                                    },
 
-                top: {
-                    xs: `${position.y}%`,
-                    sm: 0,
-                },
+                                                    top: {
+                                                        xs: `${position.y}%`,
+                                                        sm: 0,
+                                                    },
 
-                transform: {
-                    xs: "translate(-50%, -50%)",
-                    sm: "none",
-                },
+                                                    transform: {
+                                                        xs: "translate(-50%, -50%)",
+                                                        sm: "none",
+                                                    },
 
-                width: {
-                    xs: 180,
-                    sm: 350,
-                    md: 400,
-                    lg:600,
-                },
+                                                    width: {
+                                                        xs: 180,
+                                                        sm: 350,
+                                                        md: 400,
+                                                        lg: 600,
+                                                    },
 
-                height: {
-                    xs: 180,
-                    sm: 350,
-                    md: 400,
-                    lg:600,
-                },
+                                                    height: {
+                                                        xs: 180,
+                                                        sm: 350,
+                                                        md: 400,
+                                                        lg: 600,
+                                                    },
 
-                border: "1px solid #ddd",
-                borderRadius: 2,
+                                                    border: "1px solid #ddd",
+                                                    borderRadius: 2,
 
-                backgroundColor: Colors.background,
+                                                    backgroundColor: Colors.background,
 
-                backgroundImage: `url(${images[selectedImage]})`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "300% 300%",
+                                                    backgroundImage: `url(${images[selectedImage]})`,
+                                                    backgroundRepeat: "no-repeat",
+                                                    backgroundSize: "300% 300%",
 
-                backgroundPosition: `${position.x}% ${position.y}%`,
+                                                    backgroundPosition: `${position.x}% ${position.y}%`,
 
-                pointerEvents: "none",
+                                                    pointerEvents: "none",
 
-                zIndex: 20,
+                                                    zIndex: 20,
 
-                boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-            }}
-        />
-    )}
-</Box>
+                                                    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                                                }}
+                                            />
+                                        )}
+                                    </Box>
                                 </Box>
                             ) : (
                                 <Box
@@ -948,10 +951,9 @@ const handleCartQuantityChange = (change) => {
                                             key={`${image}-${index}`}
                                             component="img"
                                             src={image}
-                                            alt={`${product.name ||
-                                                "Product"
-                                                } ${index + 1
-                                                }`}
+                                            alt={`${product.name || "Product"} ${index + 1}`}
+                                            loading="lazy"
+                                            decoding="async"
                                             onClick={() =>
                                                 setSelectedImage(
                                                     index
@@ -1090,61 +1092,61 @@ const handleCartQuantityChange = (change) => {
                             RATING & REVIEWS
                         ================================================== */}
 
-              <Stack
-    direction="row"
-    alignItems="center"
-    sx={{
-        mt: 1,
-        flexWrap: "nowrap",
-        whiteSpace: "nowrap",
-    }}
->
-    <StarIcon
-        sx={{
-            color: Colors.orange,
-            fontSize: {
-                xs: 19,
-                sm: 22,
-            },
-            mr: 0.6,
-        }}
-    />
+                        <Stack
+                            direction="row"
+                            alignItems="center"
+                            sx={{
+                                mt: 1,
+                                flexWrap: "nowrap",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            <StarIcon
+                                sx={{
+                                    color: Colors.orange,
+                                    fontSize: {
+                                        xs: 19,
+                                        sm: 22,
+                                    },
+                                    mr: 0.6,
+                                }}
+                            />
 
-    <Typography
-        variant="body2"
-        sx={{
-            fontSize: Theme.font18Regular,
-        }}
-    >
-        {rating > 0 ? rating.toFixed(1) : "0.0"}
-    </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    fontSize: Theme.font18Regular,
+                                }}
+                            >
+                                {rating > 0 ? rating.toFixed(1) : "0.0"}
+                            </Typography>
 
-    <Typography
-    sx={{
-        fontSize: Theme.font18Regular,
-        lineHeight: 1,
-        display: "flex",
-        alignItems: "center",
-        ml: 0.5,
-        mr: 0.5,
-    }}
->
-    |
-</Typography>
+                            <Typography
+                                sx={{
+                                    fontSize: Theme.font18Regular,
+                                    lineHeight: 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    ml: 0.5,
+                                    mr: 0.5,
+                                }}
+                            >
+                                |
+                            </Typography>
 
-   <Typography
-    variant="body2"
-    sx={{
-        color: Colors.blue,
-        fontSize: Theme.font14Bold,
-        lineHeight: 1,
-        display: "flex",
-        alignItems: "center",
-    }}
->
-    {reviewCount} Reviews
-</Typography>
-</Stack>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: Colors.blue,
+                                    fontSize: Theme.font14Bold,
+                                    lineHeight: 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}
+                            >
+                                {reviewCount} Reviews
+                            </Typography>
+                        </Stack>
 
 
                         {/* ==================================
@@ -1324,7 +1326,7 @@ const handleCartQuantityChange = (change) => {
                             {displayDiscount > 0 && (
                                 <Typography
                                     sx={{
-                                        fontSize:Theme.font14Bold,
+                                        fontSize: Theme.font14Bold,
                                         whiteSpace:
                                             "nowrap",
                                         color:
@@ -1451,7 +1453,7 @@ const handleCartQuantityChange = (change) => {
                                                                         .includes(
                                                                             "trending"
                                                                         )
-                                                                        ?Colors.orange
+                                                                        ? Colors.orange
                                                                         : badge
                                                                             .toLowerCase()
                                                                             .includes(
@@ -1461,8 +1463,8 @@ const handleCartQuantityChange = (change) => {
                                                                             : Colors.green,
                                                                 color:
                                                                     Colors.background,
-                                                                fontSize:Theme.font14Bold,
-                                                               
+                                                                fontSize: Theme.font14Bold,
+
                                                                 lineHeight:
                                                                     1.25,
                                                                 whiteSpace:
@@ -1676,7 +1678,7 @@ const handleCartQuantityChange = (change) => {
                         >
                             <LocationOnOutlinedIcon
                                 sx={{
-                                   ...Theme.font18Bold,
+                                    ...Theme.font18Bold,
                                 }}
                             />
 
@@ -1995,9 +1997,9 @@ const handleCartQuantityChange = (change) => {
                                     <Box
                                         component="img"
                                         src={image}
-                                        alt={`${product.name ||
-                                            "Product"
-                                            } ${index + 1}`}
+                                        alt={`${product.name || "Product"} ${index + 1}`}
+                                        loading="lazy"
+                                        decoding="async"
                                         sx={{
                                             width: {
                                                 xs: "100%",
@@ -2839,15 +2841,15 @@ const handleCartQuantityChange = (change) => {
                                 <Box
                                     component="img"
                                     src={
-                                        images[
-                                        selectedImage
-                                        ] ||
+                                        images[selectedImage] ||
                                         images[0]
                                     }
                                     alt={
                                         product.name ||
                                         "Product"
                                     }
+                                    loading="lazy"
+                                    decoding="async"
                                     sx={{
                                         width: {
                                             xs: 50,
@@ -2900,7 +2902,7 @@ const handleCartQuantityChange = (change) => {
 
                         {/* ADD TO CART BUTTON */}
 
-                       {cartQuantity > 0 ? (
+                        {cartQuantity > 0 ? (
                             <Box
                                 sx={{
                                     flexShrink: 0,
@@ -2924,7 +2926,7 @@ const handleCartQuantityChange = (change) => {
                                 onClick={handleAddToCart}
                                 sx={{
                                     flexShrink: 0,
-                                    backgroundColor:Colors.blue,
+                                    backgroundColor: Colors.blue,
                                     color: Colors.background,
                                     borderRadius: "30px",
                                     textTransform: "none",
@@ -2941,28 +2943,28 @@ const handleCartQuantityChange = (change) => {
                         )}
                     </Box>
                 </Box>
- <Snackbar
-    open={snackbarOpen}
-    autoHideDuration={2500}
-    onClose={() => setSnackbarOpen(false)}
-    anchorOrigin={{
-        vertical: "top",
-        horizontal: "center",
-    }}
->
-    <Alert
-        onClose={() => setSnackbarOpen(false)}
-        severity={
-            snackbarMessage === "Added to cart"
-                ? "success"
-                : "error"
-        }
-        variant="filled"
-        sx={{ width: "100%" }}
-    >
-        {snackbarMessage}
-    </Alert>
-</Snackbar>
+                <Snackbar
+                    open={snackbarOpen}
+                    autoHideDuration={2500}
+                    onClose={() => setSnackbarOpen(false)}
+                    anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "center",
+                    }}
+                >
+                    <Alert
+                        onClose={() => setSnackbarOpen(false)}
+                        severity={
+                            snackbarMessage === "Added to cart"
+                                ? "success"
+                                : "error"
+                        }
+                        variant="filled"
+                        sx={{ width: "100%" }}
+                    >
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
                 <Footer />
 
             </Box>
