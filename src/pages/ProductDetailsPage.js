@@ -2215,6 +2215,7 @@ function ProductDetailsPage() {
                                 <Box
                                     component="img"
                                     src="/images/vitamin-c.png"
+                                     alt="Vitamin C"
                                     sx={{
                                         width: {
                                             xs: 75,
