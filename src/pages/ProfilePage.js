@@ -1020,8 +1020,6 @@ function ProfilePage() {
                       component="img"
                       src="/images/Plantname.webp"
                       alt="We plant goodness"
-                      loading="eager"
-                      decoding="async"
                       sx={{
                         width: "120px",
                         height: "auto",
@@ -1367,16 +1365,17 @@ function ProfilePage() {
                         flexShrink: 0,
                       }}
                     >
-                      <Box
-                        component="img"
-                        src="/images/trackPlant.avif"
-                        alt="Easy To Track Your Plant"
-                        sx={{
-                          width: "36px",
-
-                          height: "36px",
-                        }}
-                      />
+                   <Box
+  component="img"
+  src="/images/Plant.avif"
+  alt="Plant"
+  loading="lazy"
+  decoding="async"
+  sx={{
+    width: "36px",
+    height: "36px",
+  }}
+/>
                     </Box>
 
                     <Typography
@@ -2059,15 +2058,18 @@ function ProfilePage() {
                       marginBottom: "20px",
                     }}
                   >
-                    <Box
-                      component="img"
-                      src="/images/Plant.avif"
-                      alt="Plant"
-                      sx={{
-                        width: "100px",
-                        height: "auto",
-                      }}
-                    />
+                  <Box
+  component="img"
+  src="/images/Plant.avif"
+  alt="Plant"
+  loading="eager"
+  fetchPriority="high"
+  decoding="async"
+  sx={{
+    width: "100px",
+    height: "auto",
+  }}
+/>
 
                     <Box
                       component="img"
