@@ -150,6 +150,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
         "&::placeholder": {
             opacity: 1,
+            color: "#555555",
         },
     },
 }));
@@ -419,13 +420,13 @@ function NavBar() {
                 const description =
                     String(
                         product?.description ||
-                            ""
+                        ""
                     ).toLowerCase();
 
                 const netContent =
                     String(
                         product?.net_content ||
-                            ""
+                        ""
                     ).toLowerCase();
 
                 const benefits =
@@ -433,12 +434,12 @@ function NavBar() {
                         product?.benefits
                     )
                         ? product.benefits
-                              .join(" ")
-                              .toLowerCase()
+                            .join(" ")
+                            .toLowerCase()
                         : String(
-                              product?.benefits ||
-                                  ""
-                          ).toLowerCase();
+                            product?.benefits ||
+                            ""
+                        ).toLowerCase();
 
                 return (
                     name.includes(search) ||
@@ -482,7 +483,7 @@ function NavBar() {
     useEffect(() => {
         const text =
             searchPlaceholders[
-                currentSearch
+            currentSearch
             ];
 
         let index = 0;
@@ -1002,24 +1003,18 @@ function NavBar() {
             >
                 <Typography
                     sx={{
-                        color: "#fff",
+                        color: Colors.black,
                         fontSize: {
                             xs: "12px",
                             sm: "14px",
                             md: "16px",
                         },
-                        fontWeight: 500,
-                        textAlign:
-                            "center",
-                        whiteSpace:
-                            "nowrap",
+                        fontWeight: 600,
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
                     }}
                 >
-                    {
-                        bannerTexts[
-                            currentText
-                        ]
-                    }
+                    {bannerTexts[currentText]}
                 </Typography>
             </Box>
 
@@ -1243,7 +1238,7 @@ function NavBar() {
                                 }}
                             >
                                 {searchResults.length >
-                                0 ? (
+                                    0 ? (
                                     searchResults.map(
                                         (
                                             product
@@ -1286,10 +1281,10 @@ function NavBar() {
                                                             "1px solid #eeeeee",
 
                                                         "&:hover":
-                                                            {
-                                                                backgroundColor:
-                                                                    Colors.background,
-                                                            },
+                                                        {
+                                                            backgroundColor:
+                                                                Colors.background,
+                                                        },
                                                     }}
                                                 >
 
@@ -1390,12 +1385,9 @@ function NavBar() {
                                                     <Typography
                                                         sx={{
                                                             fontSize: 12,
-
-                                                            color:
-                                                                "#777",
-
-                                                            flexShrink:
-                                                                0,
+                                                            color: Colors.black,
+                                                            flexShrink: 0,
+                                                            fontWeight: 600,
                                                         }}
                                                     >
                                                         View
@@ -1415,9 +1407,8 @@ function NavBar() {
                                     >
                                         <Typography
                                             sx={{
-                                                fontSize: 14,
-                                                color:
-                                                    "#777",
+                                               ...Theme.font14Regular,
+                                                color:Colors.black,
                                             }}
                                         >
                                             No products found
@@ -1497,11 +1488,11 @@ function NavBar() {
                                 color="error"
                                 sx={{
                                     "& .MuiBadge-badge":
-                                        {
-                                            fontSize: 10,
-                                            minWidth: 18,
-                                            height: 18,
-                                        },
+                                    {
+                                        fontSize: 10,
+                                        minWidth: 18,
+                                        height: 18,
+                                    },
                                 }}
                             >
                                 <ShoppingCartIcon />
