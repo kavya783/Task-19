@@ -335,63 +335,65 @@ const ProductCardItem = memo(
         }}
       >
         <Card
-          sx={{
-            height: "100%",
-            borderRadius: "10px",
-            overflow: "hidden",
-            border: "1px solid #ddd",
-            boxShadow:
-              "0 2px 8px rgba(0,0,0,0.08)",
-            cursor: "pointer",
-          }}
+         
+  sx={{
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: "10px",
+    overflow: "hidden",
+    border: "1px solid #ddd",
+    boxShadow:
+      "0 2px 8px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+  }}
           onClick={handleCardClick}
         >
-          {/* ==================================
-              PRODUCT IMAGE
-          ================================== */}
+        {/* ==================================
+    PRODUCT IMAGE
+================================== */}
 
-         {currentImage && (
-  <Box
-    sx={{
-      position: "relative",
-      width: "100%",
-      height: {
-        xs: "150px",
-        sm: "175px",
-        md: "210px",
-      },
-      overflow: "hidden",
-      flexShrink: 0,
-    }}
-  >
-    {/* STATUS */}
-    {product?.status && (
-      <Box
-        sx={{
-          position: "absolute",
-          top: 2,
-          left: 0,
-          zIndex: 1,
-          px: 0.3,
-          py: 0.35,
-          color: "#fff",
-          backgroundColor: Colors.green,
-          fontSize: 12,
-          fontWeight: 700,
-        }}
-      >
-        {product.status}
-      </Box>
-    )}
+<Box
+  sx={{
+    position: "relative",
+    width: "100%",
+    height: {
+      xs: "150px",
+      sm: "175px",
+      md: "210px",
+    },
+    overflow: "hidden",
+    flexShrink: 0,
+  }}
+>
+  {/* STATUS */}
+  {product?.status && (
+    <Box
+      sx={{
+        position: "absolute",
+        top: 2,
+        left: 0,
+        zIndex: 1,
+        px: 0.3,
+        py: 0.35,
+        color: "#fff",
+        backgroundColor: Colors.green,
+        fontSize: 12,
+        fontWeight: 700,
+      }}
+    >
+      {product.status}
+    </Box>
+  )}
 
+  {/* PRODUCT IMAGE */}
+  {currentImage && (
     <CardMedia
       component="img"
       image={currentImage}
       alt={productName}
       loading="lazy"
       decoding="async"
-      width={500}
-      height={500}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       sx={{
@@ -410,31 +412,31 @@ const ProductCardItem = memo(
         },
       }}
     />
-  </Box>
-)}
-
+  )}
+</Box>
           {/* ==================================
               CARD CONTENT
           ================================== */}
 
           <CardContent
-            sx={{
-              display: "flex",
-              flexDirection: "column",
+  sx={{
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
 
-              p: {
-                xs: 1.2,
-                sm: 1.5,
-              },
+    p: {
+      xs: 1.2,
+      sm: 1.5,
+    },
 
-              "&:last-child": {
-                pb: {
-                  xs: 1.2,
-                  sm: 1.5,
-                },
-              },
-            }}
-          >
+    "&:last-child": {
+      pb: {
+        xs: 1.2,
+        sm: 1.5,
+      },
+    },
+  }}
+>
             {/* ==================================
                 PRODUCT NAME
             ================================== */}
@@ -572,7 +574,7 @@ const ProductCardItem = memo(
                     whiteSpace:
                       "nowrap",
 
-                    mt: 2,
+                    mt: 0,
                   }}
                 >
                   {product.rating}
