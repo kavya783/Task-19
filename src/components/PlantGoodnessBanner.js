@@ -11,18 +11,18 @@ import Colors from "../themes/colors";
 
 function PlantGoodnessBanner() {
 
- 
+
   // TARGET TREE COUNT
- 
+
 
   const targetCount = 1093966;
 
   const [treeCount, setTreeCount] = useState(0);
 
 
- 
+
   // COUNT ANIMATION
- 
+
 
   useEffect(() => {
 
@@ -67,7 +67,7 @@ function PlantGoodnessBanner() {
       sx={{
         width: "100%",
 
-        backgroundColor:Colors.card,
+        backgroundColor: Colors.card,
 
         px: {
           xs: 2,
@@ -142,17 +142,19 @@ function PlantGoodnessBanner() {
             component="img"
             src="/images/Plantname.webp"
             alt="We Plant Goodness"
+            width={1600}
+            height={427}
+            loading="lazy"
+            decoding="async"
             sx={{
               width: {
                 xs: "180px",
                 sm: "220px",
                 md: "300px",
               },
-
               height: "auto",
-
               objectFit: "contain",
-
+              display: "block",
               mb: 3,
             }}
           />
@@ -162,18 +164,18 @@ function PlantGoodnessBanner() {
 
           <Typography
             sx={{
-              fontSize:Theme.font20Regular,
-              color:Colors.black,
-              ml:3
+              fontSize: Theme.font20Regular,
+              color: Colors.black,
+              ml: 3
             }}
           >
             Plant a tree with
-            
+
             your next <br /> purchase
           </Typography>
 
 
-        
+
 
         </Box>
 
@@ -192,35 +194,35 @@ function PlantGoodnessBanner() {
           }}
         >
 
-         <Box
-  sx={{
-    width: "70%",
-    maxWidth: "500px",
+          <Box
+            sx={{
+              width: "70%",
+              maxWidth: "500px",
 
-    backgroundColor: Colors.background,
+              backgroundColor: Colors.background,
 
-    border: `2px solid ${Colors.green}`,
+              border: `2px solid ${Colors.green}`,
 
-    borderRadius: "24px",
+              borderRadius: "24px",
 
-    px: {
-      xs: 3,
-      sm: 4,
-      md: 5,
-    },
+              px: {
+                xs: 3,
+                sm: 4,
+                md: 5,
+              },
 
-    py: {
-      xs: 4,
-      sm: 5,
-      md: 6,
-    },
+              py: {
+                xs: 4,
+                sm: 5,
+                md: 6,
+              },
 
-    textAlign: "center",
+              textAlign: "center",
 
-    boxShadow:
-      "0 10px 30px rgba(0,0,0,0.08)",
-  }}
->
+              boxShadow:
+                "0 10px 30px rgba(0,0,0,0.08)",
+            }}
+          >
 
             {/* SUB HEADING */}
 
@@ -247,7 +249,7 @@ function PlantGoodnessBanner() {
             </Typography>
 
 
-           
+
 
 
             {/* COUNT */}
@@ -302,7 +304,7 @@ function PlantGoodnessBanner() {
             </Typography>
 
 
-           </Box>
+          </Box>
 
         </Box>
 
