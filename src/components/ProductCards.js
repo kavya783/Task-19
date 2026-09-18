@@ -25,17 +25,17 @@ import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
 
-// ========================================
+// 
 // CONSTANTS
-// ========================================
+// 
 
 const GUEST_CART_KEY = "mamaearth_cart_guest";
 const USER_STORAGE_KEY = "user";
 
 
-// ========================================
+// 
 // GET CART KEY
-// ========================================
+// 
 
 const getCartKey = () => {
   try {
@@ -54,9 +54,9 @@ const getCartKey = () => {
 };
 
 
-// ========================================
+// 
 // GET PRODUCT IMAGES
-// ========================================
+// 
 
 const getProductImages = (product) => {
   if (
@@ -79,9 +79,9 @@ const getProductImages = (product) => {
 
   return [];
 };
-// ========================================
+// 
 // OPTIMIZE CLOUDINARY IMAGE
-// ========================================
+// 
 
 const getOptimizedImageUrl = (url, width = 256) => {
   if (!url) return "";
@@ -96,9 +96,9 @@ const getOptimizedImageUrl = (url, width = 256) => {
   );
 };
 
-// ========================================
+// 
 // GET CART QUANTITIES
-// ========================================
+// 
 
 const getCartQuantities = () => {
   try {
@@ -118,9 +118,9 @@ const getCartQuantities = () => {
 };
 
 
-// ========================================
+// 
 // GET SALE PRICE
-// ========================================
+// 
 
 const getSalePrice = (product) => {
   if (Number(product?.sale_price) > 0) {
@@ -143,9 +143,9 @@ const getSalePrice = (product) => {
 };
 
 
-// ========================================
+// 
 // GET PRODUCT PRICING
-// ========================================
+// 
 
 const getProductPricing = (product) => {
   const mrp = Number(product?.mrp) || 0;
@@ -178,9 +178,9 @@ const getProductPricing = (product) => {
 };
 
 
-// ========================================
+// 
 // PRODUCT CARD ITEM
-// ========================================
+// 
 
 const ProductCardItem = memo(
   function ProductCardItem({
@@ -193,18 +193,18 @@ const ProductCardItem = memo(
     onAddToCart,
     onQuantityChange,
   }) {
-  
+
     // PRODUCT IMAGES
-  
+
 
     const images = useMemo(
       () => getProductImages(product),
       [product]
     );
 
-  
+
     // CURRENT IMAGE
-  
+
 
     const currentImage =
       isHovered && images.length > 1
@@ -216,9 +216,9 @@ const ProductCardItem = memo(
       [currentImage]
     );
 
-  
+
     // PRICING
-  
+
 
     const {
       salePrice,
@@ -229,18 +229,18 @@ const ProductCardItem = memo(
       [product]
     );
 
-  
+
     // PRODUCT NAME
-  
+
 
     const productName =
       product?.name ||
       product?.heading ||
       "Product";
 
-  
+
     // BENEFITS
-  
+
 
     const benefits = Array.isArray(
       product?.benefits
@@ -248,9 +248,9 @@ const ProductCardItem = memo(
       ? product.benefits.join(" | ")
       : product?.benefits || "";
 
-  
+
     // CARD CLICK
-  
+
 
     const handleCardClick = useCallback(() => {
       onNavigate(product.id);
@@ -259,9 +259,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-  
+
     // MOUSE ENTER
-  
+
 
     const handleMouseEnter = useCallback(() => {
       if (images.length > 1) {
@@ -273,9 +273,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-  
+
     // MOUSE LEAVE
-  
+
 
     const handleMouseLeave = useCallback(() => {
       onMouseLeave(product.id);
@@ -284,9 +284,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-  
+
     // ADD TO CART
-  
+
 
     const handleAdd = useCallback(
       (event) => {
@@ -298,9 +298,9 @@ const ProductCardItem = memo(
       ]
     );
 
-  
+
     // DECREASE QUANTITY
-  
+
 
     const handleDecrease = useCallback(
       (event) => {
@@ -316,9 +316,9 @@ const ProductCardItem = memo(
       ]
     );
 
-  
+
     // INCREASE QUANTITY
-  
+
 
     const handleIncrease = useCallback(
       (event) => {
@@ -366,9 +366,9 @@ const ProductCardItem = memo(
           }}
           onClick={handleCardClick}
         >
-          {/* ==================================
+          {/* 
               PRODUCT IMAGE
-          ================================== */}
+           */}
 
           {currentImage && (
             <Box
@@ -442,9 +442,9 @@ const ProductCardItem = memo(
             </Box>
           )}
 
-          {/* ==================================
+          {/* 
               CARD CONTENT
-          ================================== */}
+           */}
 
           <CardContent
             sx={{
@@ -464,9 +464,9 @@ const ProductCardItem = memo(
               },
             }}
           >
-            {/* ==================================
+            {/* 
                 PRODUCT NAME
-            ================================== */}
+             */}
 
             <Box
               sx={{
@@ -499,9 +499,9 @@ const ProductCardItem = memo(
               </Typography>
             </Box>
 
-            {/* ==================================
+            {/* 
                 PRODUCT HEADING
-            ================================== */}
+             */}
 
             <Box
               sx={{
@@ -535,9 +535,9 @@ const ProductCardItem = memo(
               </Typography>
             </Box>
 
-            {/* ==================================
+            {/* 
                 BENEFITS
-            ================================== */}
+             */}
 
             <Box
               sx={{
@@ -572,9 +572,9 @@ const ProductCardItem = memo(
               </Typography>
             </Box>
 
-            {/* ==================================
+            {/* 
                 RATING
-            ================================== */}
+             */}
 
             <Box
               sx={{
@@ -633,9 +633,9 @@ const ProductCardItem = memo(
               ) : null}
             </Box>
 
-            {/* ==================================
+            {/* 
                 NET CONTENT
-            ================================== */}
+             */}
 
             <Box
               sx={{
@@ -661,9 +661,9 @@ const ProductCardItem = memo(
               ) : null}
             </Box>
 
-            {/* ==================================
+            {/* 
                 PRICE
-            ================================== */}
+             */}
 
             <Box
               sx={{
@@ -738,9 +738,9 @@ const ProductCardItem = memo(
               )}
             </Box>
 
-            {/* ==================================
+            {/* 
                 CART
-            ================================== */}
+             */}
 
             {quantity ? (
               <Box
@@ -886,32 +886,32 @@ const ProductCardItem = memo(
 );
 
 
-// ========================================
+// 
 // PRODUCT CARDS
-// ========================================
+// 
 
 function ProductCards({
   products = [],
 }) {
   const navigate = useNavigate();
 
-==
+
   // HOVER STATE
-==
+
 
   const [hoveredProducts, setHoveredProducts] =
     useState({});
 
-==
+
   // CART QUANTITIES
-==
+
 
   const [cartQuantities, setCartQuantities] =
     useState(getCartQuantities);
 
-==
+
   // SNACKBAR
-==
+
 
   const [snackbarOpen, setSnackbarOpen] =
     useState(false);
@@ -919,15 +919,15 @@ function ProductCards({
   const [snackbarMessage, setSnackbarMessage] =
     useState("");
 
-==
+
   // SYNC CART
-==
+
 
   const syncCartQuantities = useCallback(() => {
-    setCartQuantities(
-      getCartQuantities()
-    );
-  }, []);
+      setCartQuantities(
+        getCartQuantities()
+      );
+    }, []);
 
   useEffect(() => {
     window.addEventListener(
@@ -955,9 +955,9 @@ function ProductCards({
     syncCartQuantities,
   ]);
 
-==
+
   // NAVIGATE
-==
+
 
   const handleNavigate = useCallback(
     (productId) => {
@@ -968,9 +968,9 @@ function ProductCards({
     [navigate]
   );
 
-==
+
   // HOVER ENTER
-==
+
 
   const handleMouseEnter = useCallback(
     (productId) => {
@@ -990,9 +990,9 @@ function ProductCards({
     []
   );
 
-==
+
   // HOVER LEAVE
-==
+
 
   const handleMouseLeave = useCallback(
     (productId) => {
@@ -1015,9 +1015,9 @@ function ProductCards({
     []
   );
 
-==
+
   // ADD TO CART
-==
+
 
   const handleAddToCart = useCallback(
     (event, product) => {
@@ -1040,7 +1040,7 @@ function ProductCards({
         const cartIndex =
           existingCart.findIndex(
             (item) =>
-              String(item.id) ===
+              String(item.id) =
               productId
           );
 
@@ -1112,9 +1112,9 @@ function ProductCards({
     []
   );
 
-==
+
   // CART QUANTITY CHANGE
-==
+
 
   const handleCartQuantityChange =
     useCallback(
@@ -1142,7 +1142,7 @@ function ProductCards({
           const cartIndex =
             existingCart.findIndex(
               (item) =>
-                String(item.id) ===
+                String(item.id) =
                 productId
             );
 
@@ -1214,21 +1214,21 @@ function ProductCards({
       []
     );
 
-==
+
   // PRODUCTS
-==
+
 
   const productList = useMemo(
-    () =>
-      Array.isArray(products)
-        ? products
-        : [],
-    [products]
-  );
+      () =>
+        Array.isArray(products)
+          ? products
+          : [],
+      [products]
+    );
 
-==
+
   // NO PRODUCTS
-==
+
 
   if (!productList.length) {
     return (
@@ -1254,15 +1254,15 @@ function ProductCards({
     );
   }
 
-==
+
   // UI
-==
+
 
   return (
     <>
-      {/* ==================================
+      {/* 
           PRODUCTS CONTAINER
-      ================================== */}
+       */}
 
       <Box
         sx={{
@@ -1347,9 +1347,9 @@ function ProductCards({
         </Box>
       </Box>
 
-      {/* ==================================
+      {/* 
           SNACKBAR
-      ================================== */}
+       */}
 
       <Snackbar
         open={snackbarOpen}
@@ -1367,7 +1367,7 @@ function ProductCards({
             setSnackbarOpen(false)
           }
           severity={
-            snackbarMessage ===
+            snackbarMessage =
               "Added to cart"
               ? "success"
               : "error"
@@ -1386,9 +1386,9 @@ function ProductCards({
 }
 
 
-// ========================================
+// 
 // MEMOIZED EXPORT
-// ========================================
+// 
 
 export default memo(ProductCards);
 
