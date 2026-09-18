@@ -2215,7 +2215,7 @@ function ProductDetailsPage() {
                                 <Box
                                     component="img"
                                     src="/images/vitamin-c.png"
-                                     alt="Vitamin C"
+                                    alt="Vitamin C"
                                     sx={{
                                         width: {
                                             xs: 75,
@@ -2287,6 +2287,9 @@ function ProductDetailsPage() {
                                 <Box
                                     component="img"
                                     src="/images/niacinamide.png"
+                                    alt="Niacinamide"
+                                    loading="lazy"
+                                    decoding="async"
                                     sx={{
                                         width: {
                                             xs: 75,
@@ -2359,6 +2362,9 @@ function ProductDetailsPage() {
                                 <Box
                                     component="img"
                                     src="/images/turmeric.png"
+                                    alt="Turmeric"
+                                    loading="lazy"
+                                    decoding="async"
                                     sx={{
                                         width: {
                                             xs: 75,
@@ -2430,6 +2436,9 @@ function ProductDetailsPage() {
                                 <Box
                                     component="img"
                                     src="/images/tangerine.png"
+                                    alt="Tangerine"
+                                    loading="lazy"
+                                    decoding="async"
                                     sx={{
                                         width: {
                                             xs: 75,
