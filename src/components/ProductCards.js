@@ -1037,12 +1037,9 @@ function ProductCards({
         const productId =
           String(product.id);
 
-        const cartIndex =
-          existingCart.findIndex(
-            (item) =>
-              String(item.id) =
-              productId
-          );
+       const cartIndex = existingCart.findIndex(
+  (item) => String(item.id) === productId
+);
 
         if (cartIndex >= 0) {
           existingCart[
@@ -1139,12 +1136,9 @@ function ProductCards({
           const productId =
             String(product.id);
 
-          const cartIndex =
-            existingCart.findIndex(
-              (item) =>
-                String(item.id) =
-                productId
-            );
+         const cartIndex = existingCart.findIndex(
+  (item) => String(item.id) === productId
+);
 
           if (cartIndex < 0) {
             return;
