@@ -23,7 +23,6 @@ import {
 function Carousel() {
   const dispatch = useDispatch();
 
-  // Get only the required Redux values
   const carouselImages = useSelector(
     (state) => state.content?.carouselImages || []
   );
@@ -113,6 +112,17 @@ function Carousel() {
 
   const activeImage = carouselImages[activeStep];
 
+  /*
+   * Optimize Cloudinary image
+   *
+   * f_auto -> automatic modern image format
+   * q_auto -> automatic image quality optimization
+   */
+  const optimizedImageUrl = activeImage.image_url?.replace(
+    "/image/upload/",
+    "/image/upload/f_auto,q_auto/"
+  );
+
   return (
     <Box
       sx={{
@@ -131,13 +141,12 @@ function Carousel() {
       >
         <Box
           component="img"
-          src={activeImage.image_url}
+          src={optimizedImageUrl}
           alt={
             activeImage.heading || "Mamaearth Banner"
           }
           loading="eager"
           fetchPriority="high"
-          decoding="async"
           sx={{
             width: "100%",
             height: "auto",
