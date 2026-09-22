@@ -20,8 +20,6 @@ import {
   getOurFaceDataActionInitiate,
 } from "../redux/actions/contentActions";
 
-
-
 import ProductCards from "./ProductCards";
 
 import { Theme } from "../themes/GlobalStyles";
@@ -148,6 +146,8 @@ const CategoryItem = memo(
             ? "8px"
             : 0,
 
+          boxSizing: "border-box",
+
           borderRadius: "10px",
 
           backgroundColor: isSelected
@@ -172,6 +172,7 @@ const CategoryItem = memo(
           sx={{
             display: "block",
             flex: "0 0 auto",
+            position: "relative",
 
             width: mobile
               ? "42px"
@@ -201,16 +202,22 @@ const CategoryItem = memo(
                   md: "36px",
                 },
 
+            aspectRatio: "1 / 1",
+
             backgroundColor:
               isSelected
                 ? Colors.blue
                 : Colors.black,
 
             WebkitMaskImage:
-              `url(${item?.image_url})`,
+              item?.image_url
+                ? `url(${item.image_url})`
+                : "none",
 
             maskImage:
-              `url(${item?.image_url})`,
+              item?.image_url
+                ? `url(${item.image_url})`
+                : "none",
 
             WebkitMaskRepeat:
               "no-repeat",
@@ -242,6 +249,8 @@ const CategoryItem = memo(
             mt: mobile ? 1 : 0.5,
 
             height: "18px",
+            minHeight: "18px",
+
             lineHeight: "18px",
 
             width: "100%",
@@ -324,7 +333,13 @@ const CategoryList = memo(
 
           mt: 3,
 
+          boxSizing: "border-box",
+
           minHeight: mobile
+            ? "92px"
+            : "72px",
+
+          height: mobile
             ? "92px"
             : "72px",
 
@@ -436,12 +451,14 @@ function OurFaceBestsellers({
   ] = useState("Facewash");
 
   // ========================================
-  // API CALLS
+  // API CALL
   // ========================================
 
- useEffect(() => {
-  dispatch(getOurFaceDataActionInitiate());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(
+      getOurFaceDataActionInitiate()
+    );
+  }, [dispatch]);
 
   // ========================================
   // NORMALIZE PRODUCTS
@@ -561,10 +578,16 @@ function OurFaceBestsellers({
         sx={{
           width: "100%",
 
+          /*
+           * Reserve the same vertical space
+           * as the final Face Bestsellers section.
+           * This helps prevent CLS while API
+           * data is loading.
+           */
           minHeight: {
-            xs: "520px",
-            sm: "560px",
-            md: "600px",
+            xs: "850px",
+            sm: "900px",
+            md: "950px",
           },
 
           py: 3,
@@ -579,10 +602,14 @@ function OurFaceBestsellers({
         }}
       >
         <Typography
+          component="h2"
           sx={{
             textAlign: "center",
             fontSize:
               Theme.font24SemiBold,
+
+            minHeight: "36px",
+            lineHeight: "36px",
           }}
         >
           Our{" "}
@@ -595,15 +622,41 @@ function OurFaceBestsellers({
         <Typography
           sx={{
             textAlign: "center",
+
             fontSize:
               Theme.font12Regular,
+
             mt: 0.5,
+
+            minHeight: "18px",
+            lineHeight: "18px",
           }}
         >
           Formulated with love and
           the goodness of natural
           ingredients
         </Typography>
+
+        {/* Reserve category space */}
+        <Box
+          sx={{
+            height: {
+              xs: "108px",
+              sm: "96px",
+            },
+          }}
+        />
+
+        {/* Reserve product space */}
+        <Box
+          sx={{
+            minHeight: {
+              xs: "280px",
+              sm: "320px",
+              md: "350px",
+            },
+          }}
+        />
       </Box>
     );
   }
@@ -620,7 +673,23 @@ function OurFaceBestsellers({
       <Box
         sx={{
           width: "100%",
+
+          minHeight: {
+            xs: "850px",
+            sm: "900px",
+            md: "950px",
+          },
+
           py: 5,
+
+          px: {
+            xs: 2,
+            sm: 3,
+            md: 5,
+          },
+
+          boxSizing: "border-box",
+
           textAlign: "center",
         }}
       >
@@ -655,6 +724,9 @@ function OurFaceBestsellers({
 
         boxSizing: "border-box",
 
+        /*
+         * Reserve a stable section height.
+         */
         minHeight: {
           xs: "850px",
           sm: "900px",
@@ -668,8 +740,12 @@ function OurFaceBestsellers({
         component="h2"
         sx={{
           textAlign: "center",
+
           fontSize:
             Theme.font24SemiBold,
+
+          minHeight: "36px",
+          lineHeight: "36px",
         }}
       >
         Our{" "}
@@ -691,6 +767,7 @@ function OurFaceBestsellers({
           mt: 0.5,
 
           minHeight: "18px",
+          lineHeight: "18px",
         }}
       >
         Formulated with love and
@@ -707,7 +784,16 @@ function OurFaceBestsellers({
             sm: "block",
           },
 
-          minHeight: "72px",
+          /*
+           * Fixed height prevents the
+           * category SVGs from changing
+           * the section height after load.
+           */
+          height: "96px",
+
+          overflow: "hidden",
+
+          boxSizing: "border-box",
         }}
       >
         <CategoryList
@@ -730,7 +816,14 @@ function OurFaceBestsellers({
             sm: "none",
           },
 
-          minHeight: "92px",
+          /*
+           * Fixed mobile category area.
+           */
+          height: "108px",
+
+          overflow: "hidden",
+
+          boxSizing: "border-box",
         }}
       >
         <CategoryList
@@ -760,6 +853,10 @@ function OurFaceBestsellers({
           mb: 3,
 
           minHeight: "30px",
+
+          height: "30px",
+
+          boxSizing: "border-box",
         }}
       >
         <Typography
@@ -776,6 +873,9 @@ function OurFaceBestsellers({
             },
 
             minHeight: "30px",
+            height: "30px",
+
+            lineHeight: "30px",
           }}
         >
           {selectedCategory}
@@ -800,6 +900,8 @@ function OurFaceBestsellers({
             },
 
             overflow: "visible",
+
+            boxSizing: "border-box",
           }}
         >
           <ProductCards
@@ -824,6 +926,8 @@ function OurFaceBestsellers({
             textAlign: "center",
 
             borderRadius: "10px",
+
+            boxSizing: "border-box",
           }}
         >
           <Typography
