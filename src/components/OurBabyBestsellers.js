@@ -21,10 +21,6 @@ import {
   getOurBabyDataActionInitiate,
 } from "../redux/actions/contentActions";
 
-import {
-  getProductsDataActionInitiate,
-} from "../redux/actions/productActions";
-
 import ProductCards from "./ProductCards";
 
 import {
@@ -153,24 +149,11 @@ const CategoryItem = memo(
       item?.heading?.trim() || "";
 
 
-    const normalizedCategoryName =
-      useMemo(
-        () =>
-          normalizeCategory(
-            categoryName
-          ),
-        [categoryName]
-      );
+   const normalizedCategoryName =
+  normalizeCategory(categoryName);
 
-
-    const normalizedSelectedCategory =
-      useMemo(
-        () =>
-          normalizeCategory(
-            selectedCategory
-          ),
-        [selectedCategory]
-      );
+const normalizedSelectedCategory =
+  normalizeCategory(selectedCategory);
 
 
     const isSelected =
@@ -531,17 +514,9 @@ function OurBabyBestsellers() {
   // GET DATA
   // ========================================
 
-  useEffect(() => {
-
-    dispatch(
-      getOurBabyDataActionInitiate()
-    );
-
-    dispatch(
-      getProductsDataActionInitiate()
-    );
-
-  }, [dispatch]);
+ useEffect(() => {
+  dispatch(getOurBabyDataActionInitiate());
+}, [dispatch]);
 
 
   // ========================================

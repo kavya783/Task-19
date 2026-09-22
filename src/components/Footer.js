@@ -231,9 +231,7 @@ function Footer() {
         boxSizing: "border-box",
       }}
     >
-      {/* ========================================
-          MAIN FOOTER
-      ======================================== */}
+      {/* MAIN FOOTER */}
 
       <Box
         sx={{
@@ -256,9 +254,7 @@ function Footer() {
           boxSizing: "border-box",
         }}
       >
-        {/* ========================================
-            MAIN 4 COLUMN GRID
-        ======================================== */}
+        {/* MAIN 4 COLUMN GRID */}
 
         <Box
           sx={{
@@ -279,9 +275,7 @@ function Footer() {
             minWidth: 0,
           }}
         >
-          {/* ========================================
-              LOGO
-          ======================================== */}
+          {/* LOGO */}
 
           <Box
             sx={{
@@ -305,6 +299,8 @@ function Footer() {
               component="img"
               src="/images/ME_New.avif"
               alt="Mamaearth"
+              width={210}
+              height={80}
               loading="lazy"
               decoding="async"
               sx={{
@@ -335,9 +331,7 @@ function Footer() {
             </Typography>
           </Box>
 
-          {/* ========================================
-              ABOUT US
-          ======================================== */}
+          {/* ABOUT US */}
 
           <Box sx={{ minWidth: 0 }}>
             <Typography
@@ -360,9 +354,7 @@ function Footer() {
             ))}
           </Box>
 
-          {/* ========================================
-              TOP CATEGORIES
-          ======================================== */}
+          {/* TOP CATEGORIES */}
 
           <Box sx={{ minWidth: 0 }}>
             <Typography
@@ -400,9 +392,7 @@ function Footer() {
             </Box>
           </Box>
 
-          {/* ========================================
-              INFORMATION
-          ======================================== */}
+          {/* INFORMATION */}
 
           <Box sx={{ minWidth: 0 }}>
             <Typography
@@ -431,10 +421,8 @@ function Footer() {
                 fontSize: Theme.font14SemiBold,
                 fontWeight: 600,
                 color: Colors.black,
-
                 mt: 3,
                 mb: 1,
-
                 lineHeight: 1.4,
               }}
             >
@@ -519,9 +507,7 @@ function Footer() {
           </Box>
         </Box>
 
-        {/* ========================================
-            TRUST + SERVICES
-        ======================================== */}
+        {/* TRUST + SERVICES */}
 
         <Box
           sx={{
@@ -603,6 +589,8 @@ function Footer() {
                     component="img"
                     src="/images/Rectangle.avif"
                     alt="Dermatologically Tested"
+                    width={75}
+                    height={75}
                     loading="lazy"
                     decoding="async"
                     sx={{
@@ -672,6 +660,8 @@ function Footer() {
                     component="img"
                     src="/images/Rectangle1.webp"
                     alt="Made Safe Certified"
+                    width={75}
+                    height={75}
                     loading="lazy"
                     decoding="async"
                     sx={{
@@ -739,6 +729,8 @@ function Footer() {
                     component="img"
                     src="/images/Rectangle11.webp"
                     alt="Cruelty Free"
+                    width={75}
+                    height={75}
                     loading="lazy"
                     decoding="async"
                     sx={{
@@ -817,6 +809,8 @@ function Footer() {
                   component="img"
                   src="/images/free_shipping.webp"
                   alt="Free Shipping"
+                  width={55}
+                  height={55}
                   loading="lazy"
                   decoding="async"
                   sx={{
@@ -872,6 +866,8 @@ function Footer() {
                   component="img"
                   src="/images/easy_return.webp"
                   alt="Easy Return"
+                  width={55}
+                  height={55}
                   loading="lazy"
                   decoding="async"
                   sx={{
@@ -927,6 +923,8 @@ function Footer() {
                   component="img"
                   src="/images/cod.webp"
                   alt="COD Available"
+                  width={55}
+                  height={55}
                   loading="lazy"
                   decoding="async"
                   sx={{
@@ -973,9 +971,7 @@ function Footer() {
           </Box>
         </Box>
 
-        {/* ========================================
-            COPYRIGHT + PAYMENT
-        ======================================== */}
+        {/* COPYRIGHT + PAYMENT */}
 
         <Box
           sx={{
@@ -1041,15 +1037,16 @@ function Footer() {
               component="img"
               src="/images/visa-b614b878.svg"
               alt="Visa"
+              width={40}
+              height={24}
               loading="lazy"
               decoding="async"
               sx={{
+                width: "auto",
                 height: {
                   xs: 20,
                   sm: 24,
                 },
-
-                width: "auto",
               }}
             />
 
@@ -1057,15 +1054,16 @@ function Footer() {
               component="img"
               src="/images/master-f5a74105.svg"
               alt="Mastercard"
+              width={40}
+              height={24}
               loading="lazy"
               decoding="async"
               sx={{
+                width: "auto",
                 height: {
                   xs: 20,
                   sm: 24,
                 },
-
-                width: "auto",
               }}
             />
 
@@ -1073,15 +1071,16 @@ function Footer() {
               component="img"
               src="/images/american_express-2bdbf0e2.svg"
               alt="American Express"
+              width={40}
+              height={24}
               loading="lazy"
               decoding="async"
               sx={{
+                width: "auto",
                 height: {
                   xs: 20,
                   sm: 24,
                 },
-
-                width: "auto",
               }}
             />
 
@@ -1089,15 +1088,16 @@ function Footer() {
               component="img"
               src="/images/rupay-866b7e37.svg"
               alt="RuPay"
+              width={40}
+              height={24}
               loading="lazy"
               decoding="async"
               sx={{
+                width: "auto",
                 height: {
                   xs: 20,
                   sm: 24,
                 },
-
-                width: "auto",
               }}
             />
 
@@ -1105,15 +1105,16 @@ function Footer() {
               component="img"
               src="/images/paytm-c8147fd8.svg"
               alt="Paytm"
+              width={40}
+              height={24}
               loading="lazy"
               decoding="async"
               sx={{
+                width: "auto",
                 height: {
                   xs: 20,
                   sm: 24,
                 },
-
-                width: "auto",
               }}
             />
 
@@ -1121,15 +1122,16 @@ function Footer() {
               component="img"
               src="/images/google_pay-34c30515.svg"
               alt="Google Pay"
+              width={40}
+              height={24}
               loading="lazy"
               decoding="async"
               sx={{
+                width: "auto",
                 height: {
                   xs: 20,
                   sm: 24,
                 },
-
-                width: "auto",
               }}
             />
 
@@ -1137,15 +1139,16 @@ function Footer() {
               component="img"
               src="/images/freecharge-e030814b.svg"
               alt="Freecharge"
+              width={40}
+              height={24}
               loading="lazy"
               decoding="async"
               sx={{
+                width: "auto",
                 height: {
                   xs: 20,
                   sm: 24,
                 },
-
-                width: "auto",
               }}
             />
           </Box>

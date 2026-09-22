@@ -23,7 +23,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import Badge from "@mui/material/Badge";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import LogoutIcon from "@mui/icons-material/Logout";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -35,10 +35,6 @@ import { toast } from "react-toastify";
 
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
-
-import {
-    getProductsDataActionInitiate,
-} from "../redux/actions/productActions";
 
 
 // =====================================================
@@ -60,6 +56,7 @@ const CartPage = lazy(
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
+
     borderRadius: theme.shape.borderRadius,
 
     backgroundColor: alpha(
@@ -167,7 +164,6 @@ const bannerTexts = [
     "Natural Care Products for Healthy Skin & Hair | Shop Now",
 ];
 
-
 const searchPlaceholders = [
     "Search for Shampoo",
     "Search for Face Wash",
@@ -209,33 +205,42 @@ const getCartKey = () => {
 
 
 // =====================================================
+// GET CART ITEMS
+// =====================================================
+
+const getCartItems = () => {
+    try {
+        const cartKey = getCartKey();
+
+        return JSON.parse(
+            localStorage.getItem(cartKey) || "[]"
+        );
+    } catch {
+        return [];
+    }
+};
+
+
+// =====================================================
 // GET PRODUCT IMAGE
 // =====================================================
 
 const getProductImage = (product) => {
     if (
-        Array.isArray(
-            product?.image_urls
-        ) &&
+        Array.isArray(product?.image_urls) &&
         product.image_urls.length > 0
     ) {
         return product.image_urls[0];
     }
 
     if (
-        Array.isArray(
-            product?.images
-        ) &&
+        Array.isArray(product?.images) &&
         product.images.length > 0
     ) {
         return product.images[0];
     }
 
-    if (product?.image_url) {
-        return product.image_url;
-    }
-
-    return "";
+    return product?.image_url || "";
 };
 
 
@@ -245,8 +250,6 @@ const getProductImage = (product) => {
 
 function NavBar() {
     const navigate = useNavigate();
-
-    const dispatch = useDispatch();
 
 
     // =================================================
@@ -295,7 +298,6 @@ function NavBar() {
             )
         );
 
-
     const [loginOpen, setLoginOpen] =
         useState(false);
 
@@ -307,26 +309,17 @@ function NavBar() {
     const [cartOpen, setCartOpen] =
         useState(false);
 
-
     const [cartItems, setCartItems] =
-        useState(() => {
-            try {
-                const cartKey =
-                    getCartKey();
-
-                return JSON.parse(
-                    localStorage.getItem(
-                        cartKey
-                    ) || "[]"
-                );
-            } catch {
-                return [];
-            }
-        });
+        useState(getCartItems);
 
 
     // =================================================
     // PRODUCTS FROM REDUX
+    // =================================================
+    // IMPORTANT:
+    // Products are NOT fetched here.
+    // Home/product sections already fetch products.
+    // NavBar only reads the existing Redux data.
     // =================================================
 
     const productData = useSelector(
@@ -336,9 +329,15 @@ function NavBar() {
 
 
     const products = useMemo(() => {
-        return Array.isArray(productData)
-            ? productData
-            : productData?.products || [];
+        if (Array.isArray(productData)) {
+            return productData;
+        }
+
+        return Array.isArray(
+            productData?.products
+        )
+            ? productData.products
+            : [];
     }, [productData]);
 
 
@@ -346,15 +345,14 @@ function NavBar() {
     // CART COUNT
     // =================================================
 
-    const cartItemCount =
-        cartItems.reduce(
+    const cartItemCount = useMemo(() => {
+        return cartItems.reduce(
             (total, item) =>
                 total +
-                (Number(
-                    item.quantity
-                ) || 1),
+                (Number(item?.quantity) || 1),
             0
         );
+    }, [cartItems]);
 
 
     // =================================================
@@ -371,22 +369,6 @@ function NavBar() {
 
 
     // =================================================
-    // FETCH PRODUCTS
-    // =================================================
-
-    useEffect(() => {
-        if (!products.length) {
-            dispatch(
-                getProductsDataActionInitiate()
-            );
-        }
-    }, [
-        dispatch,
-        products.length,
-    ]);
-
-
-    // =================================================
     // SEARCH RESULTS
     // =================================================
 
@@ -396,7 +378,7 @@ function NavBar() {
                 .trim()
                 .toLowerCase();
 
-        if (!search) {
+        if (!search || !products.length) {
             return [];
         }
 
@@ -413,20 +395,24 @@ function NavBar() {
                     ).toLowerCase();
 
                 const category =
-                    String(
-                        product?.category || ""
-                    ).toLowerCase();
+                    typeof product?.category === "object"
+                        ? String(
+                            product?.category?.name ||
+                            product?.category?.heading ||
+                            ""
+                        ).toLowerCase()
+                        : String(
+                            product?.category || ""
+                        ).toLowerCase();
 
                 const description =
                     String(
-                        product?.description ||
-                        ""
+                        product?.description || ""
                     ).toLowerCase();
 
                 const netContent =
                     String(
-                        product?.net_content ||
-                        ""
+                        product?.net_content || ""
                     ).toLowerCase();
 
                 const benefits =
@@ -437,8 +423,7 @@ function NavBar() {
                             .join(" ")
                             .toLowerCase()
                         : String(
-                            product?.benefits ||
-                            ""
+                            product?.benefits || ""
                         ).toLowerCase();
 
                 return (
@@ -462,17 +447,17 @@ function NavBar() {
     // =================================================
 
     useEffect(() => {
-        const interval =
-            setInterval(() => {
-                setCurrentText(
-                    (prev) =>
-                        (prev + 1) %
-                        bannerTexts.length
-                );
-            }, 3000);
+        const interval = setInterval(() => {
+            setCurrentText(
+                (prev) =>
+                    (prev + 1) %
+                    bannerTexts.length
+            );
+        }, 3000);
 
-        return () =>
+        return () => {
             clearInterval(interval);
+        };
     }, []);
 
 
@@ -482,91 +467,62 @@ function NavBar() {
 
     useEffect(() => {
         const text =
-            searchPlaceholders[
-            currentSearch
-            ];
+            searchPlaceholders[currentSearch];
 
         let index = 0;
-
         let deleting = false;
 
         let typingInterval;
-
         let deleteInterval;
-
         let waitTimeout;
-
 
         setSearchText("");
 
+        typingInterval = setInterval(() => {
+            if (!deleting) {
+                index++;
 
-        typingInterval =
-            setInterval(() => {
-                if (!deleting) {
-                    index++;
+                setSearchText(
+                    text.slice(0, index)
+                );
 
-                    setSearchText(
-                        text.slice(
-                            0,
-                            index
-                        )
+                if (index === text.length) {
+                    clearInterval(
+                        typingInterval
                     );
 
-                    if (
-                        index ===
-                        text.length
-                    ) {
-                        clearInterval(
-                            typingInterval
-                        );
+                    waitTimeout = setTimeout(() => {
+                        deleting = true;
 
-                        waitTimeout =
-                            setTimeout(
-                                () => {
-                                    deleting =
-                                        true;
+                        deleteInterval =
+                            setInterval(() => {
+                                index--;
 
-                                    deleteInterval =
-                                        setInterval(
-                                            () => {
-                                                index--;
+                                setSearchText(
+                                    text.slice(
+                                        0,
+                                        index
+                                    )
+                                );
 
-                                                setSearchText(
-                                                    text.slice(
-                                                        0,
-                                                        index
-                                                    )
-                                                );
+                                if (index === 0) {
+                                    clearInterval(
+                                        deleteInterval
+                                    );
 
-                                                if (
-                                                    index ===
-                                                    0
-                                                ) {
-                                                    clearInterval(
-                                                        deleteInterval
-                                                    );
-
-                                                    setCurrentSearch(
-                                                        (
-                                                            prev
-                                                        ) =>
-                                                            (
-                                                                prev +
-                                                                1
-                                                            ) %
-                                                            searchPlaceholders.length
-                                                    );
-                                                }
-                                            },
-                                            80
-                                        );
-                                },
-                                3000
-                            );
-                    }
+                                    setCurrentSearch(
+                                        (prev) =>
+                                            (
+                                                prev + 1
+                                            ) %
+                                            searchPlaceholders.length
+                                    );
+                                }
+                            }, 80);
+                    }, 3000);
                 }
-            }, 100);
-
+            }
+        }, 100);
 
         return () => {
             clearInterval(
@@ -588,35 +544,30 @@ function NavBar() {
     // MENU HANDLERS
     // =================================================
 
-    const handleProfileMenuOpen =
-        (event) => {
-            setAnchorEl(
-                event.currentTarget
-            );
-        };
+    const handleProfileMenuOpen = (
+        event
+    ) => {
+        setAnchorEl(
+            event.currentTarget
+        );
+    };
 
-
-    const handleMobileMenuClose =
-        () => {
-            setMobileMoreAnchorEl(
-                null
-            );
-        };
-
+    const handleMobileMenuClose = () => {
+        setMobileMoreAnchorEl(null);
+    };
 
     const handleMenuClose = () => {
         setAnchorEl(null);
-
         handleMobileMenuClose();
     };
 
-
-    const handleMobileMenuOpen =
-        (event) => {
-            setMobileMoreAnchorEl(
-                event.currentTarget
-            );
-        };
+    const handleMobileMenuOpen = (
+        event
+    ) => {
+        setMobileMoreAnchorEl(
+            event.currentTarget
+        );
+    };
 
 
     // =================================================
@@ -625,7 +576,6 @@ function NavBar() {
 
     const handleLogin = () => {
         handleMenuClose();
-
         setLoginOpen(true);
     };
 
@@ -636,7 +586,6 @@ function NavBar() {
 
     const handleMyProfile = () => {
         handleMenuClose();
-
         navigate("/ProfilePage");
     };
 
@@ -646,32 +595,22 @@ function NavBar() {
     // =================================================
 
     const handleLogout = () => {
-        localStorage.removeItem(
-            "token"
-        );
-
-        localStorage.removeItem(
-            "user"
-        );
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
 
         setIsLoggedIn(false);
 
-
-        const guestCart =
-            JSON.parse(
-                localStorage.getItem(
-                    GUEST_CART_KEY
-                ) || "[]"
-            );
-
         setCartItems(
-            guestCart
+            getCartItems()
         );
-
 
         handleMenuClose();
 
         navigate("/");
+
+        window.dispatchEvent(
+            new CustomEvent("auth:changed")
+        );
 
         toast.success(
             "Logout Successfully"
@@ -693,23 +632,9 @@ function NavBar() {
     // =================================================
 
     const syncCartItems = () => {
-        try {
-            const cartKey =
-                getCartKey();
-
-            const savedCart =
-                JSON.parse(
-                    localStorage.getItem(
-                        cartKey
-                    ) || "[]"
-                );
-
-            setCartItems(
-                savedCart
-            );
-        } catch {
-            setCartItems([]);
-        }
+        setCartItems(
+            getCartItems()
+        );
     };
 
 
@@ -718,25 +643,26 @@ function NavBar() {
     // =================================================
 
     useEffect(() => {
-        const handleCartUpdate =
-            () => {
-                syncCartItems();
-            };
+        const handleCartUpdate = () => {
+            syncCartItems();
+        };
 
+        const handleCartOpen = () => {
+            syncCartItems();
+            setCartOpen(true);
+        };
 
-        const handleCartOpen =
-            () => {
-                syncCartItems();
+        const handleAuthChanged = () => {
+            syncCartItems();
 
-                setCartOpen(true);
-
-                window.dispatchEvent(
-                    new CustomEvent(
-                        "cart:open"
+            setIsLoggedIn(
+                Boolean(
+                    localStorage.getItem(
+                        "token"
                     )
-                );
-            };
-
+                )
+            );
+        };
 
         window.addEventListener(
             "cart:update",
@@ -748,6 +674,10 @@ function NavBar() {
             handleCartOpen
         );
 
+        window.addEventListener(
+            "auth:changed",
+            handleAuthChanged
+        );
 
         return () => {
             window.removeEventListener(
@@ -759,6 +689,11 @@ function NavBar() {
                 "cart:open",
                 handleCartOpen
             );
+
+            window.removeEventListener(
+                "auth:changed",
+                handleAuthChanged
+            );
         };
     }, []);
 
@@ -769,7 +704,6 @@ function NavBar() {
 
     const handleCartOpen = () => {
         syncCartItems();
-
         setCartOpen(true);
     };
 
@@ -780,10 +714,13 @@ function NavBar() {
 
     const handleLoginSuccess = () => {
         setIsLoggedIn(true);
-
         setLoginOpen(false);
 
         syncCartItems();
+
+        window.dispatchEvent(
+            new CustomEvent("auth:changed")
+        );
     };
 
 
@@ -791,31 +728,33 @@ function NavBar() {
     // SEARCH PRODUCT CLICK
     // =================================================
 
-    const handleSearchProductClick =
-        (product) => {
-            setSearchInput("");
+    const handleSearchProductClick = (
+        product
+    ) => {
+        setSearchInput("");
 
-            navigate(
-                `/products/${product.id}`
-            );
-        };
+        navigate(
+            `/products/${product.id}`
+        );
+    };
 
 
     // =================================================
     // ENTER SEARCH
     // =================================================
 
-    const handleSearchKeyDown =
-        (event) => {
-            if (
-                event.key === "Enter" &&
-                searchResults.length > 0
-            ) {
-                handleSearchProductClick(
-                    searchResults[0]
-                );
-            }
-        };
+    const handleSearchKeyDown = (
+        event
+    ) => {
+        if (
+            event.key === "Enter" &&
+            searchResults.length > 0
+        ) {
+            handleSearchProductClick(
+                searchResults[0]
+            );
+        }
+    };
 
 
     // =================================================
@@ -847,20 +786,15 @@ function NavBar() {
             id={menuId}
             keepMounted
             open={isMenuOpen}
-            onClose={
-                handleMenuClose
-            }
+            onClose={handleMenuClose}
         >
             {!isLoggedIn && (
                 <MenuItem
-                    onClick={
-                        handleLogin
-                    }
+                    onClick={handleLogin}
                 >
                     Login
                 </MenuItem>
             )}
-
 
             {isLoggedIn && (
                 <>
@@ -913,9 +847,7 @@ function NavBar() {
         >
             {!isLoggedIn && (
                 <MenuItem
-                    onClick={
-                        handleLogin
-                    }
+                    onClick={handleLogin}
                 >
                     <IconButton
                         size="large"
@@ -929,7 +861,6 @@ function NavBar() {
                     </Typography>
                 </MenuItem>
             )}
-
 
             {isLoggedIn && (
                 <>
@@ -949,7 +880,6 @@ function NavBar() {
                             My Profile
                         </Typography>
                     </MenuItem>
-
 
                     <MenuItem
                         onClick={
@@ -993,10 +923,8 @@ function NavBar() {
                     backgroundColor:
                         Colors.blue,
                     display: "flex",
-                    alignItems:
-                        "center",
-                    justifyContent:
-                        "center",
+                    alignItems: "center",
+                    justifyContent: "center",
                     overflow: "hidden",
                     px: 2,
                 }}
@@ -1060,6 +988,8 @@ function NavBar() {
                             navigate("/")
                         }
                         alt="Mamaearth"
+                        width={160}
+                        height={40}
                         sx={{
                             width: {
                                 xs: 120,
@@ -1079,8 +1009,7 @@ function NavBar() {
                                 md: 2,
                             },
 
-                            cursor:
-                                "pointer",
+                            cursor: "pointer",
                         }}
                     />
 
@@ -1139,14 +1068,10 @@ function NavBar() {
                         }}
                     >
 
-                        {/* SEARCH ICON */}
-
                         <SearchIconWrapper>
                             <SearchIcon />
                         </SearchIconWrapper>
 
-
-                        {/* SEARCH INPUT */}
 
                         <StyledInputBase
                             value={
@@ -1184,7 +1109,8 @@ function NavBar() {
                                     position:
                                         "absolute",
 
-                                    top: "calc(100% + 8px)",
+                                    top:
+                                        "calc(100% + 8px)",
 
                                     width: {
                                         xs: "calc(100vw - 20px)",
@@ -1197,16 +1123,10 @@ function NavBar() {
                                     },
 
                                     transform: {
-                                        xs: "translateX(-50%)",
+                                        xs:
+                                            "translateX(-50%)",
                                         sm: "none",
                                     },
-
-                                    right: {
-                                        xs: "auto",
-                                        sm: 0,
-                                    },
-
-                                    mr: 0,
 
                                     backgroundColor:
                                         Colors.background,
@@ -1237,12 +1157,9 @@ function NavBar() {
                                         "border-box",
                                 }}
                             >
-                                {searchResults.length >
-                                    0 ? (
+                                {searchResults.length > 0 ? (
                                     searchResults.map(
-                                        (
-                                            product
-                                        ) => {
+                                        (product) => {
                                             const image =
                                                 getProductImage(
                                                     product
@@ -1280,29 +1197,24 @@ function NavBar() {
                                                         borderBottom:
                                                             "1px solid #eeeeee",
 
-                                                        "&:hover":
-                                                        {
+                                                        "&:hover": {
                                                             backgroundColor:
                                                                 Colors.background,
                                                         },
                                                     }}
                                                 >
 
-                                                    {/* PRODUCT IMAGE */}
-
                                                     <Box
                                                         component="img"
-                                                        src={
-                                                            image
-                                                        }
+                                                        src={image}
                                                         alt={
                                                             product?.name ||
                                                             "Product"
                                                         }
                                                         loading="lazy"
                                                         decoding="async"
-                                                        width="58"
-                                                        height="58"
+                                                        width={58}
+                                                        height={58}
                                                         sx={{
                                                             width: 58,
                                                             height: 58,
@@ -1316,11 +1228,10 @@ function NavBar() {
                                                                 0,
                                                             backgroundColor:
                                                                 Colors.background,
+                                                            display:
+                                                                "block",
                                                         }}
                                                     />
-
-
-                                                    {/* PRODUCT DETAILS */}
 
                                                     <Box
                                                         sx={{
@@ -1332,22 +1243,16 @@ function NavBar() {
                                                         <Typography
                                                             sx={{
                                                                 ...Theme.font14Bold,
-
                                                                 lineHeight:
                                                                     1.3,
-
                                                                 overflow:
                                                                     "hidden",
-
                                                                 textOverflow:
                                                                     "ellipsis",
-
                                                                 display:
                                                                     "-webkit-box",
-
                                                                 WebkitLineClamp:
                                                                     2,
-
                                                                 WebkitBoxOrient:
                                                                     "vertical",
                                                             }}
@@ -1359,13 +1264,10 @@ function NavBar() {
                                                             }
                                                         </Typography>
 
-
                                                         <Typography
                                                             sx={{
                                                                 ...Theme.font14Bold,
-
                                                                 mt: 0.5,
-
                                                                 color:
                                                                     Colors.blue,
                                                             }}
@@ -1379,20 +1281,17 @@ function NavBar() {
                                                         </Typography>
                                                     </Box>
 
-
-                                                    {/* VIEW */}
-
                                                     <Typography
                                                         sx={{
                                                             fontSize: 12,
-                                                            color: Colors.black,
+                                                            color:
+                                                                Colors.black,
                                                             flexShrink: 0,
                                                             fontWeight: 600,
                                                         }}
                                                     >
                                                         View
                                                     </Typography>
-
                                                 </Box>
                                             );
                                         }
@@ -1407,8 +1306,9 @@ function NavBar() {
                                     >
                                         <Typography
                                             sx={{
-                                               ...Theme.font14Regular,
-                                                color:Colors.black,
+                                                ...Theme.font14Regular,
+                                                color:
+                                                    Colors.black,
                                             }}
                                         >
                                             No products found
@@ -1439,8 +1339,6 @@ function NavBar() {
                         }}
                     >
 
-                        {/* PROFILE */}
-
                         <IconButton
                             size="large"
                             aria-label="account"
@@ -1466,8 +1364,6 @@ function NavBar() {
                         </IconButton>
 
 
-                        {/* CART */}
-
                         <IconButton
                             size="large"
                             aria-label="shopping cart"
@@ -1487,8 +1383,7 @@ function NavBar() {
                                 }
                                 color="error"
                                 sx={{
-                                    "& .MuiBadge-badge":
-                                    {
+                                    "& .MuiBadge-badge": {
                                         fontSize: 10,
                                         minWidth: 18,
                                         height: 18,
@@ -1538,30 +1433,26 @@ function NavBar() {
             </AppBar>
 
 
-            {/* MENUS */}
-
             {renderMobileMenu}
 
             {renderMenu}
 
 
-            {/* CART - LOAD ONLY WHEN OPEN */}
+            {/* CART */}
 
             {cartOpen && (
                 <Suspense fallback={null}>
                     <CartPage
                         open={cartOpen}
                         onClose={() =>
-                            setCartOpen(
-                                false
-                            )
+                            setCartOpen(false)
                         }
                     />
                 </Suspense>
             )}
 
 
-            {/* LOGIN - LOAD ONLY WHEN OPEN */}
+            {/* LOGIN */}
 
             {loginOpen && (
                 <Suspense fallback={null}>
@@ -1580,6 +1471,5 @@ function NavBar() {
         </Box>
     );
 }
-
 
 export default NavBar;

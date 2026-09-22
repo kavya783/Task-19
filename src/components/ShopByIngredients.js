@@ -21,9 +21,6 @@ import {
   getShopByIngredientsDataActionInitiate,
 } from "../redux/actions/contentActions";
 
-import {
-  getProductsDataActionInitiate,
-} from "../redux/actions/productActions";
 
 import ProductCards from "./ProductCards";
 
@@ -443,9 +440,7 @@ function ShopByIngredients() {
       getShopByIngredientsDataActionInitiate()
     );
 
-    dispatch(
-      getProductsDataActionInitiate()
-    );
+  
   }, [dispatch]);
 
 

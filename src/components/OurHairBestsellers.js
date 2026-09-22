@@ -21,9 +21,6 @@ import {
   getOurHairDataActionInitiate,
 } from "../redux/actions/contentActions";
 
-import {
-  getProductsDataActionInitiate,
-} from "../redux/actions/productActions";
 
 import ProductCards from "./ProductCards";
 
@@ -468,17 +465,13 @@ function OurHairBestsellers({
   // GET DATA
   // ========================================
 
+  
+
   useEffect(() => {
+  dispatch(getOurHairDataActionInitiate());
+}, [dispatch]);
 
-    dispatch(
-      getOurHairDataActionInitiate()
-    );
 
-    dispatch(
-      getProductsDataActionInitiate()
-    );
-
-  }, [dispatch]);
 
 
   // ========================================

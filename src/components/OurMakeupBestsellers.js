@@ -21,9 +21,7 @@ import {
   getOurMakeupDataActionInitiate,
 } from "../redux/actions/contentActions";
 
-import {
-  getProductsDataActionInitiate,
-} from "../redux/actions/productActions";
+
 
 import ProductCards from "./ProductCards";
 
@@ -445,9 +443,7 @@ function OurMakeupBestSellers({
       getOurMakeupDataActionInitiate()
     );
 
-    dispatch(
-      getProductsDataActionInitiate()
-    );
+  
   }, [dispatch]);
 
 

@@ -395,11 +395,11 @@ const ProductCardItem = memo(
     400
   )}
   srcSet={`
-    ${optimizeCloudinaryImage(currentImage, 300)} 300w,
-    ${optimizeCloudinaryImage(currentImage, 400)} 400w,
-    ${optimizeCloudinaryImage(currentImage, 600)} 600w
-  `}
-  sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 210px"
+  ${optimizeCloudinaryImage(currentImage, 200)} 200w,
+  ${optimizeCloudinaryImage(currentImage, 300)} 300w,
+  ${optimizeCloudinaryImage(currentImage, 400)} 400w
+`}
+sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
   alt={productName}
   loading="lazy"
   decoding="async"
@@ -883,8 +883,7 @@ function ProductCards({
   // HOVER STATE
   
 
-  const [hoveredProducts, setHoveredProducts] =
-    useState({});
+const [hoveredProductId, setHoveredProductId] = useState(null);
 
   
   // CART QUANTITIES
@@ -955,49 +954,13 @@ function ProductCards({
   
   // HOVER ENTER
   
+const handleMouseEnter = useCallback((productId) => {
+  setHoveredProductId(productId);
+}, []);
 
-  const handleMouseEnter = useCallback(
-    (productId) => {
-      setHoveredProducts(
-        (previous) => {
-          if (previous[productId]) {
-            return previous;
-          }
-
-          return {
-            ...previous,
-            [productId]: true,
-          };
-        }
-      );
-    },
-    []
-  );
-
-  
-  // HOVER LEAVE
-  
-
-  const handleMouseLeave = useCallback(
-    (productId) => {
-      setHoveredProducts(
-        (previous) => {
-          if (!previous[productId]) {
-            return previous;
-          }
-
-          const next = {
-            ...previous,
-          };
-
-          delete next[productId];
-
-          return next;
-        }
-      );
-    },
-    []
-  );
+const handleMouseLeave = useCallback(() => {
+  setHoveredProductId(null);
+}, []);
 
   
   // ADD TO CART
@@ -1202,13 +1165,9 @@ function ProductCards({
   // PRODUCTS
   
 
-  const productList = useMemo(
-    () =>
-      Array.isArray(products)
-        ? products
-        : [],
-    [products]
-  );
+const productList = Array.isArray(products)
+  ? products
+  : [];
 
   
   // NO PRODUCTS
@@ -1302,13 +1261,7 @@ function ProductCards({
                       productId
                     ] || 0
                   }
-                  isHovered={
-                    Boolean(
-                      hoveredProducts[
-                        productId
-                      ]
-                    )
-                  }
+                 isHovered={hoveredProductId === productId}
                   onNavigate={
                     handleNavigate
                   }
