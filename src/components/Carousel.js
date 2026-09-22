@@ -147,32 +147,31 @@ function Carousel() {
     >
       {/* Banner */}
       <Box sx={bannerWrapperSx}>
-        <Box
-          component="img"
-          src={optimizeCloudinaryImage(bannerUrl, 800)}
-          srcSet={`
-            ${optimizeCloudinaryImage(bannerUrl, 600)} 600w,
-            ${optimizeCloudinaryImage(bannerUrl, 800)} 800w,
-            ${optimizeCloudinaryImage(bannerUrl, 1200)} 1200w
-          `}
-          sizes="100vw"
-          alt={
-            activeImage.heading || "Mamaearth Banner"
-          }
-          width={1600}
-          height={427}
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          sx={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            display: "block",
-            objectFit: "cover",
-          }}
-        />
+       <Box
+  component="img"
+  src={optimizeCloudinaryImage(bannerUrl, 600)}
+  srcSet={`
+    ${optimizeCloudinaryImage(bannerUrl, 600)} 600w,
+    ${optimizeCloudinaryImage(bannerUrl, 800)} 800w
+  `}
+  sizes="100vw"
+  alt={
+    activeImage.heading || "Mamaearth Banner"
+  }
+  width={1600}
+  height={427}
+  loading="eager"
+  fetchPriority="high"
+  decoding="async"
+  sx={{
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    display: "block",
+    objectFit: "cover",
+  }}
+/>
 
         {carouselImages.length > 1 && (
           <>
