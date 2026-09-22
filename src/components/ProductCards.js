@@ -334,8 +334,7 @@ const ProductCardItem = memo(
           boxSizing: "border-box",
         }}
       >
-        <Card
-         
+  <Card
   sx={{
     height: "100%",
     display: "flex",
@@ -343,8 +342,7 @@ const ProductCardItem = memo(
     borderRadius: "10px",
     overflow: "hidden",
     border: "1px solid #ddd",
-    boxShadow:
-      "0 2px 8px rgba(0,0,0,0.08)",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
     cursor: "pointer",
   }}
           onClick={handleCardClick}
@@ -357,13 +355,18 @@ const ProductCardItem = memo(
   sx={{
     position: "relative",
     width: "100%",
+
     height: {
       xs: "150px",
       sm: "175px",
       md: "210px",
     },
+
+    aspectRatio: "1 / 1",
+
     overflow: "hidden",
     flexShrink: 0,
+    boxSizing: "border-box",
   }}
 >
   {/* STATUS */}
@@ -390,16 +393,13 @@ const ProductCardItem = memo(
   {currentImage && (
    <CardMedia
   component="img"
-  image={optimizeCloudinaryImage(
-    currentImage,
-    400
-  )}
+  image={optimizeCloudinaryImage(currentImage, 400)}
   srcSet={`
-  ${optimizeCloudinaryImage(currentImage, 200)} 200w,
-  ${optimizeCloudinaryImage(currentImage, 300)} 300w,
-  ${optimizeCloudinaryImage(currentImage, 400)} 400w
-`}
-sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
+    ${optimizeCloudinaryImage(currentImage, 200)} 200w,
+    ${optimizeCloudinaryImage(currentImage, 300)} 300w,
+    ${optimizeCloudinaryImage(currentImage, 400)} 400w
+  `}
+  sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
   alt={productName}
   loading="lazy"
   decoding="async"
@@ -461,24 +461,17 @@ sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
               }}
             >
               <Typography
-                variant="h6"
-                sx={{
-                  fontSize:
-                    Theme.font12Bold,
-
-                  mb: 0.5,
-
-                  display:
-                    "-webkit-box",
-
-                  WebkitLineClamp: 2,
-
-                  WebkitBoxOrient:
-                    "vertical",
-
-                  overflow: "hidden",
-                }}
-              >
+  variant="h6"
+  sx={{
+    fontSize: Theme.font12Bold,
+    lineHeight: "17px",
+    mb: 0.5,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  }}
+>
                 {productName}
               </Typography>
             </Box>
@@ -496,24 +489,17 @@ sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
               }}
             >
               <Typography
-                variant="h6"
-                sx={{
-                  fontSize:
-                    Theme.font12Bold,
-
-                  mb: 0.5,
-
-                  display:
-                    "-webkit-box",
-
-                  WebkitLineClamp: 2,
-
-                  WebkitBoxOrient:
-                    "vertical",
-
-                  overflow: "hidden",
-                }}
-              >
+  variant="h6"
+  sx={{
+    fontSize: Theme.font12Bold,
+    lineHeight: "17px",
+    mb: 0.5,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  }}
+>
                 {product?.heading ||
                   "Product"}
               </Typography>
@@ -531,27 +517,19 @@ sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
                 },
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontSize:
-                    Theme.font14SemiBold,
-
-                  fontWeight: 500,
-
-                  mb: 0.5,
-
-                  display:
-                    "-webkit-box",
-
-                  WebkitLineClamp: 2,
-
-                  WebkitBoxOrient:
-                    "vertical",
-
-                  overflow: "hidden",
-                }}
-              >
+             <Typography
+  variant="h6"
+  sx={{
+    fontSize: Theme.font14SemiBold,
+    lineHeight: "17px",
+    fontWeight: 500,
+    mb: 0.5,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  }}
+>
                 {benefits}
               </Typography>
             </Box>
