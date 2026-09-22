@@ -14,8 +14,8 @@ import {
 
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+// import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
+// import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -28,29 +28,27 @@ function SideBar({
   const [mobileMenuOpen, setMobileMenuOpen] =
     useState(false);
 
-  // =====================================================
-  // LOGOUT
-  // =====================================================
+  
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("user");
 
-    window.location.href = "/login";
-  };
+  //   window.location.href = "/login";
+  // };
 
-  // =====================================================
+ 
   // MENU CLICK
-  // =====================================================
+ 
 
   const handleMenuClick = (section) => {
     setSelectedSection(section);
     setMobileMenuOpen(false);
   };
 
-  // =====================================================
+ 
   // MENU ITEMS
-  // =====================================================
+ 
 
   const menuItems = [
     {
@@ -66,9 +64,9 @@ function SideBar({
    
   ];
 
-  // =====================================================
+ 
   // SIDEBAR CONTENT
-  // =====================================================
+ 
 
   const sidebarContent = (
     <Box
@@ -174,43 +172,9 @@ function SideBar({
         })}
       </List>
 
-      {/* =================================================
-          DIVIDER
-      ================================================= */}
+     
 
-      <Divider sx={{ my: 2 }} />
-
-      {/* =================================================
-          LOGOUT
-      ================================================= */}
-
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleLogout}
-            sx={{
-              borderRadius: 2,
-
-              "&:hover": {
-                backgroundColor: Colors.background,
-              },
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 40,
-                color: Colors.black,
-              }}
-            >
-              <LogoutOutlinedIcon />
-            </ListItemIcon>
-
-            <ListItemText
-              primary="Logout"
-            />
-          </ListItemButton>
-        </ListItem>
-      </List>
+     
     </Box>
   );
 
