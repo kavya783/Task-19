@@ -38,7 +38,7 @@ import { getProductsDataActionInitiate } from "../redux/actions/productActions";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 import Footer from "../components/Footer";
-
+import { optimizeCloudinaryImage } from "../utils/imageUtils";
 
 
 // PARSE VALUE
@@ -622,32 +622,32 @@ function ProductDetailsPage() {
                     MAIN PRODUCT SECTION
                 ================================================== */}
 
-               <Box
-    sx={{
-        display: "grid",
-        gridTemplateColumns: {
-            xs: "1fr",
-            sm: "minmax(0, 1fr) minmax(0, 1fr)",
-        },
-        alignItems: "start",
-        gap: {
-            xs: 3,
-            md: 4,
-            lg: 5,
-        },
-        width: "100%",
-    }}
->
+                <Box
+                    sx={{
+                        display: "grid",
+                        gridTemplateColumns: {
+                            xs: "1fr",
+                            sm: "minmax(0, 1fr) minmax(0, 1fr)",
+                        },
+                        alignItems: "start",
+                        gap: {
+                            xs: 3,
+                            md: 4,
+                            lg: 5,
+                        },
+                        width: "100%",
+                    }}
+                >
                     {/* ==================================================
                         LEFT SIDE - IMAGES
                     ================================================== */}
 
-                   <Box
-    component="main"
-    sx={{
-        width: "100%",
-        maxWidth: 1280,
-    }}
+                    <Box
+                        component="main"
+                        sx={{
+                            width: "100%",
+                            maxWidth: 1280,
+                        }}
                     >
 
                         {/* MAIN IMAGE CARD */}
@@ -828,7 +828,7 @@ function ProductDetailsPage() {
                                     >
                                         <Box
                                             component="img"
-                                            src={images[selectedImage]}
+                                            src={optimizeCloudinaryImage(images[selectedImage], 600)}
                                             alt={product.name || "Product"}
                                             loading="eager"
                                             fetchPriority="high"
@@ -884,7 +884,10 @@ function ProductDetailsPage() {
 
                                                     backgroundColor: Colors.background,
 
-                                                    backgroundImage: `url(${images[selectedImage]})`,
+                                                    backgroundImage: `url(${optimizeCloudinaryImage(
+                                                        images[selectedImage],
+                                                        1000
+                                                    )})`,
                                                     backgroundRepeat: "no-repeat",
                                                     backgroundSize: "300% 300%",
 
@@ -951,7 +954,7 @@ function ProductDetailsPage() {
                                         <Box
                                             key={`${image}-${index}`}
                                             component="img"
-                                            src={image}
+                                            src={optimizeCloudinaryImage(image, 100)}
                                             alt={`${product.name || "Product"} ${index + 1}`}
                                             loading="lazy"
                                             decoding="async"
@@ -1997,7 +2000,7 @@ function ProductDetailsPage() {
                                 >
                                     <Box
                                         component="img"
-                                        src={image}
+                                        src={optimizeCloudinaryImage(image, 800)}
                                         alt={`${product.name || "Product"} ${index + 1}`}
                                         loading="lazy"
                                         decoding="async"
@@ -2851,10 +2854,10 @@ function ProductDetailsPage() {
                             {images.length > 0 && (
                                 <Box
                                     component="img"
-                                    src={
-                                        images[selectedImage] ||
-                                        images[0]
-                                    }
+                                    src={optimizeCloudinaryImage(
+                                        images[selectedImage] || images[0],
+                                        100
+                                    )}
                                     alt={
                                         product.name ||
                                         "Product"
