@@ -1008,21 +1008,30 @@ function ProfilePage() {
                       component="img"
                       src="/images/Plant.avif"
                       alt="Plant"
-                      loading="eager"
-                      fetchPriority="high"
+                      width={100}
+                      height={100}
+                      loading="lazy"
                       decoding="async"
                       sx={{
                         width: "100px",
-                        height: "auto",
+                        height: "100px",
+                        objectFit: "contain",
+                        display: "block",
                       }}
                     />
                     <Box
                       component="img"
                       src="/images/Plantname.webp"
                       alt="We plant goodness"
+                      width={120}
+                      height={40}
+                      loading="lazy"
+                      decoding="async"
                       sx={{
                         width: "120px",
-                        height: "auto",
+                        height: "40px",
+                        objectFit: "contain",
+                        display: "block",
                       }}
                     />
                   </Box>
@@ -1365,17 +1374,17 @@ function ProfilePage() {
                         flexShrink: 0,
                       }}
                     >
-                   <Box
-  component="img"
-  src="/images/Plant.avif"
-  alt="Plant"
-  loading="lazy"
-  decoding="async"
-  sx={{
-    width: "36px",
-    height: "36px",
-  }}
-/>
+                      <Box
+                        component="img"
+                        src="/images/Plant.avif"
+                        alt="Plant"
+                        loading="lazy"
+                        decoding="async"
+                        sx={{
+                          width: "36px",
+                          height: "36px",
+                        }}
+                      />
                     </Box>
 
                     <Typography
@@ -2058,26 +2067,34 @@ function ProfilePage() {
                       marginBottom: "20px",
                     }}
                   >
-                  <Box
-  component="img"
-  src="/images/Plant.avif"
-  alt="Plant"
-  loading="eager"
-  fetchPriority="high"
-  decoding="async"
-  sx={{
-    width: "100px",
-    height: "auto",
-  }}
-/>
-
+                    <Box
+                      component="img"
+                      src="/images/Plant.avif"
+                      alt="Plant"
+                      width={100}
+                      height={100}
+                      loading="lazy"
+                      decoding="async"
+                      sx={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "contain",
+                        display: "block",
+                      }}
+                    />
                     <Box
                       component="img"
                       src="/images/Plantname.webp"
                       alt="We plant goodness"
+                      width={120}
+                      height={40}
+                      loading="lazy"
+                      decoding="async"
                       sx={{
                         width: "120px",
-                        height: "auto",
+                        height: "40px",
+                        objectFit: "contain",
+                        display: "block",
                       }}
                     />
                   </Box>
@@ -2119,16 +2136,18 @@ function ProfilePage() {
                       component="img"
                       src="/images/Qrcode.png"
                       alt="Download app QR code"
+                      width={105}
+                      height={105}
+                      loading="lazy"
+                      decoding="async"
                       sx={{
                         width: "105px",
                         height: "105px",
-
                         objectFit: "contain",
-
                         flexShrink: 0,
+                        display: "block",
                       }}
                     />
-
                     {/* RIGHT CONTENT */}
 
                     <Box
