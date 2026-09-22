@@ -36,7 +36,7 @@ function SellerDashboard() {
   sx={{
     width: "100%",
     height: "70px",
-    backgroundColor: Colors.profile,
+    backgroundColor: Colors.blue,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -69,16 +69,7 @@ function SellerDashboard() {
         sx={{
           position: "fixed",
 
-          /*
-            MOBILE
-            Navbar = 150px
-            Menu Icon Bar = 55px
-            Content starts = 205px
-
-            DESKTOP
-            Navbar = 120px
-          */
-
+         
           top: {
             xs: "205px",
             md: "120px",
@@ -142,11 +133,7 @@ function SellerDashboard() {
             PRODUCT COUNT
         ===================================================== */}
 
-        {selectedSection === "product-count" && (
-          <Box>
-            <h2>Product Count</h2>
-          </Box>
-        )}
+       
       </Box>
     </Box>
   );

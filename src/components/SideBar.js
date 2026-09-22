@@ -63,11 +63,7 @@ function SideBar({
       value: "add-products",
       icon: <AddBoxOutlinedIcon />,
     },
-    {
-      label: "Product Count",
-      value: "product-count",
-      icon: <NumbersOutlinedIcon />,
-    },
+   
   ];
 
   // =====================================================
@@ -138,7 +134,7 @@ function SideBar({
 
                   // Selected text
                   color: isSelected
-                    ?Colors.red
+                    ?Colors.orange
                     : Colors.black,
 
                   "&:hover": {
@@ -153,7 +149,7 @@ function SideBar({
                     minWidth: 40,
 
                     color: isSelected
-                      ? Colors.red
+                      ? Colors.orange
                       : Colors.black
                   }}
                 >
@@ -168,7 +164,7 @@ function SideBar({
                       : 400,
 
                     color: isSelected
-                      ? Colors.red
+                      ? Colors.orange
                       : Colors.black,
                   }}
                 />
@@ -303,12 +299,12 @@ function SideBar({
 
             p: 1,
 
-            color: "#000",
+            color:Colors.black,
 
             zIndex: 1160,
 
             "&:hover": {
-              backgroundColor: "#f5f5f5",
+              backgroundColor:Colors.background,
             },
           }}
         >

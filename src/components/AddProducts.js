@@ -546,7 +546,7 @@ onProductAdded?.();
           },
 
           borderRadius: 2,
-          backgroundColor: "#ffffff",
+          backgroundColor:Colors.background,
 
           display: "flex",
           alignItems: "center",
@@ -604,7 +604,7 @@ onProductAdded?.();
 
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
-      backgroundColor: "#ffffff",
+      backgroundColor:Colors.background,
     },
 
     "& .MuiInputLabel-root": {
@@ -655,7 +655,7 @@ onProductAdded?.();
             mt:{xs:5,sm:5},
             fontWeight: 700,
 
-            color: "#222",
+            color:Colors.black,
           }}
         >
           Add Product
@@ -663,7 +663,7 @@ onProductAdded?.();
 
         <Typography
           sx={{
-            color: "#777",
+            color:Colors.black,
 
             fontSize: {
               xs: 12,
@@ -823,7 +823,7 @@ onProductAdded?.();
                 sx={{
                   fontSize: 13,
                   mt: 2,
-                  color: "#816262",
+                color:Colors.black,
                 }}
               >
                 {categoryError}
@@ -1081,12 +1081,12 @@ onProductAdded?.();
                         sx={{
                           flexShrink: 0,
 
-                          backgroundColor:
-                            "#ffffff",
+                          backgroundColor:Colors.background,
+                            
 
                           "&:hover": {
-                            backgroundColor:
-                              "#f5f5f5",
+                           
+                          backgroundColor:Colors.background,
                           },
                         }}
                       >
@@ -1116,7 +1116,7 @@ onProductAdded?.();
 
                 color: Colors.black,
 
-                borderColor: "#ffffff",
+                borderColor:Colors.background,
 
                 width: {
                   xs: "100%",
@@ -1124,9 +1124,9 @@ onProductAdded?.();
                 },
 
                 "&:hover": {
-                  borderColor: "#010000",
-                  backgroundColor:
-                    "rgba(255,255,255,0.1)",
+                  borderColor:Colors.black,
+                  backgroundColor:Colors.black
+                  
                 },
               }}
             >
@@ -1167,8 +1167,8 @@ onProductAdded?.();
                           key={index}
                           label={benefit}
                           sx={{
-                            backgroundColor:
-                              "#ffffff",
+                           
+                          backgroundColor:Colors.background,
 
                             border:
                               "1px solid #b7df8f",
@@ -1231,8 +1231,7 @@ onProductAdded?.();
                       border:
                         "1px solid #e5e5e5",
 
-                      backgroundColor:
-                        "#fafafa",
+                          backgroundColor:Colors.background,
 
                       width: "100%",
 
@@ -1257,7 +1256,7 @@ onProductAdded?.();
                             sm: 15,
                           },
 
-                          color: "#222",
+                          color:Colors.black,
                         }}
                       >
                         Variant {index + 1}
@@ -1402,7 +1401,7 @@ onProductAdded?.();
                         <Typography
                           sx={{
                             fontSize: 12,
-                            color: "#777",
+                            color:Colors.black,
                             mb: 1,
                           }}
                         >
@@ -1412,10 +1411,10 @@ onProductAdded?.();
                         <Chip
                           label={variant.badge}
                           sx={{
-                            backgroundColor:
-                              "#8bc34a",
+                            backgroundColor:Colors.green,
+                             
 
-                            color: "#ffffff",
+                            color: Colors.background,
 
                             fontWeight: 600,
 
@@ -1447,7 +1446,7 @@ onProductAdded?.();
 
                 color: Colors.black,
 
-                borderColor: "#ffffff",
+                borderColor:Colors.background,
 
                 width: {
                   xs: "100%",
@@ -1455,9 +1454,8 @@ onProductAdded?.();
                 },
 
                 "&:hover": {
-                  borderColor: "#ffffff",
-                  backgroundColor:
-                    "rgba(255,255,255,0.1)",
+                  borderColor:Colors.background,
+                  backgroundColor:Colors.black,
                 },
               }}
             >
@@ -1533,8 +1531,8 @@ onProductAdded?.();
                         }
                         sx={{
                           flexShrink: 0,
-                          backgroundColor:
-                            "#ffffff",
+                          backgroundColor:Colors.background,
+                           
                         }}
                       >
                         <DeleteIcon />
@@ -1563,7 +1561,7 @@ onProductAdded?.();
 
                 color: Colors.black,
 
-                borderColor: "#ffffff",
+                borderColor: Colors.background,
 
                 width: {
                   xs: "100%",
@@ -1571,9 +1569,9 @@ onProductAdded?.();
                 },
 
                 "&:hover": {
-                  borderColor: "#ffffff",
-                  backgroundColor:
-                    "rgba(255,255,255,0.1)",
+                  borderColor:Colors.background,
+                  backgroundColor:Colors.black,
+                   
                 },
               }}
             >
@@ -1660,7 +1658,7 @@ onProductAdded?.();
               sx={{
                 fontSize: 14,
                 mt: 3,
-                color: "#ffffff",
+                color:Colors.background,
               }}
             >
               {error}
@@ -1716,12 +1714,12 @@ onProductAdded?.();
 
                 fontWeight: 600,
 
-                backgroundColor: "#ffffff",
+                backgroundColor:Colors.background,
 
                 color: "red",
 
                 "&:hover": {
-                  backgroundColor: "#f5f5f5",
+                  backgroundColor:Colors.background,
                 },
               }}
             >
