@@ -38,7 +38,7 @@ import { getProductsDataActionInitiate } from "../redux/actions/productActions";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 import Footer from "../components/Footer";
-import { optimizeCloudinaryImage } from "../utils/imageUtils";
+import { optimizeCloudinaryImage } from "../utils/cloudinary";
 
 
 // PARSE VALUE
