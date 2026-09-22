@@ -622,31 +622,32 @@ function ProductDetailsPage() {
                     MAIN PRODUCT SECTION
                 ================================================== */}
 
-                <Box
-                    sx={{
-                        display: "grid",
-                        gridTemplateColumns: {
-                            xs: "1fr",
-                            sm: "minmax(0, 1fr) minmax(0, 1fr)",
-                        },
-                        gap: {
-                            xs: 3,
-                            md: 4,
-                            lg: 5,
-                        },
-                        width: "100%",
-                    }}
-                >
-
+               <Box
+    sx={{
+        display: "grid",
+        gridTemplateColumns: {
+            xs: "1fr",
+            sm: "minmax(0, 1fr) minmax(0, 1fr)",
+        },
+        alignItems: "start",
+        gap: {
+            xs: 3,
+            md: 4,
+            lg: 5,
+        },
+        width: "100%",
+    }}
+>
                     {/* ==================================================
                         LEFT SIDE - IMAGES
                     ================================================== */}
 
-                    <Box
-                        sx={{
-                            minWidth: 0,
-                            width: "100%",
-                        }}
+                   <Box
+    component="main"
+    sx={{
+        width: "100%",
+        maxWidth: 1280,
+    }}
                     >
 
                         {/* MAIN IMAGE CARD */}
