@@ -142,16 +142,10 @@ const CategoryItem = memo(
         onClick={handleClick}
         sx={{
           display: "flex",
-
           flexDirection: "column",
-
           alignItems: "center",
-
-          justifyContent: "center",
-
+          justifyContent: "flex-start",
           flexShrink: 0,
-
-          cursor: "pointer",
 
           width: mobile
             ? "auto"
@@ -159,11 +153,11 @@ const CategoryItem = memo(
 
           minWidth: mobile
             ? "75px"
-            : "auto",
+            : "50px",
 
           minHeight: mobile
-            ? "auto"
-            : 30,
+            ? "76px"
+            : "60px",
 
           padding: mobile
             ? "8px"
@@ -171,10 +165,9 @@ const CategoryItem = memo(
 
           borderRadius: "10px",
 
-          backgroundColor:
-            isSelected
-              ? Colors.background
-              : "transparent",
+          backgroundColor: isSelected
+            ? Colors.background
+            : "transparent",
 
           transition:
             "background-color 0.3s ease",
@@ -185,7 +178,6 @@ const CategoryItem = memo(
           },
         }}
       >
-
         {/* CATEGORY IMAGE */}
 
         <Box
@@ -198,16 +190,84 @@ const CategoryItem = memo(
             width: mobile
               ? 42
               : {
-                  sm: 32,
-                  md: 36,
-                },
+                sm: 32,
+                md: 36,
+              },
 
             height: mobile
               ? 42
               : {
-                  sm: 32,
-                  md: 36,
-                },
+                sm: 32,
+                md: 36,
+              },
+
+            backgroundColor:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
+
+            WebkitMaskImage:
+              `url(${item?.image_url})`,
+
+            maskImage:
+              `url(${item?.image_url})`,
+
+            WebkitMaskRepeat:
+              "no-repeat",
+
+            maskRepeat:
+              "no-repeat",
+
+            WebkitMaskPosition:
+              "center",
+
+            maskPosition:
+              "center",
+
+            WebkitMaskSize:
+              "contain",
+
+            maskSize:
+              "contain",
+
+            transition:
+              "background-color 0.3s ease",
+          }}
+        /><Box
+          component="span"
+          role="img"
+          aria-label={categoryName}
+          sx={{
+            display: "block",
+            flex: "0 0 auto",
+
+            width: mobile
+              ? "42px"
+              : {
+                sm: "32px",
+                md: "36px",
+              },
+
+            height: mobile
+              ? "42px"
+              : {
+                sm: "32px",
+                md: "36px",
+              },
+
+            minWidth: mobile
+              ? "42px"
+              : {
+                sm: "32px",
+                md: "36px",
+              },
+
+            minHeight: mobile
+              ? "42px"
+              : {
+                sm: "32px",
+                md: "36px",
+              },
 
             backgroundColor:
               isSelected
@@ -248,29 +308,28 @@ const CategoryItem = memo(
 
         <Typography
           sx={{
-            mt: mobile
-              ? 1
-              : 0.5,
+            mt: mobile ? 1 : 0.5,
+
+            height: "18px",
+            lineHeight: "18px",
 
             textAlign: "center",
 
             whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
 
-            fontSize:
-              Theme.font12Regular,
+            fontSize: Theme.font12Regular,
 
-            color:
-              isSelected
-                ? Colors.blue
-                : Colors.black,
+            color: isSelected
+              ? Colors.blue
+              : Colors.black,
 
-            fontWeight:
-              isSelected
-                ? 600
-                : 400,
+            fontWeight: isSelected
+              ? 600
+              : 400,
 
-            transition:
-              "color 0.3s ease",
+            transition: "color 0.3s ease",
           }}
         >
           {categoryName}
@@ -321,10 +380,10 @@ const CategoryList = memo(
           gap: mobile
             ? 2
             : {
-                sm: 2,
-                md: 3,
-                lg: 4,
-              },
+              sm: 2,
+              md: 3,
+              lg: 4,
+            },
 
           overflowX: "auto",
 
@@ -533,7 +592,7 @@ function OurFaceBestsellers({
 
       const selectedCategoryValues =
         FACE_CATEGORY_MAP[
-          selectedCategoryKey
+        selectedCategoryKey
         ] || [
           selectedCategoryKey,
         ];
@@ -605,24 +664,42 @@ function OurFaceBestsellers({
   // LOADING
   // ========================================
 
-  if (
-    contentLoading ||
-    productLoading
-  ) {
-
+  if (contentLoading || productLoading) {
     return (
       <Box
         sx={{
           width: "100%",
-
-          py: 5,
-
-          textAlign:
-            "center",
+          minHeight: {
+            xs: "520px",
+            sm: "560px",
+            md: "600px",
+          },
+          py: 3,
+          px: {
+            xs: 2,
+            sm: 3,
+            md: 5,
+          },
+          boxSizing: "border-box",
         }}
       >
-        <Typography>
-          Loading...
+        <Typography
+          sx={{
+            textAlign: "center",
+            fontSize: Theme.font24SemiBold,
+          }}
+        >
+          Our <strong>Face</strong> Bestsellers
+        </Typography>
+
+        <Typography
+          sx={{
+            textAlign: "center",
+            fontSize: Theme.font12Regular,
+            mt: 0.5,
+          }}
+        >
+          Formulated with love and the goodness of natural ingredients
         </Typography>
       </Box>
     );
@@ -810,22 +887,21 @@ function OurFaceBestsellers({
         <Box
           sx={{
             width: "100%",
-
             maxWidth: "1200px",
-
             mx: "auto",
 
-            overflow:
-              "visible",
+            minHeight: {
+              xs: "280px",
+              sm: "320px",
+              md: "350px",
+            },
+
+            overflow: "visible",
           }}
         >
-
           <ProductCards
-            products={
-              filteredProducts
-            }
+            products={filteredProducts}
           />
-
         </Box>
 
       ) : (
