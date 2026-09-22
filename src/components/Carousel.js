@@ -15,6 +15,7 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import { useDispatch, useSelector } from "react-redux";
 
 import Colors from "../themes/colors";
+import { optimizeCloudinaryImage } from "../utils/cloudinary";
 
 import {
   getCarouselDataActionInitiate,
@@ -82,11 +83,6 @@ function Carousel() {
     );
   }, [carouselImages.length]);
 
-  /*
-   * IMPORTANT:
-   * Reserve the banner space BEFORE the API response arrives.
-   * This prevents the content below the carousel from shifting.
-   */
   const bannerWrapperSx = {
     width: "100%",
     aspectRatio: "1600 / 427",
@@ -95,7 +91,6 @@ function Carousel() {
     backgroundColor: Colors.background,
   };
 
-  // Loading state
   if (loading && carouselImages.length === 0) {
     return (
       <Box
@@ -109,7 +104,6 @@ function Carousel() {
     );
   }
 
-  // Error state
   if (error && carouselImages.length === 0) {
     return (
       <Box
@@ -135,12 +129,13 @@ function Carousel() {
     );
   }
 
-  // No carousel data
   if (!carouselImages.length) {
     return null;
   }
 
   const activeImage = carouselImages[activeStep];
+
+  const bannerUrl = activeImage?.image_url;
 
   return (
     <Box
@@ -154,7 +149,13 @@ function Carousel() {
       <Box sx={bannerWrapperSx}>
         <Box
           component="img"
-          src={activeImage.image_url}
+          src={optimizeCloudinaryImage(bannerUrl, 800)}
+          srcSet={`
+            ${optimizeCloudinaryImage(bannerUrl, 600)} 600w,
+            ${optimizeCloudinaryImage(bannerUrl, 800)} 800w,
+            ${optimizeCloudinaryImage(bannerUrl, 1200)} 1200w
+          `}
+          sizes="100vw"
           alt={
             activeImage.heading || "Mamaearth Banner"
           }

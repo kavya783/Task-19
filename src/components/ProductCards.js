@@ -24,18 +24,18 @@ import StarIcon from "@mui/icons-material/Star";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
+import { optimizeCloudinaryImage } from "../utils/cloudinary";
 
-// ========================================
 // CONSTANTS
-// ========================================
+
 
 const GUEST_CART_KEY = "mamaearth_cart_guest";
 const USER_STORAGE_KEY = "user";
 
 
-// ========================================
+
 // GET CART KEY
-// ========================================
+
 
 const getCartKey = () => {
   try {
@@ -54,9 +54,9 @@ const getCartKey = () => {
 };
 
 
-// ========================================
+
 // GET PRODUCT IMAGES
-// ========================================
+
 
 const getProductImages = (product) => {
   if (
@@ -81,9 +81,9 @@ const getProductImages = (product) => {
 };
 
 
-// ========================================
+
 // GET CART QUANTITIES
-// ========================================
+
 
 const getCartQuantities = () => {
   try {
@@ -103,9 +103,9 @@ const getCartQuantities = () => {
 };
 
 
-// ========================================
+
 // GET SALE PRICE
-// ========================================
+
 
 const getSalePrice = (product) => {
   if (Number(product?.sale_price) > 0) {
@@ -128,9 +128,9 @@ const getSalePrice = (product) => {
 };
 
 
-// ========================================
+
 // GET PRODUCT PRICING
-// ========================================
+
 
 const getProductPricing = (product) => {
   const mrp = Number(product?.mrp) || 0;
@@ -163,9 +163,9 @@ const getProductPricing = (product) => {
 };
 
 
-// ========================================
+
 // PRODUCT CARD ITEM
-// ========================================
+
 
 const ProductCardItem = memo(
   function ProductCardItem({
@@ -388,30 +388,41 @@ const ProductCardItem = memo(
 
   {/* PRODUCT IMAGE */}
   {currentImage && (
-    <CardMedia
-      component="img"
-      image={currentImage}
-      alt={productName}
-      loading="lazy"
-      decoding="async"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      sx={{
-        width: "100%",
-        height: "100%",
-        display: "block",
-        objectFit: "cover",
-        boxSizing: "border-box",
-        borderTopLeftRadius: "10px",
-        borderTopRightRadius: "10px",
-        cursor: "pointer",
-        transition: "transform 0.2s ease",
+   <CardMedia
+  component="img"
+  image={optimizeCloudinaryImage(
+    currentImage,
+    400
+  )}
+  srcSet={`
+    ${optimizeCloudinaryImage(currentImage, 300)} 300w,
+    ${optimizeCloudinaryImage(currentImage, 400)} 400w,
+    ${optimizeCloudinaryImage(currentImage, 600)} 600w
+  `}
+  sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 210px"
+  alt={productName}
+  loading="lazy"
+  decoding="async"
+  width={400}
+  height={400}
+  onMouseEnter={handleMouseEnter}
+  onMouseLeave={handleMouseLeave}
+  sx={{
+    width: "100%",
+    height: "100%",
+    display: "block",
+    objectFit: "cover",
+    boxSizing: "border-box",
+    borderTopLeftRadius: "10px",
+    borderTopRightRadius: "10px",
+    cursor: "pointer",
+    transition: "transform 0.2s ease",
 
-        "&:hover": {
-          transform: "scale(1.03)",
-        },
-      }}
-    />
+    "&:hover": {
+      transform: "scale(1.03)",
+    },
+  }}
+/>
   )}
 </Box>
           {/* ==================================
@@ -859,32 +870,32 @@ const ProductCardItem = memo(
 );
 
 
-// ========================================
+
 // PRODUCT CARDS
-// ========================================
+
 
 function ProductCards({
   products = [],
 }) {
   const navigate = useNavigate();
 
-  // ========================================
+  
   // HOVER STATE
-  // ========================================
+  
 
   const [hoveredProducts, setHoveredProducts] =
     useState({});
 
-  // ========================================
+  
   // CART QUANTITIES
-  // ========================================
+  
 
   const [cartQuantities, setCartQuantities] =
     useState(getCartQuantities);
 
-  // ========================================
+  
   // SNACKBAR
-  // ========================================
+  
 
   const [snackbarOpen, setSnackbarOpen] =
     useState(false);
@@ -892,9 +903,9 @@ function ProductCards({
   const [snackbarMessage, setSnackbarMessage] =
     useState("");
 
-  // ========================================
+  
   // SYNC CART
-  // ========================================
+  
 
   const syncCartQuantities = useCallback(() => {
     setCartQuantities(
@@ -928,9 +939,9 @@ function ProductCards({
     syncCartQuantities,
   ]);
 
-  // ========================================
+  
   // NAVIGATE
-  // ========================================
+  
 
   const handleNavigate = useCallback(
     (productId) => {
@@ -941,9 +952,9 @@ function ProductCards({
     [navigate]
   );
 
-  // ========================================
+  
   // HOVER ENTER
-  // ========================================
+  
 
   const handleMouseEnter = useCallback(
     (productId) => {
@@ -963,9 +974,9 @@ function ProductCards({
     []
   );
 
-  // ========================================
+  
   // HOVER LEAVE
-  // ========================================
+  
 
   const handleMouseLeave = useCallback(
     (productId) => {
@@ -988,9 +999,9 @@ function ProductCards({
     []
   );
 
-  // ========================================
+  
   // ADD TO CART
-  // ========================================
+  
 
   const handleAddToCart = useCallback(
     (event, product) => {
@@ -1085,9 +1096,9 @@ function ProductCards({
     []
   );
 
-  // ========================================
+  
   // CART QUANTITY CHANGE
-  // ========================================
+  
 
   const handleCartQuantityChange =
     useCallback(
@@ -1187,9 +1198,9 @@ function ProductCards({
       []
     );
 
-  // ========================================
+  
   // PRODUCTS
-  // ========================================
+  
 
   const productList = useMemo(
     () =>
@@ -1199,9 +1210,9 @@ function ProductCards({
     [products]
   );
 
-  // ========================================
+  
   // NO PRODUCTS
-  // ========================================
+  
 
   if (!productList.length) {
     return (
@@ -1227,9 +1238,9 @@ function ProductCards({
     );
   }
 
-  // ========================================
+  
   // UI
-  // ========================================
+  
 
   return (
     <>
@@ -1359,9 +1370,9 @@ function ProductCards({
 }
 
 
-// ========================================
+
 // MEMOIZED EXPORT
-// ========================================
+
 
 export default memo(ProductCards);
 
