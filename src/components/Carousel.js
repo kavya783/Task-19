@@ -20,25 +20,6 @@ import {
   getCarouselDataActionInitiate,
 } from "../redux/actions/contentActions";
 
-
-// ========================================
-// CLOUDINARY IMAGE OPTIMIZATION
-// ========================================
-
-const getOptimizedImageUrl = (url, width) => {
-  if (!url) return "";
-
-  if (!url.includes("res.cloudinary.com")) {
-    return url;
-  }
-
-  return url.replace(
-    "/image/upload/",
-    `/image/upload/f_auto,q_auto,w_${width}/`
-  );
-};
-
-
 function Carousel() {
   const dispatch = useDispatch();
 
@@ -56,19 +37,9 @@ function Carousel() {
 
   const [activeStep, setActiveStep] = useState(0);
 
-
-  // ========================================
-  // FETCH CAROUSEL DATA
-  // ========================================
-
   useEffect(() => {
     dispatch(getCarouselDataActionInitiate());
   }, [dispatch]);
-
-
-  // ========================================
-  // RESET ACTIVE SLIDE
-  // ========================================
 
   useEffect(() => {
     if (
@@ -78,11 +49,6 @@ function Carousel() {
       setActiveStep(0);
     }
   }, [carouselImages.length, activeStep]);
-
-
-  // ========================================
-  // AUTO SLIDE
-  // ========================================
 
   useEffect(() => {
     if (carouselImages.length <= 1) {
@@ -100,11 +66,6 @@ function Carousel() {
     return () => clearInterval(timer);
   }, [carouselImages.length]);
 
-
-  // ========================================
-  // NEXT SLIDE
-  // ========================================
-
   const handleNext = useCallback(() => {
     setActiveStep((prevStep) =>
       prevStep === carouselImages.length - 1
@@ -112,11 +73,6 @@ function Carousel() {
         : prevStep + 1
     );
   }, [carouselImages.length]);
-
-
-  // ========================================
-  // PREVIOUS SLIDE
-  // ========================================
 
   const handleBack = useCallback(() => {
     setActiveStep((prevStep) =>
@@ -126,76 +82,65 @@ function Carousel() {
     );
   }, [carouselImages.length]);
 
+  /*
+   * IMPORTANT:
+   * Reserve the banner space BEFORE the API response arrives.
+   * This prevents the content below the carousel from shifting.
+   */
+  const bannerWrapperSx = {
+    width: "100%",
+    aspectRatio: "1600 / 427",
+    position: "relative",
+    overflow: "hidden",
+    backgroundColor: Colors.background,
+  };
 
-  // ========================================
-  // LOADING
-  // ========================================
-
+  // Loading state
   if (loading && carouselImages.length === 0) {
     return (
       <Box
         sx={{
           width: "100%",
-          minHeight: {
-            xs: 100,
-            sm: 150,
-            md: 200,
-          },
           backgroundColor: Colors.background,
         }}
-      />
+      >
+        <Box sx={bannerWrapperSx} />
+      </Box>
     );
   }
 
-
-  // ========================================
-  // ERROR
-  // ========================================
-
+  // Error state
   if (error && carouselImages.length === 0) {
-    return <Box>{error}</Box>;
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          backgroundColor: Colors.background,
+        }}
+      >
+        <Box sx={bannerWrapperSx}>
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {error}
+          </Box>
+        </Box>
+      </Box>
+    );
   }
 
-
-  // ========================================
-  // NO DATA
-  // ========================================
-
+  // No carousel data
   if (!carouselImages.length) {
     return null;
   }
 
-
-  const activeImage =
-    carouselImages[activeStep];
-
-
-  const originalImageUrl =
-    activeImage?.image_url || "";
-
-
-  // ========================================
-  // RESPONSIVE CLOUDINARY URLS
-  // ========================================
-
-  const mobileImage =
-    getOptimizedImageUrl(
-      originalImageUrl,
-      480
-    );
-
-  const tabletImage =
-    getOptimizedImageUrl(
-      originalImageUrl,
-      768
-    );
-
-  const desktopImage =
-    getOptimizedImageUrl(
-      originalImageUrl,
-      1200
-    );
-
+  const activeImage = carouselImages[activeStep];
 
   return (
     <Box
@@ -205,159 +150,71 @@ function Carousel() {
         backgroundColor: Colors.background,
       }}
     >
-
-      {/* ========================================
-          BANNER
-          ======================================== */}
-
-      <Box
-        sx={{
-          width: "100%",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-
+      {/* Banner */}
+      <Box sx={bannerWrapperSx}>
         <Box
           component="img"
-          src={tabletImage || originalImageUrl}
-          srcSet={`
-            ${mobileImage} 480w,
-            ${tabletImage} 768w,
-            ${desktopImage} 1200w
-          `}
-          sizes="100vw"
+          src={activeImage.image_url}
           alt={
-            activeImage.heading ||
-            "Mamaearth Banner"
+            activeImage.heading || "Mamaearth Banner"
           }
+          width={1600}
+          height={427}
           loading="eager"
           fetchPriority="high"
           decoding="async"
           sx={{
+            position: "absolute",
+            inset: 0,
             width: "100%",
-            height: "auto",
+            height: "100%",
             display: "block",
-
-            maxWidth: "100%",
+            objectFit: "cover",
           }}
         />
 
-
-        {/* ========================================
-            ARROWS
-            ======================================== */}
-
         {carouselImages.length > 1 && (
           <>
-
-            {/* LEFT */}
-
+            {/* Left Arrow */}
             <IconButton
               onClick={handleBack}
               aria-label="Previous slide"
-              size="small"
               sx={{
                 position: "absolute",
-
-                left: {
-                  xs: 4,
-                  sm: 10,
-                },
-
+                left: 10,
                 top: "50%",
-
-                transform:
-                  "translateY(-50%)",
-
-                width: {
-                  xs: 30,
-                  sm: 40,
-                },
-
-                height: {
-                  xs: 30,
-                  sm: 40,
-                },
-
-                backgroundColor:
-                  "rgba(255,255,255,0.85)",
-
+                transform: "translateY(-50%)",
+                backgroundColor: Colors.background,
                 "&:hover": {
-                  backgroundColor:
-                    "rgba(255,255,255,0.95)",
+                  backgroundColor: Colors.background,
                 },
               }}
             >
-              <KeyboardArrowLeft
-                sx={{
-                  fontSize: {
-                    xs: 20,
-                    sm: 28,
-                  },
-                }}
-              />
+              <KeyboardArrowLeft />
             </IconButton>
 
-
-            {/* RIGHT */}
-
+            {/* Right Arrow */}
             <IconButton
               onClick={handleNext}
               aria-label="Next slide"
-              size="small"
               sx={{
                 position: "absolute",
-
-                right: {
-                  xs: 4,
-                  sm: 10,
-                },
-
+                right: 10,
                 top: "50%",
-
-                transform:
-                  "translateY(-50%)",
-
-                width: {
-                  xs: 30,
-                  sm: 40,
-                },
-
-                height: {
-                  xs: 30,
-                  sm: 40,
-                },
-
-                backgroundColor:
-                  "rgba(255,255,255,0.85)",
-
+                transform: "translateY(-50%)",
+                backgroundColor: Colors.background,
                 "&:hover": {
-                  backgroundColor:
-                    "rgba(255,255,255,0.95)",
+                  backgroundColor: Colors.background,
                 },
               }}
             >
-              <KeyboardArrowRight
-                sx={{
-                  fontSize: {
-                    xs: 20,
-                    sm: 28,
-                  },
-                }}
-              />
+              <KeyboardArrowRight />
             </IconButton>
-
           </>
         )}
-
       </Box>
 
-
-      {/* ========================================
-          DOTS
-          ======================================== */}
-
+      {/* Dots */}
       {carouselImages.length > 1 && (
         <MobileStepper
           variant="dots"
@@ -365,41 +222,21 @@ function Carousel() {
           position="static"
           activeStep={activeStep}
           sx={{
-            height: {
-              xs: 32,
-              sm: 45,
-            },
-
+            height: 45,
             justifyContent: "center",
-
-            backgroundColor:
-              Colors.background,
-
+            backgroundColor: Colors.background,
             "& .MuiMobileStepper-dot": {
-              width: {
-                xs: 6,
-                sm: 7,
-              },
-
-              height: {
-                xs: 6,
-                sm: 7,
-              },
-
-              margin: {
-                xs: "0 3px",
-                sm: "0 5px",
-              },
+              width: 7,
+              height: 7,
+              margin: "0 5px",
             },
           }}
           nextButton={<Box />}
           backButton={<Box />}
         />
       )}
-
     </Box>
   );
 }
-
 
 export default memo(Carousel);
