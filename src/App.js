@@ -1,32 +1,52 @@
 
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect} from "react";
 
 import {
   BrowserRouter,
   Routes,
   Route,
 } from "react-router-dom";
-
+import {
+  listenForForegroundNotifications,
+} from "./Services/notificationService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import "./App.css";
+
 import HomePage from "./pages/HomePage";
 
-const Login = lazy(() => import("./components/UserLogin"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+// ==========================================
+// LAZY LOADED COMPONENTS
+// ==========================================
+
+const Login = lazy(
+  () => import("./components/UserLogin")
+);
+
+const ProfilePage = lazy(
+  () => import("./pages/ProfilePage")
+);
+
 const SellerDashboard = lazy(
   () => import("./components/SellerDashboard")
 );
+
 const MamaCash = lazy(
   () => import("./components/MamaCash")
 );
+
 const ProductDetailsPage = lazy(
   () => import("./pages/ProductDetailsPage")
 );
+
 const PaymentResultPage = lazy(
   () => import("./pages/PaymentResultPage")
 );
+
+// ==========================================
+// PAGE LOADER
+// ==========================================
 
 function PageLoader() {
   return (
@@ -44,48 +64,78 @@ function PageLoader() {
   );
 }
 
+// ==========================================
+// APP
+// ==========================================
+
+
 function App() {
+  console.log("APP COMPONENT RENDERED");
+
+  useEffect(() => {
+    let unsubscribe;
+
+    const setupForegroundNotifications =
+      async () => {
+        console.log(
+          "🔔 Setting up foreground FCM listener..."
+        );
+
+        unsubscribe =
+          await listenForForegroundNotifications();
+      };
+
+    setupForegroundNotifications();
+
+    return () => {
+      if (
+        typeof unsubscribe ===
+        "function"
+      ) {
+        unsubscribe();
+
+        console.log(
+          "🧹 Foreground FCM listener removed"
+        );
+      }
+    };
+  }, []);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* Home */}
+
           <Route
             path="/"
             element={<HomePage />}
           />
 
-          {/* Login */}
           <Route
             path="/login"
             element={<Login />}
           />
 
-          {/* Profile */}
           <Route
             path="/profilepage"
             element={<ProfilePage />}
           />
 
-          {/* Seller Dashboard */}
           <Route
             path="/seller-dashboard"
             element={<SellerDashboard />}
           />
 
-          {/* Mama Cash */}
           <Route
             path="/mamacash"
             element={<MamaCash />}
           />
 
-          {/* Product Details */}
           <Route
             path="/products/:id"
             element={<ProductDetailsPage />}
           />
 
-          {/* Payment */}
           <Route
             path="/payment-success"
             element={<PaymentResultPage />}
@@ -95,6 +145,7 @@ function App() {
             path="/payment-failure"
             element={<PaymentResultPage />}
           />
+
         </Routes>
       </Suspense>
 
@@ -109,4 +160,7 @@ function App() {
   );
 }
 
+
+
 export default App;
+
