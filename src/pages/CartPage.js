@@ -132,45 +132,83 @@
 
         // SYNC CART
 
-  useEffect(() => {
+useEffect(() => {
 
     const syncCartItems = () => {
 
-        // Logged out ayithe old products chupinchakudadhu
-        if (!isLoggedIn) {
-            setCartItems([]);
-            return;
-        }
-
         try {
+
+            const currentUser =
+                JSON.parse(
+                    sessionStorage.getItem(
+                        "user"
+                    ) || "null"
+                );
+
+            const loggedIn =
+                sessionStorage.getItem(
+                    "isLoggedIn"
+                ) === "true" &&
+                Boolean(
+                    sessionStorage.getItem(
+                        "token"
+                    )
+                ) &&
+                Boolean(
+                    currentUser?.id
+                );
+
+            if (!loggedIn) {
+                setCartItems([]);
+                return;
+            }
+
+            const currentCartKey =
+                `mamaearth_cart_${currentUser.id}`;
 
             const latestCart =
                 JSON.parse(
                     localStorage.getItem(
-                        cartKey
+                        currentCartKey
                     ) || "[]"
                 );
 
             setCartItems(
-                latestCart
+                Array.isArray(latestCart)
+                    ? latestCart
+                    : []
             );
 
-        } catch {
+        } catch (error) {
+
+            console.error(
+                "Cart sync failed:",
+                error
+            );
 
             setCartItems([]);
         }
     };
 
 
+    // Initial cart load
     syncCartItems();
 
 
+    // ProductCards → CartPage
     const handleCartUpdate = () => {
         syncCartItems();
     };
 
 
+    // Navbar → CartPage
     const handleCartOpen = () => {
+        syncCartItems();
+    };
+
+
+    // Login / Logout
+    const handleAuthChanged = () => {
         syncCartItems();
     };
 
@@ -185,6 +223,11 @@
         handleCartOpen
     );
 
+    window.addEventListener(
+        "auth:changed",
+        handleAuthChanged
+    );
+
 
     return () => {
 
@@ -197,13 +240,14 @@
             "cart:open",
             handleCartOpen
         );
+
+        window.removeEventListener(
+            "auth:changed",
+            handleAuthChanged
+        );
     };
 
-}, [
-    cartKey,
-    isLoggedIn,
-]);
-
+}, []);
 
         // REMOVE CART ITEM
 
