@@ -2930,30 +2930,55 @@ function ProductDetailsPage() {
                                     backgroundColor: Colors.background,
                                 }}
                             >
-                                <IconButton aria-label="decrease quantity" onClick={() => handleCartQuantityChange(-1)} sx={{ borderRadius: 0, color: Colors.black }}><RemoveIcon /></IconButton>
-                                <Typography sx={{ display: "flex", alignItems: "center", justifyContent: "center", borderLeft: "1px solid #d5d5d5", borderRight: "1px solid #d5d5d5", fontWeight: 700, fontSize: { xs: 16, sm: 18 } }}>{cartQuantity}</Typography>
-                                <IconButton aria-label="increase quantity" onClick={() => handleCartQuantityChange(1)} sx={{ borderRadius: 0, color: Colors.black }}><AddIcon /></IconButton>
-                            </Box>
+<IconButton
+    aria-label="decrease quantity"
+    onClick={(event) =>
+        handleCartQuantityChange(event, product, -1)
+    }
+    sx={{
+        borderRadius: 0,
+        color: Colors.black,
+    }}
+>
+    <RemoveIcon />
+</IconButton>                                <Typography sx={{ display: "flex", alignItems: "center", justifyContent: "center", borderLeft: "1px solid #d5d5d5", borderRight: "1px solid #d5d5d5", fontWeight: 700, fontSize: { xs: 16, sm: 18 } }}>{cartQuantity}</Typography>
+<IconButton
+    aria-label="increase quantity"
+    onClick={(event) =>
+        handleCartQuantityChange(event, product, 1)
+    }
+    sx={{
+        borderRadius: 0,
+        color: Colors.black,
+    }}
+>
+    <AddIcon />
+</IconButton>                            </Box>
                         ) : (
                             <Button
-                                variant="contained"
-                                onClick={handleAddToCart}
-                                sx={{
-                                    flexShrink: 0,
-                                    backgroundColor: Colors.blue,
-                                    color: Colors.background,
-                                    borderRadius: "30px",
-                                    textTransform: "none",
-                                    fontWeight: 700,
-                                    fontSize: { xs: 13, sm: 16 },
-                                    minWidth: { xs: 150, sm: 220 },
-                                    height: { xs: 44, sm: 54 },
-                                    px: { xs: 2, sm: 3 },
-                                    "&:hover": { backgroundColor: Colors.blue },
-                                }}
-                            >
-                                Add to cart&nbsp; · &nbsp;₹{displaySalePrice > 0 ? formatPrice(displaySalePrice) : "-"}
-                            </Button>
+    variant="contained"
+    onClick={(event) => handleAddToCart(event, product)}
+    sx={{
+        flexShrink: 0,
+        backgroundColor: Colors.blue,
+        color: Colors.background,
+        borderRadius: "30px",
+        textTransform: "none",
+        fontWeight: 700,
+        fontSize: { xs: 13, sm: 16 },
+        minWidth: { xs: 150, sm: 220 },
+        height: { xs: 44, sm: 54 },
+        px: { xs: 2, sm: 3 },
+        "&:hover": {
+            backgroundColor: Colors.blue,
+        },
+    }}
+>
+    Add to cart&nbsp; · &nbsp;₹
+    {displaySalePrice > 0
+        ? formatPrice(displaySalePrice)
+        : "-"}
+</Button>
                         )}
                     </Box>
                 </Box>
