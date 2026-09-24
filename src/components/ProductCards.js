@@ -966,45 +966,76 @@ const handleMouseLeave = useCallback(() => {
   
 
  // ADD TO CART
-
 const handleAddToCart = useCallback(
     (event, product) => {
         event.preventDefault();
         event.stopPropagation();
 
         try {
-            const cartKey = getCartKey();
+            // ==========================================
+            // CHECK LOGIN
+            // ==========================================
 
-            const existingCart =
-                JSON.parse(
-                    localStorage.getItem(cartKey) || "[]"
-                );
+            const user = JSON.parse(
+                sessionStorage.getItem("user") || "null"
+            );
 
-            const productId =
-                String(product.id);
+            const isLoggedIn =
+                sessionStorage.getItem("isLoggedIn") === "true" &&
+                Boolean(sessionStorage.getItem("token")) &&
+                Boolean(user?.id);
 
-            const cartIndex =
+            // ==========================================
+            // CART KEY
+            // ==========================================
+
+            const cartKey = isLoggedIn
+                ? `mamaearth_cart_${user.id}`
+                : "mamaearth_cart_guest";
+
+            // ==========================================
+            // GET EXISTING CART
+            // ==========================================
+
+            const existingCart = JSON.parse(
+                localStorage.getItem(cartKey) || "[]"
+            );
+
+            // ==========================================
+            // PRODUCT ID
+            // ==========================================
+
+            const productId = String(product?.id);
+
+            // ==========================================
+            // CHECK PRODUCT ALREADY EXISTS
+            // ==========================================
+
+            const existingIndex =
                 existingCart.findIndex(
                     (item) =>
-                        String(item.id) === productId
+                        String(item?.id) === productId
                 );
 
             let updatedCart;
 
-            if (cartIndex >= 0) {
-                // Already in cart
+            if (existingIndex !== -1) {
+                // Already exists
+                // Don't increase quantity here.
+                // + button will increase it.
+
                 updatedCart = existingCart.map(
                     (item, index) =>
-                        index === cartIndex
+                        index === existingIndex
                             ? {
-                                ...item,
-                                quantity:
-                                    Number(item.quantity) || 1,
-                            }
+                                  ...item,
+                                  quantity: 1,
+                              }
                             : item
                 );
             } else {
                 // New product
+
                 updatedCart = [
                     ...existingCart,
                     {
@@ -1014,30 +1045,36 @@ const handleAddToCart = useCallback(
                 ];
             }
 
+            // ==========================================
+            // SAVE CART
+            // ==========================================
+
             localStorage.setItem(
                 cartKey,
                 JSON.stringify(updatedCart)
             );
 
+            // ==========================================
+            // UPDATE LOCAL QUANTITY
+            // ==========================================
+
+            setCartQuantities((previous) => ({
+                ...previous,
+                [productId]: 1,
+            }));
+
+            // ==========================================
+            // IMPORTANT
+            // TELL NAVBAR + CART PAGE
+            // ==========================================
+
             window.dispatchEvent(
                 new CustomEvent("cart:update")
             );
 
-            const updatedItem =
-                updatedCart.find(
-                    (item) =>
-                        String(item.id) === productId
-                );
-
-            setCartQuantities(
-                (previous) => ({
-                    ...previous,
-                    [productId]:
-                        Number(
-                            updatedItem?.quantity
-                        ) || 1,
-                })
-            );
+            // ==========================================
+            // SUCCESS MESSAGE
+            // ==========================================
 
             setSnackbarMessage(
                 "Added to cart"
