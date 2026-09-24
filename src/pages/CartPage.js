@@ -142,6 +142,8 @@
 
         // SYNC CART
 
+// SYNC CART
+
 useEffect(() => {
     const syncCartItems = () => {
         try {
@@ -157,6 +159,7 @@ useEffect(() => {
                 ) &&
                 Boolean(currentUser?.id);
 
+            // Not logged in
             if (!loggedIn) {
                 setCartItems([]);
                 return;
@@ -177,6 +180,12 @@ useEffect(() => {
                     ? latestCart
                     : []
             );
+
+            console.log(
+                "Cart synced:",
+                latestCart
+            );
+
         } catch (error) {
             console.error(
                 "Cart sync failed:",
@@ -187,10 +196,15 @@ useEffect(() => {
         }
     };
 
-    // Initial sync
+    // Initial cart load
     syncCartItems();
 
-    // ProductCards -> CartPage
+    // When drawer opens
+    if (open) {
+        syncCartItems();
+    }
+
+    // Add / remove / quantity update
     window.addEventListener(
         "cart:update",
         syncCartItems
@@ -213,7 +227,7 @@ useEffect(() => {
             syncCartItems
         );
     };
-}, []);
+}, [open]);
 
         // REMOVE CART ITEM
 
