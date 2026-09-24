@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -48,7 +49,6 @@ function Login({
   const [loading, setLoading] = useState(false);
   const [offers, setOffers] = useState(true);
 
-  // RESET LOGIN FORM WHEN DIALOG OPENS
   useEffect(() => {
     if (open) {
       setPhone("");
@@ -56,25 +56,28 @@ function Login({
       setOtpSent(false);
       setMessage("");
       setOffers(true);
-      setLoading(false);
     }
   }, [open]);
 
-  // --------------------------------------------------
+  
   // SEND OTP
-  // --------------------------------------------------
+  
 
   const sendOTP = async () => {
     try {
       setMessage("");
 
       if (!phone) {
-        setMessage("Please enter mobile number");
+        setMessage(
+          "Please enter mobile number"
+        );
         return;
       }
 
       if (phone.length !== 10) {
-        setMessage("Please enter a valid 10-digit mobile number");
+        setMessage(
+          "Please enter a valid 10-digit mobile number"
+        );
         return;
       }
 
@@ -82,43 +85,64 @@ function Login({
 
       const formattedPhone = `+91${phone}`;
 
-      console.log("Sending OTP:", formattedPhone);
-
-      const data = await dispatch(
-        sendOTPActionInitiate(formattedPhone)
+      console.log(
+        "Sending OTP:",
+        formattedPhone
       );
 
-      console.log("Send OTP Response:", data);
+      const data = await dispatch(
+        sendOTPActionInitiate(
+          formattedPhone
+        )
+      );
+
+      console.log(
+        "Send OTP Response:",
+        data
+      );
 
       if (!data?.success) {
         throw new Error(
-          data?.message || "Unable to send OTP"
+          data?.message ||
+          "Unable to send OTP"
         );
       }
 
       setOtpSent(true);
 
-      setMessage("OTP sent successfully");
+      setMessage(
+        "OTP sent successfully"
+      );
 
-      toast.success("OTP Sent Successfully");
+      toast.success(
+        "OTP Sent Successfully"
+      );
+
     } catch (error) {
-      console.error("Send OTP Error:", error);
+      console.error(
+        "Send OTP Error:",
+        error
+      );
 
-      toast.error("Send OTP Error");
+      toast.error(
+        "Send OTP Error"
+      );
 
       setMessage(
         error.response?.data?.message ||
-          error.message ||
-          "Unable to send OTP. Please try again."
+        error.message ||
+        "Unable to send OTP. Please try again."
       );
+
     } finally {
       setLoading(false);
     }
   };
 
-  // --------------------------------------------------
+  
   // VERIFY OTP
-  // --------------------------------------------------
+  
+
 
   const verifyOTP = async () => {
     try {
@@ -143,7 +167,10 @@ function Login({
 
       const formattedPhone = `+91${phone}`;
 
-      console.log("Verifying OTP:", formattedPhone);
+      console.log(
+        "Verifying OTP:",
+        formattedPhone
+      );
 
       const data = await dispatch(
         verifyOTPActionInitiate(
@@ -152,7 +179,10 @@ function Login({
         )
       );
 
-      console.log("Verify OTP Response:", data);
+      console.log(
+        "Verify OTP Response:",
+        data
+      );
 
       if (!data?.success) {
         throw new Error(
@@ -160,35 +190,21 @@ function Login({
         );
       }
 
-      // --------------------------------------------------
+      
       // OTP VERIFIED SUCCESSFULLY
-      // --------------------------------------------------
+      
 
-      /*
-       * IMPORTANT:
-       *
-       * sessionStorage is used instead of localStorage.
-       *
-       * sessionStorage:
-       * - survives page refresh
-       * - survives navigation
-       * - is cleared when the browser tab/session is closed
-       *
-       * localStorage was causing old login details to remain
-       * when the application was opened again.
-       */
-
-      sessionStorage.setItem(
+      localStorage.setItem(
         "isLoggedIn",
         "true"
       );
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         "token",
         "twilio_verified"
       );
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         "user",
         JSON.stringify(data.user)
       );
@@ -198,24 +214,27 @@ function Login({
         data.user
       );
 
-      // --------------------------------------------------
+      
       // LOGIN SUCCESS
-      // --------------------------------------------------
+      // DO NOT WAIT FOR FCM
+      
 
       if (onLoginSuccess) {
-        onLoginSuccess(data.user);
+        onLoginSuccess();
       }
 
       setMessage("Login successful");
 
-      toast.success("Login successfully");
+      toast.success(
+        "Login successfully"
+      );
 
-      // Stop loading immediately
+      // Stop "Verifying..." immediately
       setLoading(false);
 
-      // --------------------------------------------------
+      
       // NAVIGATION
-      // --------------------------------------------------
+      
 
       setTimeout(() => {
         handleClose();
@@ -227,16 +246,12 @@ function Login({
         }
       }, 300);
 
-      // --------------------------------------------------
+      
       // FCM NOTIFICATION SETUP
-      // --------------------------------------------------
-
-      /*
-       * FCM should NOT block login.
-       *
-       * Login is already successful.
-       * Notification setup runs separately.
-       */
+      // RUN SEPARATELY
+      // DO NOT BLOCK LOGIN
+      // SELLER WILL NOT ENTER THIS BLOCK
+      
 
       if (
         data.user?.role !== "seller" &&
@@ -245,7 +260,7 @@ function Login({
         (async () => {
           try {
             console.log(
-              "Starting Mamaearth notification setup..."
+              " Starting Mamaearth notification setup..."
             );
 
             const fcmToken =
@@ -253,13 +268,13 @@ function Login({
 
             if (!fcmToken) {
               console.log(
-                "FCM token was not generated"
+                " FCM token was not generated"
               );
               return;
             }
 
             console.log(
-              "FCM token received"
+              " FCM token received"
             );
 
             const tokenSaved =
@@ -270,22 +285,24 @@ function Login({
 
             if (tokenSaved) {
               console.log(
-                "FCM token saved for user:",
+                " FCM token saved for user:",
                 data.user.id
               );
             } else {
               console.log(
-                "FCM token was not saved"
+                " FCM token was not saved"
               );
             }
+
           } catch (notificationError) {
             console.log(
-              "Notification setup failed:",
+              " Notification setup failed:",
               notificationError
             );
           }
         })();
       }
+
     } catch (error) {
       console.error(
         "Verify OTP Error:",
@@ -300,15 +317,17 @@ function Login({
 
       setMessage(
         error.response?.data?.message ||
-          error.message ||
-          "OTP verification failed. Please try again."
+        error.message ||
+        "OTP verification failed. Please try again."
       );
     }
   };
 
-  // --------------------------------------------------
+
+
+  
   // CHANGE PHONE
-  // --------------------------------------------------
+  
 
   const changePhone = () => {
     setOtpSent(false);
@@ -317,9 +336,9 @@ function Login({
     setMessage("");
   };
 
-  // --------------------------------------------------
+  
   // CLOSE LOGIN
-  // --------------------------------------------------
+  
 
   const handleClose = () => {
     setPhone("");
@@ -327,79 +346,63 @@ function Login({
     setOtpSent(false);
     setMessage("");
     setOffers(true);
-    setLoading(false);
 
     onClose();
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth={false}
-      fullWidth={false}
-      sx={{
-        "& .MuiDialog-container": {
-          width: "100%",
-        },
-      }}
-      PaperProps={{
-        sx: {
-          width: {
-            xs: "92vw",
-            sm: "850px",
-            md: "1000px",
-            lg: "1100px",
-          },
-
-          minWidth: {
-            sm: "850px",
-            md: "1000px",
-            lg: "1100px",
-          },
-
-          maxWidth: {
-            xs: "92vw",
-            sm: "1000px",
-            md: "1000px",
-            lg: "1100px",
-          },
-
-          margin: "auto",
-
-          borderRadius: "18px",
-
-          overflow: "hidden",
-        },
-      }}
-    >
-      <DialogContent
-        sx={{
-          padding: 0,
-        }}
-      >
+   <Dialog
+  open={open}
+  onClose={handleClose}
+  maxWidth={false}
+  fullWidth={false}
+  sx={{
+    "& .MuiDialog-container": {
+      width: "100%",
+    },
+  }}
+  PaperProps={{
+    sx: {
+      width: {
+        xs: "92vw",
+        sm: "850px",
+        md: "1000px",
+        lg: "1100px",
+      },
+      minWidth: {
+        sm: "850px",
+        md: "1000px",
+        lg: "1100px",
+      },
+      maxWidth: {
+        xs: "92vw",
+        sm: "850px",
+        md: "1000px",
+        lg: "1100px",
+      },
+      margin: "auto",
+      borderRadius: "18px",
+      overflow: "hidden",
+    },
+  }}
+>
+      <DialogContent sx={{ padding: 0 }}>
         <Box
           sx={{
             display: "flex",
-
             width: "100%",
-
             minWidth: 0,
-
             flexDirection: {
               xs: "column",
               sm: "row",
             },
-
             minHeight: {
               xs: "auto",
               md: "300px",
             },
           }}
         >
-          {/* =========================================
-              LEFT SIDE
-          ========================================= */}
+          {/* LEFT SIDE */}
 
           <Box
             sx={{
@@ -407,26 +410,17 @@ function Login({
                 xs: "100%",
                 md: "50%",
               },
-
               minWidth: 0,
-
               boxSizing: "border-box",
-
               backgroundColor: Colors.blue,
-
               display: "flex",
-
               flexDirection: "column",
-
               alignItems: "center",
-
               justifyContent: "center",
-
               padding: {
                 xs: "30px 15px",
                 md: "20px",
               },
-
               minHeight: {
                 xs: "160px",
                 md: "300px",
@@ -443,9 +437,7 @@ function Login({
                   sm: "135px",
                   md: "145px",
                 },
-
                 height: "auto",
-
                 marginBottom: {
                   xs: "15px",
                   md: "18px",
@@ -458,9 +450,7 @@ function Login({
                 ...Theme.font14Bold,
 
                 color: Colors.black,
-
                 textAlign: "center",
-
                 lineHeight: 1.3,
               }}
             >
@@ -468,9 +458,7 @@ function Login({
             </Typography>
           </Box>
 
-          {/* =========================================
-              RIGHT SIDE
-          ========================================= */}
+          {/* RIGHT SIDE */}
 
           <Box
             sx={{
@@ -478,66 +466,46 @@ function Login({
                 xs: "100%",
                 md: "50%",
               },
-
+              
               minWidth: 0,
-
               boxSizing: "border-box",
-
               backgroundColor: Colors.background,
-
               position: "relative",
-
               display: "flex",
-
               alignItems: "center",
-
               justifyContent: "center",
-
               padding: {
                 xs: "25px 20px",
                 md: "20px 22px",
               },
-
               minHeight: {
                 xs: "320px",
                 md: "300px",
               },
             }}
           >
-            {/* =========================================
-                CLOSE BUTTON
-            ========================================= */}
+            {/* CLOSE BUTTON */}
 
             <IconButton
               onClick={handleClose}
               sx={{
                 position: "absolute",
-
                 top: "8px",
-
                 right: "8px",
-
                 width: "27px",
-
                 height: "27px",
-
                 padding: 0,
-
-                backgroundColor:
-                  Colors.background,
-
+                backgroundColor: Colors.background,
                 zIndex: 10,
 
                 "&:hover": {
-                  backgroundColor:
-                    Colors.background,
+                  backgroundColor: Colors.background,
                 },
               }}
             >
               <CloseIcon
                 sx={{
                   fontSize: "18px",
-
                   color: Colors.black,
                 }}
               />
@@ -546,15 +514,11 @@ function Login({
             <Box
               sx={{
                 width: "100%",
-
                 maxWidth: "350px",
-
                 textAlign: "center",
               }}
             >
-              {/* =========================================
-                  PHONE SCREEN
-              ========================================= */}
+              {/* PHONE SCREEN */}
 
               {!otpSent ? (
                 <>
@@ -570,7 +534,9 @@ function Login({
                           ""
                         );
 
-                      if (value.length <= 10) {
+                      if (
+                        value.length <= 10
+                      ) {
                         setPhone(value);
                       }
 
@@ -590,11 +556,10 @@ function Login({
                     sx={{
                       marginBottom: "12px",
 
-                      "& .MuiOutlinedInput-root": {
+                      "& .MuiOutlinedInput-root":
+                      {
                         height: "42px",
-
                         borderRadius: "8px",
-
                         fontSize: "14px",
                       },
                     }}
@@ -607,64 +572,43 @@ function Login({
                     disabled={loading}
                     sx={{
                       height: "42px",
-
                       borderRadius: "8px",
-
-                      backgroundColor:
-                        Colors.blue,
-
+                      backgroundColor: Colors.blue,
                       textTransform: "none",
-
                       fontSize: "14px",
-
                       fontWeight: 700,
-
                       boxShadow: "none",
 
                       "&:hover": {
-                        backgroundColor:
-                          Colors.blue,
-
+                        backgroundColor: Colors.blue,
                         boxShadow: "none",
                       },
 
                       "&.Mui-disabled": {
-                        backgroundColor:
-                          Colors.blue,
-
-                        color:
-                          Colors.background,
+                        backgroundColor: Colors.blue,
+                        color: Colors.background,
                       },
                     }}
                   >
-                    {loading
-                      ? "Sending OTP..."
-                      : "Continue"}
+                    {loading ? "Sending OTP..." : "Continue"}
                   </Button>
-
-                  {/* OFFERS */}
 
                   <Box
                     sx={{
                       marginTop: "7px",
-
                       display: "flex",
-
-                      alignItems: "center",
-
+                      alignItems:
+                        "center",
                       justifyContent:
                         "space-between",
-
                       width: "100%",
                     }}
                   >
                     <FormControlLabel
                       sx={{
                         margin: 0,
-
                         alignItems:
                           "center",
-
                         minWidth: 0,
                       }}
                       control={
@@ -672,21 +616,23 @@ function Login({
                           checked={offers}
                           onChange={(e) =>
                             setOffers(
-                              e.target.checked
+                              e.target
+                                .checked
                             )
                           }
                           size="small"
                           sx={{
-                            padding: "2px",
+                            padding:
+                              "2px",
+                            marginRight:
+                              "3px",
+                            color: Colors.black,
 
-                            marginRight: "3px",
 
-                            color:
-                              Colors.black,
+                            "&.Mui-checked":
+                            {
+                              color: Colors.black,
 
-                            "&.Mui-checked": {
-                              color:
-                                Colors.black,
                             },
                           }}
                         />
@@ -699,9 +645,7 @@ function Login({
                               sm: "11px",
                               md: "12px",
                             },
-
-                            color:
-                              Colors.black,
+                            color: Colors.black,
 
                             whiteSpace:
                               "nowrap",
@@ -720,15 +664,10 @@ function Login({
                           sm: "11px",
                           md: "12px",
                         },
-
-                        color:
-                          Colors.black,
-
+                        color: Colors.black,
                         textDecoration:
                           "underline",
-
                         cursor: "pointer",
-
                         whiteSpace:
                           "nowrap",
                       }}
@@ -738,9 +677,7 @@ function Login({
                   </Box>
                 </>
               ) : (
-                /* =========================================
-                    OTP SCREEN
-                ========================================= */
+                /* OTP SCREEN */
 
                 <>
                   <Typography
@@ -759,10 +696,9 @@ function Login({
                   <Typography
                     sx={{
                       fontSize: "12px",
-
                       color: Colors.black,
-
-                      marginBottom: "18px",
+                      marginBottom:
+                        "18px",
                     }}
                   >
                     Enter the OTP sent to
@@ -782,7 +718,9 @@ function Login({
                           ""
                         );
 
-                      if (value.length <= 6) {
+                      if (
+                        value.length <= 6
+                      ) {
                         setOtp(value);
                       }
 
@@ -795,11 +733,10 @@ function Login({
                     sx={{
                       marginBottom: "10px",
 
-                      "& .MuiOutlinedInput-root": {
+                      "& .MuiOutlinedInput-root":
+                      {
                         height: "42px",
-
                         borderRadius: "8px",
-
                         fontSize: "14px",
                       },
                     }}
@@ -815,33 +752,27 @@ function Login({
                     }
                     sx={{
                       height: "42px",
-
                       borderRadius: "8px",
+                      backgroundColor: Colors.blue,
 
-                      backgroundColor:
-                        Colors.blue,
-
-                      textTransform: "none",
-
+                      textTransform:
+                        "none",
                       fontSize: "14px",
-
                       fontWeight: 700,
-
                       boxShadow: "none",
 
                       "&:hover": {
-                        backgroundColor:
-                          Colors.blue,
+                        backgroundColor: Colors.blue,
 
-                        boxShadow: "none",
+                        boxShadow:
+                          "none",
                       },
 
-                      "&.Mui-disabled": {
-                        backgroundColor:
-                          Colors.background,
+                      "&.Mui-disabled":
+                      {
+                        backgroundColor: Colors.background,
 
-                        color:
-                          Colors.background,
+                        color: Colors.background,
                       },
                     }}
                   >
@@ -855,16 +786,13 @@ function Login({
                     onClick={changePhone}
                     sx={{
                       marginTop: "5px",
-
                       color: Colors.black,
-
-                      textTransform: "none",
-
+                      textTransform:
+                        "none",
                       fontSize: "12px",
-
                       padding: 0,
-
-                      minHeight: "25px",
+                      minHeight:
+                        "25px",
                     }}
                   >
                     Change Phone Number
@@ -872,23 +800,20 @@ function Login({
                 </>
               )}
 
-              {/* =========================================
-                  MESSAGE
-              ========================================= */}
+              {/* MESSAGE */}
 
               {message && (
                 <Typography
                   sx={{
                     marginTop: "8px",
-
                     fontSize: "11px",
-
                     color: message
                       .toLowerCase()
-                      .includes("success")
+                      .includes(
+                        "success"
+                      )
                       ? Colors.green
                       : Colors.orange,
-
                     wordBreak:
                       "break-word",
                   }}
