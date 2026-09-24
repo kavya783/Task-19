@@ -43,9 +43,9 @@ import NavBar from "../components/NavBar";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
-// ========================================
+
 // LAZY LOAD NON-INITIAL PROFILE SECTIONS
-// ========================================
+
 
 const YourOrders = lazy(
   () => import("../components/YourOrders")
@@ -63,55 +63,51 @@ const TrackOrder = lazy(
   () => import("../components/TrackOrder")
 );
 
-// ========================================
+
 // COMPONENT
-// ========================================
+
 
 function ProfilePage() {
-  // ========================================
+  
   // RESPONSIVE
-  // ========================================
+  
 
   const isMobile = useMediaQuery(
     "(max-width:599.95px)"
   );
 
-  // ========================================
+  
   // USER
-  // ========================================
+  
 
   const getStoredUser = useCallback(() => {
-    try {
-      const storedUser =
-        localStorage.getItem("user");
+  try {
+    const storedUser = sessionStorage.getItem("user");
 
-      return storedUser
-        ? JSON.parse(storedUser)
-        : null;
-    } catch (error) {
-      console.error(
-        "Failed to parse stored user:",
-        error
-      );
+    return storedUser
+      ? JSON.parse(storedUser)
+      : null;
+  } catch (error) {
+    console.error(
+      "Failed to parse stored user:",
+      error
+    );
 
-      return null;
-    }
-  }, []);
+    return null;
+  }
+}, []);
 
-  const [user, setUser] = useState(
-    getStoredUser
-  );
-
-  // ========================================
+const [user, setUser] = useState(getStoredUser);
+  
   // HOOKS
-  // ========================================
+  
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // ========================================
+  
   // STATE
-  // ========================================
+  
 
   const [isEditing, setIsEditing] =
     useState(false);
@@ -124,9 +120,9 @@ function ProfilePage() {
     email: user?.email || "",
   });
 
-  // ========================================
+  
   // FORM CHANGE
-  // ========================================
+  
 
   const handleChange = useCallback(
     (event) => {
@@ -145,9 +141,9 @@ function ProfilePage() {
     []
   );
 
-  // ========================================
+  
   // EDIT
-  // ========================================
+  
 
   const handleEdit = useCallback(() => {
     setFormData({
@@ -158,9 +154,9 @@ function ProfilePage() {
     setIsEditing(true);
   }, [user]);
 
-  // ========================================
+  
   // CANCEL
-  // ========================================
+  
 
   const handleCancel = useCallback(() => {
     setFormData({
@@ -171,9 +167,9 @@ function ProfilePage() {
     setIsEditing(false);
   }, [user]);
 
-  // ========================================
+  
   // SAVE
-  // ========================================
+  
 
   const handleSave = useCallback(
     async () => {
@@ -223,13 +219,7 @@ function ProfilePage() {
           const updatedUser =
             response.user;
 
-          localStorage.setItem(
-            "user",
-            JSON.stringify(
-              updatedUser
-            )
-          );
-
+        
           setUser(updatedUser);
 
           setFormData({
@@ -282,20 +272,25 @@ function ProfilePage() {
     ]
   );
 
-  // ========================================
+  
   // LOGOUT
-  // ========================================
+  
 
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+ const handleLogout = useCallback(() => {
+  sessionStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("isLoggedIn");
 
-    window.location.href = "/";
-  }, []);
+  window.dispatchEvent(
+    new CustomEvent("auth:changed")
+  );
 
-  // ========================================
+  window.location.href = "/";
+}, []);
+
+  
   // SECTION SELECT
-  // ========================================
+  
 
   const selectSection = useCallback(
     (section) => {
@@ -304,9 +299,9 @@ function ProfilePage() {
     []
   );
 
-  // ========================================
+  
   // SIDEBAR STYLE
-  // ========================================
+  
 
   const sidebarItemSx = useCallback(
     (section) => ({
@@ -334,9 +329,9 @@ function ProfilePage() {
     [selectedSection]
   );
 
-  // ========================================
+  
   // SECTION TITLE
-  // ========================================
+  
 
   const getSectionTitle = () => {
     switch (selectedSection) {
@@ -357,9 +352,9 @@ function ProfilePage() {
     }
   };
 
-  // ========================================
+  
   // LAZY SECTION CONTENT
-  // ========================================
+  
 
   const renderSelectedSection = () => {
     if (
@@ -415,9 +410,9 @@ function ProfilePage() {
     );
   };
 
-  // ========================================
+  
   // MOBILE PROFILE
-  // ========================================
+  
 
   const renderMobileProfile =
     () => (
@@ -1178,9 +1173,9 @@ function ProfilePage() {
       </>
     );
 
-  // ========================================
+  
   // MOBILE UI
-  // ========================================
+  
 
   const renderMobile =
     () => (
@@ -1760,9 +1755,9 @@ function ProfilePage() {
       </Box>
     );
 
-  // ========================================
+  
   // DESKTOP PROFILE
-  // ========================================
+  
 
   const renderDesktopProfile =
     () => (
@@ -2586,9 +2581,9 @@ function ProfilePage() {
       </>
     );
 
-  // ========================================
+  
   // DESKTOP UI
-  // ========================================
+  
 
   const renderDesktop =
     () => (
@@ -2959,9 +2954,9 @@ function ProfilePage() {
       </Box>
     );
 
-  // ========================================
+  
   // MAIN RETURN
-  // ========================================
+  
 
   return (
     <>
