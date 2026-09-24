@@ -40,10 +40,15 @@ const USER_STORAGE_KEY = "user";
 const getCartKey = () => {
   try {
     const user = JSON.parse(
-      localStorage.getItem(USER_STORAGE_KEY) || "null"
+      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
     );
 
-    if (user?.id) {
+    const isLoggedIn =
+      sessionStorage.getItem("isLoggedIn") === "true" &&
+      Boolean(sessionStorage.getItem("token")) &&
+      Boolean(user?.id);
+
+    if (isLoggedIn) {
       return `mamaearth_cart_${user.id}`;
     }
 
@@ -87,8 +92,24 @@ const getProductImages = (product) => {
 
 const getCartQuantities = () => {
   try {
+    const user = JSON.parse(
+      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
+    );
+
+    const isLoggedIn =
+      sessionStorage.getItem("isLoggedIn") === "true" &&
+      Boolean(sessionStorage.getItem("token")) &&
+      Boolean(user?.id);
+
+    // User logged out / session expired
+    if (!isLoggedIn) {
+      return {};
+    }
+
+    const cartKey = `mamaearth_cart_${user.id}`;
+
     const savedCart = JSON.parse(
-      localStorage.getItem(getCartKey()) || "[]"
+      localStorage.getItem(cartKey) || "[]"
     );
 
     return savedCart.reduce((quantities, item) => {
@@ -178,27 +199,27 @@ const ProductCardItem = memo(
     onAddToCart,
     onQuantityChange,
   }) {
-    // ======================================
+   
     // PRODUCT IMAGES
-    // ======================================
+   
 
     const images = useMemo(
       () => getProductImages(product),
       [product]
     );
 
-    // ======================================
+   
     // CURRENT IMAGE
-    // ======================================
+   
 
     const currentImage =
       isHovered && images.length > 1
         ? images[1]
         : images[0] || "";
 
-    // ======================================
+   
     // PRICING
-    // ======================================
+   
 
     const {
       salePrice,
@@ -209,18 +230,18 @@ const ProductCardItem = memo(
       [product]
     );
 
-    // ======================================
+   
     // PRODUCT NAME
-    // ======================================
+   
 
     const productName =
       product?.name ||
       product?.heading ||
       "Product";
 
-    // ======================================
+   
     // BENEFITS
-    // ======================================
+   
 
     const benefits = Array.isArray(
       product?.benefits
@@ -228,9 +249,9 @@ const ProductCardItem = memo(
       ? product.benefits.join(" | ")
       : product?.benefits || "";
 
-    // ======================================
+   
     // CARD CLICK
-    // ======================================
+   
 
     const handleCardClick = useCallback(() => {
       onNavigate(product.id);
@@ -239,9 +260,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-    // ======================================
+   
     // MOUSE ENTER
-    // ======================================
+   
 
     const handleMouseEnter = useCallback(() => {
       if (images.length > 1) {
@@ -253,9 +274,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-    // ======================================
+   
     // MOUSE LEAVE
-    // ======================================
+   
 
     const handleMouseLeave = useCallback(() => {
       onMouseLeave(product.id);
@@ -264,9 +285,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-    // ======================================
+   
     // ADD TO CART
-    // ======================================
+   
 
     const handleAdd = useCallback(
       (event) => {
@@ -278,9 +299,9 @@ const ProductCardItem = memo(
       ]
     );
 
-    // ======================================
+   
     // DECREASE QUANTITY
-    // ======================================
+   
 
     const handleDecrease = useCallback(
       (event) => {
@@ -296,9 +317,9 @@ const ProductCardItem = memo(
       ]
     );
 
-    // ======================================
+   
     // INCREASE QUANTITY
-    // ======================================
+   
 
     const handleIncrease = useCallback(
       (event) => {
