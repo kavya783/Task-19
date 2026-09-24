@@ -97,31 +97,41 @@
 
         // CART ITEMS
 
-       const [
+     const [
     cartItems,
     setCartItems,
 ] = useState(() => {
-
-    // User logged out ayithe
-    // old cart products display cheyyakudadhu.
-    if (!isLoggedIn) {
-        return [];
-    }
-
     try {
+        const currentUser =
+            JSON.parse(
+                sessionStorage.getItem("user") || "null"
+            );
 
-        return JSON.parse(
-            localStorage.getItem(
-                cartKey
-            ) || "[]"
-        );
+        const loggedIn =
+            sessionStorage.getItem("isLoggedIn") === "true" &&
+            Boolean(sessionStorage.getItem("token")) &&
+            Boolean(currentUser?.id);
+
+        if (!loggedIn) {
+            return [];
+        }
+
+        const currentCartKey =
+            `mamaearth_cart_${currentUser.id}`;
+
+        const savedCart =
+            JSON.parse(
+                localStorage.getItem(currentCartKey) || "[]"
+            );
+
+        return Array.isArray(savedCart)
+            ? savedCart
+            : [];
 
     } catch {
-
         return [];
     }
 });
-
         // OFFERS
 
         const [
@@ -133,30 +143,19 @@
         // SYNC CART
 
 useEffect(() => {
-
     const syncCartItems = () => {
-
         try {
-
             const currentUser =
                 JSON.parse(
-                    sessionStorage.getItem(
-                        "user"
-                    ) || "null"
+                    sessionStorage.getItem("user") || "null"
                 );
 
             const loggedIn =
-                sessionStorage.getItem(
-                    "isLoggedIn"
-                ) === "true" &&
+                sessionStorage.getItem("isLoggedIn") === "true" &&
                 Boolean(
-                    sessionStorage.getItem(
-                        "token"
-                    )
+                    sessionStorage.getItem("token")
                 ) &&
-                Boolean(
-                    currentUser?.id
-                );
+                Boolean(currentUser?.id);
 
             if (!loggedIn) {
                 setCartItems([]);
@@ -178,9 +177,7 @@ useEffect(() => {
                     ? latestCart
                     : []
             );
-
         } catch (error) {
-
             console.error(
                 "Cart sync failed:",
                 error
@@ -190,63 +187,32 @@ useEffect(() => {
         }
     };
 
-
-    // Initial cart load
+    // Initial sync
     syncCartItems();
 
-
-    // ProductCards → CartPage
-    const handleCartUpdate = () => {
-        syncCartItems();
-    };
-
-
-    // Navbar → CartPage
-    const handleCartOpen = () => {
-        syncCartItems();
-    };
-
-
-    // Login / Logout
-    const handleAuthChanged = () => {
-        syncCartItems();
-    };
-
-
+    // ProductCards -> CartPage
     window.addEventListener(
         "cart:update",
-        handleCartUpdate
+        syncCartItems
     );
 
-    window.addEventListener(
-        "cart:open",
-        handleCartOpen
-    );
-
+    // Login / logout
     window.addEventListener(
         "auth:changed",
-        handleAuthChanged
+        syncCartItems
     );
 
-
     return () => {
-
         window.removeEventListener(
             "cart:update",
-            handleCartUpdate
-        );
-
-        window.removeEventListener(
-            "cart:open",
-            handleCartOpen
+            syncCartItems
         );
 
         window.removeEventListener(
             "auth:changed",
-            handleAuthChanged
+            syncCartItems
         );
     };
-
 }, []);
 
         // REMOVE CART ITEM
@@ -270,29 +236,43 @@ useEffect(() => {
 
         // UPDATE CART
 
-        const updateCart =
-            (updatedCart) => {
+        const updateCart = (updatedCart) => {
+    try {
+        const currentUser =
+            JSON.parse(
+                sessionStorage.getItem("user") || "null"
+            );
 
-                localStorage.setItem(
-                    cartKey,
-                    JSON.stringify(
-                        updatedCart
-                    )
-                );
+        const loggedIn =
+            sessionStorage.getItem("isLoggedIn") === "true" &&
+            Boolean(sessionStorage.getItem("token")) &&
+            Boolean(currentUser?.id);
 
+        if (!loggedIn) {
+            setCartItems([]);
+            return;
+        }
 
-                setCartItems(
-                    updatedCart
-                );
+        const currentCartKey =
+            `mamaearth_cart_${currentUser.id}`;
 
+        localStorage.setItem(
+            currentCartKey,
+            JSON.stringify(updatedCart)
+        );
 
-                window.dispatchEvent(
-                    new CustomEvent(
-                        "cart:update"
-                    )
-                );
-            };
+        setCartItems(updatedCart);
 
+        window.dispatchEvent(
+            new CustomEvent("cart:update")
+        );
+    } catch (error) {
+        console.error(
+            "Update cart failed:",
+            error
+        );
+    }
+};
 
         // CHANGE QUANTITY
 

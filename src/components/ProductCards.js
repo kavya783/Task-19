@@ -968,83 +968,97 @@ const handleMouseLeave = useCallback(() => {
  // ADD TO CART
 
 const handleAddToCart = useCallback(
-  (event, product) => {
-    event.preventDefault();
-    event.stopPropagation();
+    (event, product) => {
+        event.preventDefault();
+        event.stopPropagation();
 
-    try {
-      const cartKey = getCartKey();
+        try {
+            const cartKey = getCartKey();
 
-      const existingCart = JSON.parse(
-        localStorage.getItem(cartKey) || "[]"
-      );
+            const existingCart =
+                JSON.parse(
+                    localStorage.getItem(cartKey) || "[]"
+                );
 
-      const productId = String(product.id);
+            const productId =
+                String(product.id);
 
-      const cartIndex = existingCart.findIndex(
-        (item) =>
-          String(item.id) === productId
-      );
+            const cartIndex =
+                existingCart.findIndex(
+                    (item) =>
+                        String(item.id) === productId
+                );
 
-      let updatedCart;
+            let updatedCart;
 
-      if (cartIndex >= 0) {
-        // Product already exists.
-        // Add to Cart button should start from 1,
-        // not increase to 2 or 3.
-        updatedCart = existingCart.map(
-          (item, index) =>
-            index === cartIndex
-              ? {
-                  ...item,
-                  quantity: 1,
-                }
-              : item
-        );
-      } else {
-        // New product
-        updatedCart = [
-          ...existingCart,
-          {
-            ...product,
-            quantity: 1,
-          },
-        ];
-      }
+            if (cartIndex >= 0) {
+                // Already in cart
+                updatedCart = existingCart.map(
+                    (item, index) =>
+                        index === cartIndex
+                            ? {
+                                ...item,
+                                quantity:
+                                    Number(item.quantity) || 1,
+                            }
+                            : item
+                );
+            } else {
+                // New product
+                updatedCart = [
+                    ...existingCart,
+                    {
+                        ...product,
+                        quantity: 1,
+                    },
+                ];
+            }
 
-      localStorage.setItem(
-        cartKey,
-        JSON.stringify(updatedCart)
-      );
+            localStorage.setItem(
+                cartKey,
+                JSON.stringify(updatedCart)
+            );
 
-      // Notify cart drawer/navbar/product cards
-      window.dispatchEvent(
-        new CustomEvent("cart:update")
-      );
+            window.dispatchEvent(
+                new CustomEvent("cart:update")
+            );
 
-      // Update current product card
-      setCartQuantities((previous) => ({
-        ...previous,
-        [productId]: 1,
-      }));
+            const updatedItem =
+                updatedCart.find(
+                    (item) =>
+                        String(item.id) === productId
+                );
 
-      setSnackbarMessage("Added to cart");
-      setSnackbarOpen(true);
+            setCartQuantities(
+                (previous) => ({
+                    ...previous,
+                    [productId]:
+                        Number(
+                            updatedItem?.quantity
+                        ) || 1,
+                })
+            );
 
-    } catch (error) {
-      console.error(
-        "Add to cart failed:",
-        error
-      );
+            setSnackbarMessage(
+                "Added to cart"
+            );
 
-      setSnackbarMessage(
-        "Unable to add to cart"
-      );
+            setSnackbarOpen(true);
 
-      setSnackbarOpen(true);
-    }
-  },
-  []
+        } catch (error) {
+            console.error(
+                "Add to cart failed:",
+                error
+            );
+
+            setSnackbarMessage(
+                "Unable to add to cart"
+            );
+
+            setSnackbarOpen(true);
+        }
+    },
+    []
 );
 
   
