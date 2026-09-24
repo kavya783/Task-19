@@ -101,27 +101,30 @@ const getCartQuantities = () => {
       Boolean(sessionStorage.getItem("token")) &&
       Boolean(user?.id);
 
-    // User logged out / session expired
-    if (!isLoggedIn) {
-      return {};
-    }
+    const cartKey = isLoggedIn
+      ? `mamaearth_cart_${user.id}`
+      : GUEST_CART_KEY;
 
-    const cartKey = `mamaearth_cart_${user.id}`;
+    const storage = isLoggedIn
+      ? localStorage
+      : sessionStorage;
 
     const savedCart = JSON.parse(
-      localStorage.getItem(cartKey) || "[]"
+      storage.getItem(cartKey) || "[]"
     );
 
-    return savedCart.reduce((quantities, item) => {
-      quantities[String(item.id)] =
-        Number(item.quantity) || 1;
+    return Array.isArray(savedCart)
+      ? savedCart.reduce((quantities, item) => {
+          quantities[String(item.id)] =
+            Number(item.quantity) || 1;
 
-      return quantities;
-    }, {});
+          return quantities;
+        }, {})
+      : {};
   } catch {
     return {};
   }
-};
+};;
 
 
 
@@ -967,135 +970,135 @@ const handleMouseLeave = useCallback(() => {
 
  // ADD TO CART
 const handleAddToCart = useCallback(
-    (event, product) => {
-        event.preventDefault();
-        event.stopPropagation();
+  (event, product) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-        try {
-            // ==========================================
-            // CHECK LOGIN
-            // ==========================================
+    try {
+      // ==========================================
+      // CHECK LOGIN
+      // ==========================================
 
-            const user = JSON.parse(
-                sessionStorage.getItem("user") || "null"
-            );
+      const user = JSON.parse(
+        sessionStorage.getItem("user") || "null"
+      );
 
-            const isLoggedIn =
-                sessionStorage.getItem("isLoggedIn") === "true" &&
-                Boolean(sessionStorage.getItem("token")) &&
-                Boolean(user?.id);
+      const isLoggedIn =
+        sessionStorage.getItem("isLoggedIn") === "true" &&
+        Boolean(sessionStorage.getItem("token")) &&
+        Boolean(user?.id);
 
-            // ==========================================
-            // CART KEY
-            // ==========================================
+      // ==========================================
+      // CART KEY
+      // ==========================================
 
-            const cartKey = isLoggedIn
-                ? `mamaearth_cart_${user.id}`
-                : "mamaearth_cart_guest";
+      const cartKey = isLoggedIn
+        ? `mamaearth_cart_${user.id}`
+        : GUEST_CART_KEY;
 
-            // ==========================================
-            // GET EXISTING CART
-            // ==========================================
+      // ==========================================
+      // STORAGE
+      // Logged in  -> localStorage
+      // Guest      -> sessionStorage
+      // ==========================================
 
-            const existingCart = JSON.parse(
-                localStorage.getItem(cartKey) || "[]"
-            );
+      const storage = isLoggedIn
+        ? localStorage
+        : sessionStorage;
 
-            // ==========================================
-            // PRODUCT ID
-            // ==========================================
+      // ==========================================
+      // GET EXISTING CART
+      // ==========================================
 
-            const productId = String(product?.id);
+      const existingCart = JSON.parse(
+        storage.getItem(cartKey) || "[]"
+      );
 
-            // ==========================================
-            // CHECK PRODUCT ALREADY EXISTS
-            // ==========================================
+      // ==========================================
+      // PRODUCT ID
+      // ==========================================
 
-            const existingIndex =
-                existingCart.findIndex(
-                    (item) =>
-                        String(item?.id) === productId
-                );
+      const productId = String(product?.id);
 
-            let updatedCart;
+      // ==========================================
+      // CHECK PRODUCT ALREADY EXISTS
+      // ==========================================
 
-            if (existingIndex !== -1) {
-                // Already exists
-                // Don't increase quantity here.
-                // + button will increase it.
+      const existingIndex =
+        existingCart.findIndex(
+          (item) =>
+            String(item?.id) === productId
+        );
 
-                updatedCart = existingCart.map(
-                    (item, index) =>
-                        index === existingIndex
-                            ? {
-                                  ...item,
-                                  quantity: 1,
-                              }
-                            : item
-                );
-            } else {
-                // New product
+      let updatedCart;
 
-                updatedCart = [
-                    ...existingCart,
-                    {
-                        ...product,
-                        quantity: 1,
-                    },
-                ];
-            }
+      if (existingIndex !== -1) {
+        updatedCart = existingCart.map(
+          (item, index) =>
+            index === existingIndex
+              ? {
+                  ...item,
+                  quantity: 1,
+                }
+              : item
+        );
+      } else {
+        updatedCart = [
+          ...existingCart,
+          {
+            ...product,
+            quantity: 1,
+          },
+        ];
+      }
 
-            // ==========================================
-            // SAVE CART
-            // ==========================================
+      // ==========================================
+      // SAVE CART
+      // ==========================================
 
-            localStorage.setItem(
-                cartKey,
-                JSON.stringify(updatedCart)
-            );
+      storage.setItem(
+        cartKey,
+        JSON.stringify(updatedCart)
+      );
 
-            // ==========================================
-            // UPDATE LOCAL QUANTITY
-            // ==========================================
+      // ==========================================
+      // UPDATE LOCAL QUANTITY
+      // ==========================================
 
-            setCartQuantities((previous) => ({
-                ...previous,
-                [productId]: 1,
-            }));
+      setCartQuantities((previous) => ({
+        ...previous,
+        [productId]: 1,
+      }));
 
-            // ==========================================
-            // IMPORTANT
-            // TELL NAVBAR + CART PAGE
-            // ==========================================
+      // ==========================================
+      // TELL NAVBAR + CART PAGE
+      // ==========================================
 
-            window.dispatchEvent(
-                new CustomEvent("cart:update")
-            );
+      window.dispatchEvent(
+        new CustomEvent("cart:update")
+      );
 
-            // ==========================================
-            // SUCCESS MESSAGE
-            // ==========================================
+      // ==========================================
+      // SUCCESS MESSAGE
+      // ==========================================
 
-            setSnackbarMessage(
-                "Added to cart"
-            );
+      setSnackbarMessage("Added to cart");
+      setSnackbarOpen(true);
 
-            setSnackbarOpen(true);
+    } catch (error) {
+      console.error(
+        "Add to cart failed:",
+        error
+      );
 
-        } catch (error) {
-            console.error(
-                "Add to cart failed:",
-                error
-            );
+      setSnackbarMessage(
+        "Unable to add to cart"
+      );
 
-            setSnackbarMessage(
-                "Unable to add to cart"
-            );
-
-            setSnackbarOpen(true);
-        }
-    },
-    []
+      setSnackbarOpen(true);
+    }
+  },
+  []
 );
 
   
@@ -1103,102 +1106,124 @@ const handleAddToCart = useCallback(
   
 
   const handleCartQuantityChange =
-    useCallback(
-      (
-        event,
-        product,
-        change
-      ) => {
-        event.stopPropagation();
+  useCallback(
+    (
+      event,
+      product,
+      change
+    ) => {
+      event.stopPropagation();
 
-        try {
-          const cartKey =
-            getCartKey();
+      try {
+        const user = JSON.parse(
+          sessionStorage.getItem(
+            USER_STORAGE_KEY
+          ) || "null"
+        );
 
-          const existingCart =
-            JSON.parse(
-              localStorage.getItem(
-                cartKey
-              ) || "[]"
-            );
+        const isLoggedIn =
+          sessionStorage.getItem(
+            "isLoggedIn"
+          ) === "true" &&
+          Boolean(
+            sessionStorage.getItem(
+              "token"
+            )
+          ) &&
+          Boolean(user?.id);
 
-          const productId =
-            String(product.id);
+        const cartKey = isLoggedIn
+          ? `mamaearth_cart_${user.id}`
+          : GUEST_CART_KEY;
 
-          const cartIndex =
-            existingCart.findIndex(
-              (item) =>
-                String(item.id) ===
-                productId
-            );
+        const storage = isLoggedIn
+          ? localStorage
+          : sessionStorage;
 
-          if (cartIndex < 0) {
-            return;
-          }
+        const existingCart =
+          JSON.parse(
+            storage.getItem(
+              cartKey
+            ) || "[]"
+          );
 
-          const nextQuantity =
-            (Number(
-              existingCart[
-                cartIndex
-              ].quantity
-            ) || 1) + change;
+        const productId =
+          String(product.id);
 
-          if (
-            nextQuantity <= 0
-          ) {
-            existingCart.splice(
-              cartIndex,
-              1
-            );
-          } else {
+        const cartIndex =
+          existingCart.findIndex(
+            (item) =>
+              String(item.id) ===
+              productId
+          );
+
+        if (cartIndex < 0) {
+          return;
+        }
+
+        const nextQuantity =
+          (Number(
             existingCart[
               cartIndex
-            ].quantity =
-              nextQuantity;
-          }
+            ].quantity
+          ) || 1) + change;
 
-          localStorage.setItem(
-            cartKey,
-            JSON.stringify(
-              existingCart
-            )
+        if (
+          nextQuantity <= 0
+        ) {
+          existingCart.splice(
+            cartIndex,
+            1
           );
-
-          window.dispatchEvent(
-            new CustomEvent(
-              "cart:update"
-            )
-          );
-
-          setCartQuantities(
-            (previous) => {
-              const next = {
-                ...previous,
-              };
-
-              if (
-                nextQuantity <= 0
-              ) {
-                delete next[
-                  productId
-                ];
-              } else {
-                next[productId] =
-                  nextQuantity;
-              }
-
-              return next;
-            }
-          );
-        } catch (error) {
-          console.error(
-            "Cart quantity update failed:",
-            error
-          );
+        } else {
+          existingCart[
+            cartIndex
+          ].quantity =
+            nextQuantity;
         }
-      },
-      []
-    );
+
+        storage.setItem(
+          cartKey,
+          JSON.stringify(
+            existingCart
+          )
+        );
+
+        window.dispatchEvent(
+          new CustomEvent(
+            "cart:update"
+          )
+        );
+
+        setCartQuantities(
+          (previous) => {
+            const next = {
+              ...previous,
+            };
+
+            if (
+              nextQuantity <= 0
+            ) {
+              delete next[
+                productId
+              ];
+            } else {
+              next[productId] =
+                nextQuantity;
+            }
+
+            return next;
+          }
+        );
+      } catch (error) {
+        console.error(
+          "Cart quantity update failed:",
+          error
+        );
+      }
+    },
+    []
+  );
 
   
   // PRODUCTS

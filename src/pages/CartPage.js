@@ -97,40 +97,45 @@
 
         // CART ITEMS
 
-     const [
-    cartItems,
-    setCartItems,
+ const [
+  cartItems,
+  setCartItems,
 ] = useState(() => {
-    try {
-        const currentUser =
-            JSON.parse(
-                sessionStorage.getItem("user") || "null"
-            );
+  try {
+    const currentUser =
+      JSON.parse(
+        sessionStorage.getItem("user") || "null"
+      );
 
-        const loggedIn =
-            sessionStorage.getItem("isLoggedIn") === "true" &&
-            Boolean(sessionStorage.getItem("token")) &&
-            Boolean(currentUser?.id);
+    const loggedIn =
+      sessionStorage.getItem("isLoggedIn") === "true" &&
+      Boolean(
+        sessionStorage.getItem("token")
+      ) &&
+      Boolean(currentUser?.id);
 
-        if (!loggedIn) {
-            return [];
-        }
+    const currentCartKey = loggedIn
+      ? `mamaearth_cart_${currentUser.id}`
+      : "mamaearth_cart_guest";
 
-        const currentCartKey =
-            `mamaearth_cart_${currentUser.id}`;
+    const storage = loggedIn
+      ? localStorage
+      : sessionStorage;
 
-        const savedCart =
-            JSON.parse(
-                localStorage.getItem(currentCartKey) || "[]"
-            );
+    const savedCart =
+      JSON.parse(
+        storage.getItem(
+          currentCartKey
+        ) || "[]"
+      );
 
-        return Array.isArray(savedCart)
-            ? savedCart
-            : [];
+    return Array.isArray(savedCart)
+      ? savedCart
+      : [];
 
-    } catch {
-        return [];
-    }
+  } catch {
+    return [];
+  }
 });
         // OFFERS
 
@@ -145,88 +150,83 @@
 // SYNC CART
 
 useEffect(() => {
-    const syncCartItems = () => {
-        try {
-            const currentUser =
-                JSON.parse(
-                    sessionStorage.getItem("user") || "null"
-                );
+  const syncCartItems = () => {
+    try {
+      const currentUser =
+        JSON.parse(
+          sessionStorage.getItem("user") || "null"
+        );
 
-            const loggedIn =
-                sessionStorage.getItem("isLoggedIn") === "true" &&
-                Boolean(
-                    sessionStorage.getItem("token")
-                ) &&
-                Boolean(currentUser?.id);
+      const loggedIn =
+        sessionStorage.getItem("isLoggedIn") === "true" &&
+        Boolean(
+          sessionStorage.getItem("token")
+        ) &&
+        Boolean(currentUser?.id);
 
-            // Not logged in
-            if (!loggedIn) {
-                setCartItems([]);
-                return;
-            }
+      const currentCartKey = loggedIn
+        ? `mamaearth_cart_${currentUser.id}`
+        : "mamaearth_cart_guest";
 
-            const currentCartKey =
-                `mamaearth_cart_${currentUser.id}`;
+      const storage = loggedIn
+        ? localStorage
+        : sessionStorage;
 
-            const latestCart =
-                JSON.parse(
-                    localStorage.getItem(
-                        currentCartKey
-                    ) || "[]"
-                );
+      const latestCart =
+        JSON.parse(
+          storage.getItem(
+            currentCartKey
+          ) || "[]"
+        );
 
-            setCartItems(
-                Array.isArray(latestCart)
-                    ? latestCart
-                    : []
-            );
+      setCartItems(
+        Array.isArray(latestCart)
+          ? latestCart
+          : []
+      );
 
-            console.log(
-                "Cart synced:",
-                latestCart
-            );
+      console.log(
+        "Cart synced:",
+        latestCart
+      );
 
-        } catch (error) {
-            console.error(
-                "Cart sync failed:",
-                error
-            );
+    } catch (error) {
+      console.error(
+        "Cart sync failed:",
+        error
+      );
 
-            setCartItems([]);
-        }
-    };
-
-    // Initial cart load
-    syncCartItems();
-
-    // When drawer opens
-    if (open) {
-        syncCartItems();
+      setCartItems([]);
     }
+  };
 
-    // Add / remove / quantity update
-    window.addEventListener(
-        "cart:update",
-        syncCartItems
+  syncCartItems();
+
+  if (open) {
+    syncCartItems();
+  }
+
+  window.addEventListener(
+    "cart:update",
+    syncCartItems
+  );
+
+  window.addEventListener(
+    "auth:changed",
+    syncCartItems
+  );
+
+  return () => {
+    window.removeEventListener(
+      "cart:update",
+      syncCartItems
     );
 
-    // Login / logout
-    window.addEventListener(
-        "auth:changed",
-        syncCartItems
+    window.removeEventListener(
+      "auth:changed",
+      syncCartItems
     );
-
-    return () => {
-        window.removeEventListener(
-            "cart:update",
-            syncCartItems
-        );
-
-        window.removeEventListener(
-            "auth:changed",
-            syncCartItems
-        );
-    };
+  };
 }, [open]);
 
         // REMOVE CART ITEM
@@ -251,41 +251,44 @@ useEffect(() => {
         // UPDATE CART
 
         const updateCart = (updatedCart) => {
-    try {
-        const currentUser =
-            JSON.parse(
-                sessionStorage.getItem("user") || "null"
-            );
+  try {
+    const currentUser =
+      JSON.parse(
+        sessionStorage.getItem("user") || "null"
+      );
 
-        const loggedIn =
-            sessionStorage.getItem("isLoggedIn") === "true" &&
-            Boolean(sessionStorage.getItem("token")) &&
-            Boolean(currentUser?.id);
+    const loggedIn =
+      sessionStorage.getItem("isLoggedIn") === "true" &&
+      Boolean(
+        sessionStorage.getItem("token")
+      ) &&
+      Boolean(currentUser?.id);
 
-        if (!loggedIn) {
-            setCartItems([]);
-            return;
-        }
+    const currentCartKey = loggedIn
+      ? `mamaearth_cart_${currentUser.id}`
+      : "mamaearth_cart_guest";
 
-        const currentCartKey =
-            `mamaearth_cart_${currentUser.id}`;
+    const storage = loggedIn
+      ? localStorage
+      : sessionStorage;
 
-        localStorage.setItem(
-            currentCartKey,
-            JSON.stringify(updatedCart)
-        );
+    storage.setItem(
+      currentCartKey,
+      JSON.stringify(updatedCart)
+    );
 
-        setCartItems(updatedCart);
+    setCartItems(updatedCart);
 
-        window.dispatchEvent(
-            new CustomEvent("cart:update")
-        );
-    } catch (error) {
-        console.error(
-            "Update cart failed:",
-            error
-        );
-    }
+    window.dispatchEvent(
+      new CustomEvent("cart:update")
+    );
+
+  } catch (error) {
+    console.error(
+      "Update cart failed:",
+      error
+    );
+  }
 };
 
         // CHANGE QUANTITY
