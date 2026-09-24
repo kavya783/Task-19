@@ -184,42 +184,6 @@ const USER_STORAGE_KEY =
 
 
 // =====================================================
-// REFRESH LOGIN CLEANUP
-// =====================================================
-
-const clearAuthOnRefresh = () => {
-    try {
-        const navigationEntry =
-            performance.getEntriesByType(
-                "navigation"
-            )[0];
-
-        if (
-            navigationEntry &&
-            navigationEntry.type === "reload"
-        ) {
-            sessionStorage.removeItem(
-                "isLoggedIn"
-            );
-
-            sessionStorage.removeItem(
-                "token"
-            );
-
-            sessionStorage.removeItem(
-                "user"
-            );
-        }
-    } catch (error) {
-        console.error(
-            "Refresh auth cleanup error:",
-            error
-        );
-    }
-};
-
-
-// =====================================================
 // GET CART KEY
 // =====================================================
 
@@ -318,11 +282,10 @@ function NavBar() {
 
 
     // =================================================
-    // CLEAR OLD LOGIN ONLY ON BROWSER REFRESH
+    // CHECK CURRENT LOGIN STATE
     // =================================================
 
     useEffect(() => {
-        clearAuthOnRefresh();
 
         const loggedIn =
             sessionStorage.getItem(
@@ -346,6 +309,7 @@ function NavBar() {
                 getCartItems()
             );
         }
+
     }, []);
 
 
