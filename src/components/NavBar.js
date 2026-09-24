@@ -827,33 +827,9 @@ setCartItems(getCartItems());
 
        // SYNC CART
    
-    const syncCartItems =
-        () => {
-
-            const loggedIn =
-                sessionStorage.getItem(
-                    "isLoggedIn"
-                ) === "true" &&
-                Boolean(
-                    sessionStorage.getItem(
-                        "token"
-                    )
-                ) &&
-                Boolean(
-                    sessionStorage.getItem(
-                        "user"
-                    )
-                );
-
-            if (!loggedIn) {
-                setCartItems([]);
-                return;
-            }
-
-            setCartItems(
-                getCartItems()
-            );
-        };
+   const syncCartItems = () => {
+    setCartItems(getCartItems());
+};
 
 
        // CART EVENTS
