@@ -312,33 +312,16 @@ function NavBar() {
 
        // CHECK CURRENT LOGIN STATE
    
-   useEffect(() => {
-
+  useEffect(() => {
     const loggedIn =
-        sessionStorage.getItem(
-            "isLoggedIn"
-        ) === "true" &&
-        Boolean(
-            sessionStorage.getItem(
-                "token"
-            )
-        ) &&
-        Boolean(
-            sessionStorage.getItem(
-                "user"
-            )
-        );
+        sessionStorage.getItem("isLoggedIn") === "true" &&
+        Boolean(sessionStorage.getItem("token")) &&
+        Boolean(sessionStorage.getItem("user"));
 
     setIsLoggedIn(loggedIn);
 
-    if (loggedIn) {
-        setCartItems(
-            getCartItems()
-        );
-    } else {
-        setCartItems([]);
-    }
-
+    
+    setCartItems(getCartItems());
 }, []);
 
 
