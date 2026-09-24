@@ -304,10 +304,12 @@ function NavBar() {
 
         setIsLoggedIn(loggedIn);
 
-        if (!loggedIn) {
+        if (loggedIn) {
             setCartItems(
                 getCartItems()
             );
+        } else {
+            setCartItems([]);
         }
 
     }, []);
@@ -399,9 +401,29 @@ function NavBar() {
     const [
         cartItems,
         setCartItems,
-    ] = useState(
-        getCartItems
-    );
+    ] = useState(() => {
+
+        const loggedIn =
+            sessionStorage.getItem(
+                "isLoggedIn"
+            ) === "true" &&
+            Boolean(
+                sessionStorage.getItem(
+                    "token"
+                )
+            ) &&
+            Boolean(
+                sessionStorage.getItem(
+                    "user"
+                )
+            );
+
+        if (!loggedIn) {
+            return [];
+        }
+
+        return getCartItems();
+    });
 
 
     // =================================================
@@ -816,11 +838,9 @@ function NavBar() {
 
             setIsLoggedIn(false);
 
-            // Cart remains in localStorage.
-            // Only hide it from logged-out auth state.
-            setCartItems(
-                getCartItems()
-            );
+            // Hide previous user's cart
+            // after logout.
+            setCartItems([]);
 
             handleMenuClose();
 
@@ -855,6 +875,26 @@ function NavBar() {
 
     const syncCartItems =
         () => {
+
+            const loggedIn =
+                sessionStorage.getItem(
+                    "isLoggedIn"
+                ) === "true" &&
+                Boolean(
+                    sessionStorage.getItem(
+                        "token"
+                    )
+                ) &&
+                Boolean(
+                    sessionStorage.getItem(
+                        "user"
+                    )
+                );
+
+            if (!loggedIn) {
+                setCartItems([]);
+                return;
+            }
 
             setCartItems(
                 getCartItems()
@@ -906,7 +946,13 @@ function NavBar() {
                     loggedIn
                 );
 
-                syncCartItems();
+                if (loggedIn) {
+                    setCartItems(
+                        getCartItems()
+                    );
+                } else {
+                    setCartItems([]);
+                }
             };
 
 
