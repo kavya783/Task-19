@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,31 +10,61 @@ function PaymentResultPage() {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
 
-        if (params.get("status") === "paid") {
+        const paymentStatus = params.get("status");
+
+        if (paymentStatus === "paid") {
             try {
-                // Get logged-in user
+                // ==========================================
+                // GET LOGGED-IN USER FROM SESSION STORAGE
+                // ==========================================
+
                 const user = JSON.parse(
-                    localStorage.getItem("user") || "null"
+                    sessionStorage.getItem("user") || "null"
                 );
 
-                // Use the same cart key as CartPage
-                const cartKey = user?.id
-                    ? `mamaearth_cart_${user.id}`
-                    : "mamaearth_cart_guest";
+                // ==========================================
+                // USE USER-SPECIFIC CART KEY
+                // ==========================================
 
-                // Clear cart only after successful payment
-                localStorage.removeItem(cartKey);
+                if (user?.id) {
+                    const cartKey = `mamaearth_cart_${user.id}`;
 
-                // Update cart everywhere in the application
+                    localStorage.removeItem(cartKey);
+
+                    console.log(
+                        "Cart cleared:",
+                        cartKey
+                    );
+                }
+
+                // ==========================================
+                // ALSO CLEAR GUEST CART IF ANY
+                // ==========================================
+
+                localStorage.removeItem(
+                    "mamaearth_cart_guest"
+                );
+
+                // ==========================================
+                // UPDATE CART EVERYWHERE
+                // ==========================================
+
                 window.dispatchEvent(
                     new CustomEvent("cart:update")
                 );
 
-                toast.success("Payment successfully completed");
+                toast.success(
+                    "Payment successfully completed"
+                );
+
+                // ==========================================
+                // GO TO PROFILE / ORDERS
+                // ==========================================
 
                 navigate("/profilepage", {
                     replace: true,
                 });
+
             } catch (error) {
                 console.error(
                     "Error clearing cart after payment:",
@@ -47,7 +76,9 @@ function PaymentResultPage() {
                 );
             }
         } else {
-            toast.error("Payment was not successful");
+            toast.error(
+                "Payment was not successful"
+            );
 
             navigate("/", {
                 replace: true,

@@ -12,19 +12,21 @@ function YourOrders() {
   const dispatch = useDispatch();
   const { orders, loading, error } = useSelector((state) => state.orders);
 
-  useEffect(() => {
-    let user = null;
+useEffect(() => {
+  let user = null;
 
-    try {
-      user = JSON.parse(localStorage.getItem("user") || "null");
-    } catch {
-      user = null;
-    }
+  try {
+    user = JSON.parse(
+      sessionStorage.getItem("user") || "null"
+    );
+  } catch {
+    user = null;
+  }
 
-    if (user?.id) {
-      dispatch(getOrdersActionInitiate(user.id));
-    }
-  }, [dispatch]);
+  if (user?.id) {
+    dispatch(getOrdersActionInitiate(user.id));
+  }
+}, [dispatch]);
 
   const getItemImage = (item) => {
     const images = item?.image_urls || item?.images;
