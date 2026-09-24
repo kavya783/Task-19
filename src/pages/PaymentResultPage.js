@@ -14,9 +14,9 @@ function PaymentResultPage() {
         if (params.get("status") === "paid") {
             try {
                 // Get logged-in user
-                const user = JSON.parse(
-                    localStorage.getItem("user") || "null"
-                );
+               const user = JSON.parse(
+    sessionStorage.getItem("user") || "null"
+);
 
                 // Use the same cart key as CartPage
                 const cartKey = user?.id

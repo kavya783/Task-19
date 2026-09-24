@@ -20,13 +20,15 @@ import { useNavigate } from "react-router-dom";
 function CartPage({ open, onClose }) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const user = (() => {
-        try {
-            return JSON.parse(localStorage.getItem("user") || "null");
-        } catch {
-            return null;
-        }
-    })();
+   const user = (() => {
+    try {
+        return JSON.parse(
+            sessionStorage.getItem("user") || "null"
+        );
+    } catch {
+        return null;
+    }
+})();
      const cartKey = user?.id
     ? `mamaearth_cart_${user.id}`
     : "mamaearth_cart_guest";
