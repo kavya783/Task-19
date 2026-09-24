@@ -37,9 +37,9 @@ import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
 
-// =====================================================
+
 // LAZY LOAD HEAVY COMPONENTS
-// =====================================================
+
 
 const Login = lazy(
     () => import("./UserLogin")
@@ -50,9 +50,9 @@ const CartPage = lazy(
 );
 
 
-// =====================================================
+
 // SEARCH STYLES
-// =====================================================
+
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -153,9 +153,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 
-// =====================================================
+
 // STATIC DATA
-// =====================================================
+
 
 const bannerTexts = [
     "Buy Any 3 & Pay for 2 | Use Code : B3P2 | Shop Now",
@@ -172,9 +172,9 @@ const searchPlaceholders = [
 ];
 
 
-// =====================================================
+
 // CART CONSTANTS
-// =====================================================
+
 
 const GUEST_CART_KEY =
     "mamaearth_cart_guest";
@@ -183,9 +183,9 @@ const USER_STORAGE_KEY =
     "user";
 
 
-// =====================================================
+
 // GET CART KEY
-// =====================================================
+
 
 const getCartKey = () => {
     try {
@@ -218,20 +218,49 @@ const getCartKey = () => {
 };
 
 
-// =====================================================
+
 // GET CART ITEMS
-// =====================================================
+
 
 const getCartItems = () => {
     try {
-        const cartKey =
-            getCartKey();
-
-        return JSON.parse(
-            localStorage.getItem(
-                cartKey
-            ) || "[]"
+        const user = JSON.parse(
+            sessionStorage.getItem(
+                USER_STORAGE_KEY
+            ) || "null"
         );
+
+        const isLoggedIn =
+            sessionStorage.getItem(
+                "isLoggedIn"
+            ) === "true" &&
+            Boolean(
+                sessionStorage.getItem(
+                    "token"
+                )
+            ) &&
+            Boolean(user?.id);
+
+        const cartKey = isLoggedIn
+            ? `mamaearth_cart_${user.id}`
+            : GUEST_CART_KEY;
+
+        const storage = isLoggedIn
+            ? localStorage
+            : sessionStorage;
+
+        const savedCart =
+            JSON.parse(
+                storage.getItem(
+                    cartKey
+                ) || "[]"
+            );
+
+        return Array.isArray(
+            savedCart
+        )
+            ? savedCart
+            : [];
 
     } catch {
         return [];
@@ -239,9 +268,9 @@ const getCartItems = () => {
 };
 
 
-// =====================================================
+
 // GET PRODUCT IMAGE
-// =====================================================
+
 
 const getProductImage = (
     product
@@ -271,9 +300,9 @@ const getProductImage = (
 };
 
 
-// =====================================================
+
 // COMPONENT
-// =====================================================
+
 
 function NavBar() {
 
@@ -281,44 +310,40 @@ function NavBar() {
         useNavigate();
 
 
-    // =================================================
-    // CHECK CURRENT LOGIN STATE
-    // =================================================
+       // CHECK CURRENT LOGIN STATE
+   
+   useEffect(() => {
 
-    useEffect(() => {
-
-        const loggedIn =
+    const loggedIn =
+        sessionStorage.getItem(
+            "isLoggedIn"
+        ) === "true" &&
+        Boolean(
             sessionStorage.getItem(
-                "isLoggedIn"
-            ) === "true" &&
-            Boolean(
-                sessionStorage.getItem(
-                    "token"
-                )
-            ) &&
-            Boolean(
-                sessionStorage.getItem(
-                    "user"
-                )
-            );
+                "token"
+            )
+        ) &&
+        Boolean(
+            sessionStorage.getItem(
+                "user"
+            )
+        );
 
-        setIsLoggedIn(loggedIn);
+    setIsLoggedIn(loggedIn);
 
-        if (loggedIn) {
-            setCartItems(
-                getCartItems()
-            );
-        } else {
-            setCartItems([]);
-        }
+    if (loggedIn) {
+        setCartItems(
+            getCartItems()
+        );
+    } else {
+        setCartItems([]);
+    }
 
-    }, []);
+}, []);
 
 
-    // =================================================
-    // MENU STATES
-    // =================================================
-
+       // MENU STATES
+   
     const [
         anchorEl,
         setAnchorEl,
@@ -330,10 +355,8 @@ function NavBar() {
     ] = useState(null);
 
 
-    // =================================================
-    // BANNER STATES
-    // =================================================
-
+       // BANNER STATES
+   
     const [
         currentText,
         setCurrentText,
@@ -345,10 +368,8 @@ function NavBar() {
     ] = useState(0);
 
 
-    // =================================================
-    // SEARCH STATES
-    // =================================================
-
+       // SEARCH STATES
+   
     const [
         searchText,
         setSearchText,
@@ -360,10 +381,8 @@ function NavBar() {
     ] = useState("");
 
 
-    // =================================================
-    // AUTH STATES
-    // =================================================
-
+       // AUTH STATES
+   
     const [
         isLoggedIn,
         setIsLoggedIn,
@@ -389,47 +408,23 @@ function NavBar() {
     ] = useState(false);
 
 
-    // =================================================
-    // CART STATES
-    // =================================================
-
+       // CART STATES
+   
     const [
         cartOpen,
         setCartOpen,
     ] = useState(false);
 
-    const [
-        cartItems,
-        setCartItems,
-    ] = useState(() => {
-
-        const loggedIn =
-            sessionStorage.getItem(
-                "isLoggedIn"
-            ) === "true" &&
-            Boolean(
-                sessionStorage.getItem(
-                    "token"
-                )
-            ) &&
-            Boolean(
-                sessionStorage.getItem(
-                    "user"
-                )
-            );
-
-        if (!loggedIn) {
-            return [];
-        }
-
-        return getCartItems();
-    });
+   const [
+    cartItems,
+    setCartItems,
+] = useState(() => {
+    return getCartItems();
+});
 
 
-    // =================================================
-    // PRODUCTS FROM REDUX
-    // =================================================
-
+       // PRODUCTS FROM REDUX
+   
     const productData =
         useSelector(
             (state) =>
@@ -456,10 +451,8 @@ function NavBar() {
     }, [productData]);
 
 
-    // =================================================
-    // CART COUNT
-    // =================================================
-
+       // CART COUNT
+   
     const cartItemCount =
         useMemo(() => {
 
@@ -480,10 +473,8 @@ function NavBar() {
         }, [cartItems]);
 
 
-    // =================================================
-    // MENU STATUS
-    // =================================================
-
+       // MENU STATUS
+   
     const isMenuOpen =
         Boolean(anchorEl);
 
@@ -493,10 +484,8 @@ function NavBar() {
         );
 
 
-    // =================================================
-    // SEARCH RESULTS
-    // =================================================
-
+       // SEARCH RESULTS
+   
     const searchResults =
         useMemo(() => {
 
@@ -599,10 +588,8 @@ function NavBar() {
         ]);
 
 
-    // =================================================
-    // TOP BANNER ROTATION
-    // =================================================
-
+       // TOP BANNER ROTATION
+   
     useEffect(() => {
 
         const interval =
@@ -626,10 +613,8 @@ function NavBar() {
     }, []);
 
 
-    // =================================================
-    // SEARCH PLACEHOLDER ANIMATION
-    // =================================================
-
+       // SEARCH PLACEHOLDER ANIMATION
+   
     useEffect(() => {
 
         const text =
@@ -738,10 +723,8 @@ function NavBar() {
     }, [currentSearch]);
 
 
-    // =================================================
-    // MENU HANDLERS
-    // =================================================
-
+       // MENU HANDLERS
+   
     const handleProfileMenuOpen =
         (event) => {
 
@@ -778,10 +761,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // LOGIN
-    // =================================================
-
+       // LOGIN
+   
     const handleLogin = () => {
 
         handleMenuClose();
@@ -790,10 +771,8 @@ function NavBar() {
     };
 
 
-    // =================================================
-    // PROFILE
-    // =================================================
-
+       // PROFILE
+   
     const handleMyProfile =
         () => {
 
@@ -805,10 +784,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // LOGOUT
-    // =================================================
-
+       // LOGOUT
+   
     const handleLogout =
         () => {
 
@@ -836,12 +813,10 @@ function NavBar() {
                 "isLoggedIn"
             );
 
-            setIsLoggedIn(false);
+           setIsLoggedIn(false);
 
-            // Hide previous user's cart
-            // after logout.
-            setCartItems([]);
-
+// After logout, show guest session cart if available
+setCartItems(getCartItems());
             handleMenuClose();
 
             navigate("/");
@@ -858,10 +833,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // LOGIN CLOSE
-    // =================================================
-
+       // LOGIN CLOSE
+   
     const handleLoginClose =
         () => {
 
@@ -869,10 +842,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // SYNC CART
-    // =================================================
-
+       // SYNC CART
+   
     const syncCartItems =
         () => {
 
@@ -902,10 +873,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // CART EVENTS
-    // =================================================
-
+       // CART EVENTS
+   
     useEffect(() => {
 
         const handleCartUpdate =
@@ -924,37 +893,34 @@ function NavBar() {
             };
 
 
-        const handleAuthChanged =
-            () => {
+      const handleAuthChanged =
+    () => {
 
-                const loggedIn =
-                    sessionStorage.getItem(
-                        "isLoggedIn"
-                    ) === "true" &&
-                    Boolean(
-                        sessionStorage.getItem(
-                            "token"
-                        )
-                    ) &&
-                    Boolean(
-                        sessionStorage.getItem(
-                            "user"
-                        )
-                    );
+        const loggedIn =
+            sessionStorage.getItem(
+                "isLoggedIn"
+            ) === "true" &&
+            Boolean(
+                sessionStorage.getItem(
+                    "token"
+                )
+            ) &&
+            Boolean(
+                sessionStorage.getItem(
+                    "user"
+                )
+            );
 
-                setIsLoggedIn(
-                    loggedIn
-                );
+        setIsLoggedIn(
+            loggedIn
+        );
 
-                if (loggedIn) {
-                    setCartItems(
-                        getCartItems()
-                    );
-                } else {
-                    setCartItems([]);
-                }
-            };
-
+        // Login -> user cart
+        // Logout -> guest cart
+        setCartItems(
+            getCartItems()
+        );
+    };
 
         window.addEventListener(
             "cart:update",
@@ -993,10 +959,8 @@ function NavBar() {
     }, []);
 
 
-    // =================================================
-    // CART OPEN
-    // =================================================
-
+       // CART OPEN
+   
     const handleCartOpen =
         () => {
 
@@ -1006,10 +970,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // LOGIN SUCCESS
-    // =================================================
-
+       // LOGIN SUCCESS
+   
     const handleLoginSuccess =
         (user) => {
 
@@ -1039,12 +1001,12 @@ function NavBar() {
 
                 try {
 
-                    const guestCart =
-                        JSON.parse(
-                            localStorage.getItem(
-                                GUEST_CART_KEY
-                            ) || "[]"
-                        );
+                   const guestCart =
+    JSON.parse(
+        sessionStorage.getItem(
+            GUEST_CART_KEY
+        ) || "[]"
+    );
 
                     const userCartKey =
                         `mamaearth_cart_${user.id}`;
@@ -1121,9 +1083,9 @@ function NavBar() {
                     );
 
 
-                    localStorage.removeItem(
-                        GUEST_CART_KEY
-                    );
+                   sessionStorage.removeItem(
+    GUEST_CART_KEY
+);
 
                 } catch (error) {
 
@@ -1154,10 +1116,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // SEARCH PRODUCT CLICK
-    // =================================================
-
+       // SEARCH PRODUCT CLICK
+   
     const handleSearchProductClick =
         (product) => {
 
@@ -1169,10 +1129,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // ENTER SEARCH
-    // =================================================
-
+       // ENTER SEARCH
+   
     const handleSearchKeyDown =
         (event) => {
 
@@ -1188,10 +1146,8 @@ function NavBar() {
         };
 
 
-    // =================================================
-    // MENU IDS
-    // =================================================
-
+       // MENU IDS
+   
     const menuId =
         "primary-search-account-menu";
 
@@ -1199,10 +1155,8 @@ function NavBar() {
         "primary-search-account-menu-mobile";
 
 
-    // =================================================
-    // DESKTOP MENU
-    // =================================================
-
+       // DESKTOP MENU
+   
     const renderMenu = (
 
         <Menu
@@ -1269,10 +1223,8 @@ function NavBar() {
     );
 
 
-    // =================================================
-    // MOBILE MENU
-    // =================================================
-
+       // MOBILE MENU
+   
     const renderMobileMenu = (
 
         <Menu
@@ -1376,10 +1328,8 @@ function NavBar() {
     );
 
 
-    // =================================================
-    // UI
-    // =================================================
-
+       // UI
+   
     return (
 
         <Box
