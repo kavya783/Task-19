@@ -108,24 +108,29 @@ function CartPage({
     // =====================================================
 
     const [
-        cartItems,
-        setCartItems,
-    ] = useState(() => {
+    cartItems,
+    setCartItems,
+] = useState(() => {
 
-        try {
+    // User logged out ayithe
+    // old cart products display cheyyakudadhu.
+    if (!isLoggedIn) {
+        return [];
+    }
 
-            return JSON.parse(
-                localStorage.getItem(
-                    cartKey
-                ) || "[]"
-            );
+    try {
 
-        } catch {
+        return JSON.parse(
+            localStorage.getItem(
+                cartKey
+            ) || "[]"
+        );
 
-            return [];
-        }
-    });
+    } catch {
 
+        return [];
+    }
+});
 
     // =====================================================
     // OFFERS
@@ -141,67 +146,77 @@ function CartPage({
     // SYNC CART
     // =====================================================
 
-    useEffect(() => {
+  useEffect(() => {
 
-        const syncCartItems =
-            () => {
+    const syncCartItems = () => {
 
-                try {
+        // Logged out ayithe old products chupinchakudadhu
+        if (!isLoggedIn) {
+            setCartItems([]);
+            return;
+        }
 
-                    setCartItems(
-                        JSON.parse(
-                            localStorage.getItem(
-                                cartKey
-                            ) || "[]"
-                        )
-                    );
+        try {
 
-                } catch {
+            const latestCart =
+                JSON.parse(
+                    localStorage.getItem(
+                        cartKey
+                    ) || "[]"
+                );
 
-                    setCartItems([]);
-                }
-            };
+            setCartItems(
+                latestCart
+            );
 
+        } catch {
 
-        const handleCartUpdate =
-            () => {
-
-                syncCartItems();
-            };
-
-
-        const handleCartOpen =
-            () => {
-
-                syncCartItems();
-            };
+            setCartItems([]);
+        }
+    };
 
 
-        window.addEventListener(
+    syncCartItems();
+
+
+    const handleCartUpdate = () => {
+        syncCartItems();
+    };
+
+
+    const handleCartOpen = () => {
+        syncCartItems();
+    };
+
+
+    window.addEventListener(
+        "cart:update",
+        handleCartUpdate
+    );
+
+    window.addEventListener(
+        "cart:open",
+        handleCartOpen
+    );
+
+
+    return () => {
+
+        window.removeEventListener(
             "cart:update",
             handleCartUpdate
         );
 
-        window.addEventListener(
+        window.removeEventListener(
             "cart:open",
             handleCartOpen
         );
+    };
 
-
-        return () => {
-
-            window.removeEventListener(
-                "cart:update",
-                handleCartUpdate
-            );
-
-            window.removeEventListener(
-                "cart:open",
-                handleCartOpen
-            );
-        };
-
-    }, [cartKey]);
+}, [
+    cartKey,
+    isLoggedIn,
+]);
 
 
     // =====================================================
