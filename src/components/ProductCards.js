@@ -376,90 +376,69 @@ console.log("IMAGES:", images);
     PRODUCT IMAGE
 ================================== */}
 
-<Box
-  sx={{
-    position: "relative",
-    width: "100%",
-
-    height: {
-      xs: "150px",
-      sm: "175px",
-      md: "210px",
-    },
-
-    aspectRatio: "1 / 1",
-
-    overflow: "hidden",
-    flexShrink: 0,
-    boxSizing: "border-box",
-  }}
->
-  {/* STATUS */}
-  {product?.status && (
-    <Box
-      sx={{
-        position: "absolute",
-        top: 2,
-        left: 0,
-        zIndex: 1,
-        px: 0.3,
-        py: 0.35,
-        color: "#fff",
-        backgroundColor: Colors.green,
-        fontSize: 12,
-        fontWeight: 700,
-      }}
-    >
-      {product.status}
-    </Box>
-  )}
-
-  {/* PRODUCT IMAGE */}
-  {currentImage && (
- <Box
-  onMouseEnter={handleMouseEnter}
-  onMouseLeave={handleMouseLeave}
-  sx={{
-    position: "relative",
-    width: "100%",
-    height: 250,
-    overflow: "hidden",
-    borderTopLeftRadius: "10px",
-    borderTopRightRadius: "10px",
-  }}
->
-  <CardMedia
-    component="img"
-    image={optimizeCloudinaryImage(currentImage, 400)}
-    srcSet={`
-      ${optimizeCloudinaryImage(currentImage, 200)} 200w,
-      ${optimizeCloudinaryImage(currentImage, 300)} 300w,
-      ${optimizeCloudinaryImage(currentImage, 400)} 400w
-    `}
-    sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
-    alt={productName}
-    loading="lazy"
-    decoding="async"
-    width={400}
-    height={400}
+   {currentImage && (
+  <Box
     sx={{
+      position: "relative",
       width: "100%",
-      height: "100%",
-      display: "block",
-      objectFit: "cover",
-      boxSizing: "border-box",
-      borderTopLeftRadius: "10px",
-      borderTopRightRadius: "10px",
-      cursor: "pointer",
-      transition: "transform 0.2s ease",
-      "&:hover": {
-        transform: "scale(1.03)",
+      height: {
+        xs: "150px",
+        sm: "175px",
+        md: "210px",
       },
+      overflow: "hidden",
+      flexShrink: 0,
     }}
-  />
-</Box>
-  )}
-</Box>
+  >
+    {/* STATUS */}
+    {product?.status && (
+      <Box
+        sx={{
+          position: "absolute",
+          top: 2,
+          left: 0,
+          zIndex: 1,
+          px: 0.3,
+          py: 0.35,
+          color: "#fff",
+          backgroundColor: Colors.green,
+          fontSize: 12,
+          fontWeight: 700,
+        }}
+      >
+        {product.status}
+      </Box>
+    )}
+
+    <CardMedia
+      component="img"
+      image={currentImage}
+      alt={productName}
+      loading="lazy"
+      decoding="async"
+      width={500}
+      height={500}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      sx={{
+        width: "100%",
+        height: "100%",
+        display: "block",
+        objectFit: "cover",
+        boxSizing: "border-box",
+        borderTopLeftRadius: "10px",
+        borderTopRightRadius: "10px",
+        cursor: "pointer",
+        transition: "transform 0.2s ease",
+
+        "&:hover": {
+          transform: "scale(1.03)",
+        },
+      }}
+    />
+  </Box>
+)}
+
           {/* ==================================
               CARD CONTENT
           ================================== */}
