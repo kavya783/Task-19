@@ -376,20 +376,22 @@ console.log("IMAGES:", images);
     PRODUCT IMAGE
 ================================== */}
 
-{currentImage && (
- <Box
-  sx={{
-    position: "relative",
-    width: "100%",
-    height: {
-      xs: "150px",
-      sm: "175px",
-      md: "210px",
-    },
-    overflow: "hidden",
-    flexShrink: 0,
-  }}
->
+{images.length > 0 && (
+  <Box
+    sx={{
+      position: "relative",
+      width: "100%",
+      height: {
+        xs: "150px",
+        sm: "175px",
+        md: "210px",
+      },
+      overflow: "hidden",
+      flexShrink: 0,
+    }}
+    onMouseEnter={handleMouseEnter}
+    onMouseLeave={handleMouseLeave}
+  >
     {/* STATUS */}
     {product?.status && (
       <Box
@@ -397,7 +399,7 @@ console.log("IMAGES:", images);
           position: "absolute",
           top: 2,
           left: 0,
-          zIndex: 1,
+          zIndex: 3,
           px: 0.3,
           py: 0.35,
           color: "#fff",
@@ -410,44 +412,71 @@ console.log("IMAGES:", images);
       </Box>
     )}
 
-    {/* PRODUCT IMAGE */}
-<CardMedia
-  component="img"
-  image={optimizeCloudinaryImage(
-    currentImage,
-    400
-  )}
-  srcSet={`
-    ${optimizeCloudinaryImage(currentImage, 200)} 200w,
-    ${optimizeCloudinaryImage(currentImage, 300)} 300w,
-    ${optimizeCloudinaryImage(currentImage, 400)} 400w
-  `}
-  sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
-  alt={productName}
-  loading="lazy"
-  decoding="async"
-  width={400}
-  height={400}
+    {/* FIRST IMAGE */}
+    <CardMedia
+      component="img"
+      image={optimizeCloudinaryImage(
+        images[0],
+        400
+      )}
+      srcSet={`
+        ${optimizeCloudinaryImage(images[0], 200)} 200w,
+        ${optimizeCloudinaryImage(images[0], 300)} 300w,
+        ${optimizeCloudinaryImage(images[0], 400)} 400w
+      `}
+      sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
+      alt={productName}
+      loading="lazy"
+      decoding="async"
+      width={400}
+      height={400}
+      sx={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        display: "block",
+        objectFit: "cover",
+        borderTopLeftRadius: "10px",
+        borderTopRightRadius: "10px",
+        opacity: isHovered ? 0 : 1,
+        transition: "opacity 0.2s ease",
+      }}
+    />
 
-  onMouseEnter={handleMouseEnter}
-  onMouseLeave={handleMouseLeave}
-
-  sx={{
-    width: "100%",
-    height: "100%",
-    display: "block",
-    objectFit: "cover",
-    boxSizing: "border-box",
-    borderTopLeftRadius: "10px",
-    borderTopRightRadius: "10px",
-    cursor: "pointer",
-    transition: "transform 0.2s ease",
-
-    "&:hover": {
-      transform: "scale(1.03)",
-    },
-  }}
-/>
+    {/* SECOND IMAGE */}
+    {images.length > 1 && (
+      <CardMedia
+        component="img"
+        image={optimizeCloudinaryImage(
+          images[1],
+          400
+        )}
+        srcSet={`
+          ${optimizeCloudinaryImage(images[1], 200)} 200w,
+          ${optimizeCloudinaryImage(images[1], 300)} 300w,
+          ${optimizeCloudinaryImage(images[1], 400)} 400w
+        `}
+        sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
+        alt={productName}
+        loading="lazy"
+        decoding="async"
+        width={400}
+        height={400}
+        sx={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          display: "block",
+          objectFit: "cover",
+          borderTopLeftRadius: "10px",
+          borderTopRightRadius: "10px",
+          opacity: isHovered ? 1 : 0,
+          transition: "opacity 0.2s ease",
+        }}
+      />
+    )}
   </Box>
 )}
 
