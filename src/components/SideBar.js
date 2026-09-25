@@ -14,8 +14,8 @@ import {
 
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-// import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
-// import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -28,27 +28,29 @@ function SideBar({
   const [mobileMenuOpen, setMobileMenuOpen] =
     useState(false);
 
-  
+  // =====================================================
+  // LOGOUT
+  // =====================================================
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("user");
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-  //   window.location.href = "/login";
-  // };
+    window.location.href = "/login";
+  };
 
- 
+  // =====================================================
   // MENU CLICK
- 
+  // =====================================================
 
   const handleMenuClick = (section) => {
     setSelectedSection(section);
     setMobileMenuOpen(false);
   };
 
- 
+  // =====================================================
   // MENU ITEMS
- 
+  // =====================================================
 
   const menuItems = [
     {
@@ -61,12 +63,16 @@ function SideBar({
       value: "add-products",
       icon: <AddBoxOutlinedIcon />,
     },
-   
+    {
+      label: "Product Count",
+      value: "orders",
+      icon: <NumbersOutlinedIcon />,
+    },
   ];
 
- 
+  // =====================================================
   // SIDEBAR CONTENT
- 
+  // =====================================================
 
   const sidebarContent = (
     <Box
@@ -127,18 +133,18 @@ function SideBar({
 
                   // Selected background
                   backgroundColor: isSelected
-                    ?Colors.background
+                    ? Colors.background
                     : "transparent",
 
                   // Selected text
                   color: isSelected
-                    ?Colors.orange
+                    ? Colors.orange
                     : Colors.black,
 
                   "&:hover": {
                     backgroundColor: isSelected
                       ? Colors.background
-                      : Colors.background
+                      : Colors.background,
                   },
                 }}
               >
@@ -148,7 +154,7 @@ function SideBar({
 
                     color: isSelected
                       ? Colors.orange
-                      : Colors.black
+                      : Colors.black,
                   }}
                 >
                   {item.icon}
@@ -171,10 +177,6 @@ function SideBar({
           );
         })}
       </List>
-
-     
-
-     
     </Box>
   );
 
@@ -263,12 +265,12 @@ function SideBar({
 
             p: 1,
 
-            color:Colors.black,
+            color: "#000",
 
             zIndex: 1160,
 
             "&:hover": {
-              backgroundColor:Colors.background,
+              backgroundColor: "#f5f5f5",
             },
           }}
         >
