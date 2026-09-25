@@ -1,44 +1,79 @@
 import React, { useEffect } from "react";
-import { Box, Typography, Paper } from "@mui/material";
+
+import {
+  Box,
+  Typography,
+  Paper,
+  Divider,
+  IconButton,
+} from "@mui/material";
+
 import { Link } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
-import { getOrdersActionInitiate,deleteOrderActionInitiate } from "../redux/actions/ordersActions";
+
+import {
+  getOrdersActionInitiate,
+  deleteOrderActionInitiate,
+} from "../redux/actions/ordersActions";
+
 import { Theme } from "../themes/GlobalStyles";
 import Colors from "../themes/colors";
-import CheckCircleTwoToneIcon from "@mui/icons-material/CheckCircleTwoTone";
-import DeleteIcon from '@mui/icons-material/Delete';
+
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
 
 function YourOrders() {
   const dispatch = useDispatch();
-  const { orders, loading, error } = useSelector((state) => state.orders);
 
-useEffect(() => {
-  let user = null;
+  const { orders, loading, error } = useSelector(
+    (state) => state.orders
+  );
 
-  try {
-    user = JSON.parse(
-      sessionStorage.getItem("user") || "null"
-    );
-  } catch {
-    user = null;
-  }
+  useEffect(() => {
+    let user = null;
 
-  if (user?.id) {
-    dispatch(getOrdersActionInitiate(user.id));
-  }
-}, [dispatch]);
+    try {
+      user = JSON.parse(
+        sessionStorage.getItem("user") || "null"
+      );
+    } catch {
+      user = null;
+    }
+
+    if (user?.id) {
+      dispatch(getOrdersActionInitiate(user.id));
+    }
+  }, [dispatch]);
+
+ 
+  // IMAGE
+ 
 
   const getItemImage = (item) => {
-    const images = item?.image_urls || item?.images;
+    const images =
+      item?.image_urls ||
+      item?.images;
 
-    if (Array.isArray(images) && images.length) {
+    if (
+      Array.isArray(images) &&
+      images.length
+    ) {
       return images[0];
     }
 
     if (typeof images === "string") {
       try {
-        const parsedImages = JSON.parse(images);
-        if (Array.isArray(parsedImages) && parsedImages.length) {
+        const parsedImages =
+          JSON.parse(images);
+
+        if (
+          Array.isArray(parsedImages) &&
+          parsedImages.length
+        ) {
           return parsedImages[0];
         }
       } catch {
@@ -46,224 +81,718 @@ useEffect(() => {
       }
     }
 
-    return item?.image_url || item?.image || "";
+    return (
+      item?.image_url ||
+      item?.image ||
+      ""
+    );
   };
 
+ 
+  // PRODUCT NAME
+ 
+
   const getItemHeading = (item) =>
-    item?.heading || item?.name || item?.title || item?.product?.name || "Product";
+    item?.heading ||
+    item?.name ||
+    item?.title ||
+    item?.product?.name ||
+    "Product";
+
+ 
+  // PRODUCT PRICE
+ 
 
   const getItemPrice = (item) =>
     Number(
       item?.sale_price ||
-      item?.salePrice ||
-      item?.price ||
-      item?.discount_price ||
-      item?.discountPrice ||
-      item?.mrp ||
-      0
+        item?.salePrice ||
+        item?.price ||
+        item?.discount_price ||
+        item?.discountPrice ||
+        item?.mrp ||
+        0
     );
-const handleDeleteOrder = async (orderId) => {
-  try {
-    await dispatch(deleteOrderActionInitiate(orderId));
-  } catch (error) {
-    console.error("Failed to delete order:", error);
-  }
-};
-  return (
-    <Box sx={{ width: "100%" }}>
-      {/* ORDER HISTORY */}
 
+ 
+  // DATE
+ 
+
+  const formatDate = (date) => {
+    if (!date) {
+      return "-";
+    }
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "-";
+    }
+
+    return parsedDate.toLocaleDateString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
+ 
+  // EXPECTED DELIVERY
+ 
+
+  const getExpectedDelivery = (createdAt) => {
+    if (!createdAt) {
+      return "-";
+    }
+
+    const date = new Date(createdAt);
+
+    date.setDate(date.getDate() + 5);
+
+    return formatDate(date);
+  };
+
+ 
+  // DELETE ORDER
+ 
+
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      await dispatch(
+        deleteOrderActionInitiate(orderId)
+      );
+    } catch (error) {
+      console.error(
+        "Failed to delete order:",
+        error
+      );
+    }
+  };
+
+ 
+  // STATUS
+ 
+
+  const normalizeStatus = (status) => {
+    return (
+      status?.toString().toLowerCase() ||
+      "pending"
+    );
+  };
+
+  const getStatusStep = (status) => {
+    const currentStatus =
+      normalizeStatus(status);
+
+    if (currentStatus === "delivered") {
+      return 4;
+    }
+
+    if (
+      currentStatus ===
+      "out_for_delivery"
+    ) {
+      return 3;
+    }
+
+    if (currentStatus === "shipped") {
+      return 2;
+    }
+
+    if (currentStatus === "paid") {
+      return 1;
+    }
+
+    return 1;
+  };
+
+  const trackingSteps = [
+    {
+      label: "Ordered",
+    },
+    {
+      label: "Shipped",
+    },
+    {
+      label: "Out for Delivery",
+    },
+    {
+      label: "Delivered",
+    },
+  ];
+
+ 
+  // LOADING
+ 
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          padding: "40px 20px",
+        }}
+      >
+        <Typography>
+          Loading your orders...
+        </Typography>
+      </Box>
+    );
+  }
+
+ 
+  // ERROR
+ 
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          padding: "30px 20px",
+        }}
+      >
+        <Typography color="error">
+          Unable to load your orders.
+        </Typography>
+      </Box>
+    );
+  }
+
+ 
+  // NO ORDERS
+ 
+
+  if (!orders || orders.length === 0) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          padding: {
+            xs: "15px",
+            sm: "20px",
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            ...Theme.font16Bold,
+            marginBottom: "16px",
+          }}
+        >
+          Order history
+        </Typography>
+
+        <Paper
+          elevation={0}
+          sx={{
+            border:
+              "1px solid #6cbc6f",
+            borderRadius: "6px",
+            padding: "20px",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "14px",
+              fontWeight: 600,
+            }}
+          >
+            <Link
+              to="/"
+              style={{
+                color: Colors.green,
+                textDecoration: "underline",
+              }}
+            >
+              Make your first order
+            </Link>{" "}
+            You haven't placed any
+            orders yet.
+          </Typography>
+        </Paper>
+      </Box>
+    );
+  }
+
+ 
+  // MAIN UI
+ 
+
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: "850px",
+        margin: "0 auto",
+        padding: {
+          xs: "8px",
+          sm: "16px",
+          md: "20px",
+        },
+      }}
+    >
       <Typography
         sx={{
-          fontFamily: Theme.font16Bold.fontFamily,
+          ...Theme.font16Bold,
           fontSize: {
-            xs: "15px",
-            sm: "16px",
+            xs: "16px",
+            sm: "18px",
           },
-          fontWeight: Theme.font16Bold.fontWeight,
-          color: Colors.black,
           marginBottom: "16px",
         }}
       >
         Order history
       </Typography>
 
-      {loading ? (
-        <Typography>Loading your orders...</Typography>
-      ) : error ? (
-        <Typography color="error">Unable to load your orders.</Typography>
-      ) : orders.length === 0 ? (
-        <Paper
-          elevation={0}
-          sx={{
-            width: "100%",
-            border: "1px solid #6cbc6f",
-            borderRadius: "2px",
-            padding: {
-              xs: "15px",
-              sm: "20px",
-            },
-            boxSizing: "border-box",
-          }}
-        >
-          {/* ICON + CONTENT */}
+      {orders.map((order) => {
+        const currentStep =
+          getStatusStep(order.status);
 
-          <Box
+        const createdDate =
+          formatDate(order.created_at);
+
+        const expectedDate =
+          getExpectedDelivery(
+            order.created_at
+          );
+
+        return (
+          <Paper
+            key={order.id}
+            elevation={0}
             sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: {
-                xs: "10px",
-                sm: "12px",
-              },
               width: "100%",
+              border:
+                "1px solid #e5e5e5",
+              borderRadius: "6px",
+              overflow: "hidden",
+              marginBottom: "20px",
+              backgroundColor:
+                "#ffffff",
             }}
           >
-            {/* CHECK ICON */}
+            {/* ==================================================
+                HEADER
+            ================================================== */}
 
-            <CheckCircleTwoToneIcon
+            <Box
               sx={{
-                fontSize: {
-                  xs: "22px",
-                  sm: "24px",
+                padding: {
+                  xs: "14px",
+                  sm: "18px 20px",
                 },
-
-                color: Colors.green,
-
-                flexShrink: 0,
-
-                marginTop: "1px",
-              }}
-            />
-
-            {/* CONTENT */}
-
-            <Typography
-              sx={{
-                fontSize: {
-                  xs: "13px",
-                  sm: "14px",
-                },
-
-                fontWeight: 600,
-
-                color: Colors.black,
-             
-
-                lineHeight: 1.6,
-
-                minWidth: 0,
+                backgroundColor:
+                  "#fafafa",
               }}
             >
-              <Link
-                to="/"
-                style={{
-                  color: Colors.green,
-                  textDecoration: "underline",
-                  fontWeight: 700,
-                  cursor: "pointer",
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  alignItems:
+                    "flex-start",
+                  gap: "10px",
                 }}
               >
-                Make your first order
-              </Link>{" "}
-              You haven't placed any orders yet.
-            </Typography>
-          </Box>
-        </Paper>
-      ) : (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            width: "100%",
-          }}
-        >
-         {orders.map((order, index) => (
-    <Paper
-        key={order.id}
-        elevation={0}
-        sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: "5px",
-            padding: "20px",
-        }}
-    >
-        <Typography
-            sx={{
-                fontWeight: 600,
-                marginBottom: "8px",
-            }}
-        >
-            Order #{index + 1}
-        </Typography>
-
-        <Typography sx={{ marginBottom: "12px" }}>
-            Status: {order.status}
-        </Typography>
-
-       
-
-
-              {order.items?.map((item, index) => {
-                const image = getItemImage(item);
-                const quantity = Number(item?.quantity) || 1;
-
-                return (
-                  <Box
-                    key={`${order.id}-${item?.id || index}`}
+                <Box>
+                  <Typography
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      padding: "10px 0",
-                      borderTop: "1px solid #eeeeee",
+                      fontSize: "13px",
+                      color:
+                        "text.secondary",
+                      marginBottom:
+                        "3px",
                     }}
                   >
-                    {image ? (
+                    Order Placed on
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "15px",
+                    }}
+                  >
+                    {createdDate}
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontSize: "12px",
+                      color:
+                        "text.secondary",
+                      marginTop: "3px",
+                    }}
+                  >
+                    Order ID:{" "}
+                    {order.txnid ||
+                      order.id}
+                  </Typography>
+                </Box>
+
+                <IconButton
+                  onClick={() =>
+                    handleDeleteOrder(
+                      order.id
+                    )
+                  }
+                  sx={{
+                    color: "#d32f2f",
+                  }}
+                >
+                <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Box>
+
+            <Divider />
+
+            {/* ==================================================
+                DELIVERY
+            ================================================== */}
+
+            <Box
+              sx={{
+                padding: {
+                  xs: "15px",
+                  sm: "20px",
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  marginBottom: "3px",
+                }}
+              >
+                Delivery Expected by{" "}
+                {expectedDate}
+              </Typography>
+
+              <Typography
+                sx={{
+                  fontSize: "12px",
+                  color:
+                    "text.secondary",
+                  marginBottom:
+                    "18px",
+                }}
+              >
+                Shipment 1
+              </Typography>
+
+              {/* TRACKING */}
+
+              <Box
+                sx={{
+                  position: "relative",
+                  marginLeft: "5px",
+                }}
+              >
+                {trackingSteps.map(
+                  (step, index) => {
+                    const stepNumber =
+                      index + 1;
+
+                    const completed =
+                      stepNumber <=
+                      currentStep;
+
+                    return (
                       <Box
-                        component="img"
-                        src={image}
-                        alt={getItemHeading(item)}
+                        key={step.label}
                         sx={{
-                          width: 72,
-                          height: 72,
-                          objectFit: "contain",
+                          position:
+                            "relative",
+                          display: "flex",
+                          alignItems:
+                            "center",
+                          minHeight:
+                            "38px",
+                        }}
+                      >
+                        {/* VERTICAL LINE */}
+
+                        {index <
+                          trackingSteps.length -
+                            1 && (
+                          <Box
+                            sx={{
+                              position:
+                                "absolute",
+                              left: "6px",
+                              top: "16px",
+                              width: "2px",
+                              height:
+                                "38px",
+                              backgroundColor:
+                                stepNumber <
+                                currentStep
+                                  ? Colors.green
+                                  : "#dedede",
+                            }}
+                          />
+                        )}
+
+                        {/* DOT */}
+
+                        {completed ? (
+                          <CheckCircleIcon
+                            sx={{
+                              fontSize:
+                                "14px",
+                              color:
+                                Colors.green,
+                              zIndex: 1,
+                              backgroundColor:
+                                "#fff",
+                            }}
+                          />
+                        ) : (
+                          <RadioButtonUncheckedIcon
+                            sx={{
+                              fontSize:
+                                "14px",
+                              color:
+                                "#d6d6d6",
+                              zIndex: 1,
+                              backgroundColor:
+                                "#fff",
+                            }}
+                          />
+                        )}
+
+                        <Typography
+                          sx={{
+                            marginLeft:
+                              "12px",
+                            fontSize:
+                              "13px",
+                            fontWeight:
+                              completed
+                                ? 600
+                                : 500,
+                            color:
+                              completed
+                                ? Colors.black
+                                : "#777",
+                          }}
+                        >
+                          {step.label}
+                          {completed &&
+                            stepNumber ===
+                              currentStep &&
+                            " "}
+
+                        </Typography>
+                      </Box>
+                    );
+                  }
+                )}
+              </Box>
+            </Box>
+
+            <Divider />
+
+            {/* ==================================================
+                PRODUCTS
+            ================================================== */}
+
+            <Box
+              sx={{
+                padding: {
+                  xs: "12px",
+                  sm: "18px 20px",
+                },
+              }}
+            >
+              {order.items?.map(
+                (item, index) => {
+                  const image =
+                    getItemImage(item);
+
+                  const quantity =
+                    Number(
+                      item?.quantity
+                    ) || 1;
+
+                  const price =
+                    getItemPrice(item);
+
+                  return (
+                    <Box
+                      key={`${order.id}-${item?.id || index}`}
+                      sx={{
+                        display: "flex",
+                        alignItems:
+                          "center",
+                        gap: {
+                          xs: "12px",
+                          sm: "18px",
+                        },
+                        padding:
+                          "10px 0",
+                        borderBottom:
+                          index <
+                          order.items.length -
+                            1
+                            ? "1px solid #eeeeee"
+                            : "none",
+                      }}
+                    >
+                      {/* PRODUCT IMAGE */}
+
+                      <Box
+                        sx={{
+                          width: {
+                            xs: "70px",
+                            sm: "85px",
+                          },
+                          height: {
+                            xs: "70px",
+                            sm: "85px",
+                          },
+                          border:
+                            "1px solid #e5e5e5",
+                          borderRadius:
+                            "5px",
+                          display: "flex",
+                          alignItems:
+                            "center",
+                          justifyContent:
+                            "center",
                           flexShrink: 0,
+                          overflow:
+                            "hidden",
+                          backgroundColor:
+                            "#fff",
+                        }}
+                      >
+                        {image ? (
+                          <Box
+                            component="img"
+                            src={image}
+                            alt={getItemHeading(
+                              item
+                            )}
+                            sx={{
+                              width:
+                                "100%",
+                              height:
+                                "100%",
+                              objectFit:
+                                "contain",
+                            }}
+                          />
+                        ) : (
+                          <Typography
+                            sx={{
+                              fontSize:
+                                "11px",
+                              color:
+                                "#999",
+                            }}
+                          >
+                            No image
+                          </Typography>
+                        )}
+                      </Box>
+
+                      {/* PRODUCT INFO */}
+
+                      <Box
+                        sx={{
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: {
+                              xs: "13px",
+                              sm: "14px",
+                            },
+                            fontWeight: 600,
+                            lineHeight:
+                              1.4,
+                            display:
+                              "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient:
+                              "vertical",
+                            overflow:
+                              "hidden",
+                          }}
+                        >
+                          {getItemHeading(
+                            item
+                          )}
+                        </Typography>
+
+                        <Typography
+                          sx={{
+                            fontSize:
+                              "12px",
+                            color:
+                              "text.secondary",
+                            marginTop:
+                              "5px",
+                          }}
+                        >
+                          Qty: {quantity}
+                        </Typography>
+
+                        <Typography
+                          sx={{
+                            fontSize:
+                              "14px",
+                            fontWeight: 700,
+                            marginTop:
+                              "5px",
+                          }}
+                        >
+                          ₹
+                          {(
+                            price *
+                            quantity
+                          ).toFixed(2)}
+                        </Typography>
+                      </Box>
+
+                      <ArrowForwardIosIcon
+                        sx={{
+                          fontSize:
+                            "14px",
+                          color:
+                            "#aaa",
                         }}
                       />
-                    ) : null}
-
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography sx={{ fontWeight: 600 }}>
-                        {getItemHeading(item)}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Quantity: {quantity}
-                      </Typography>
-                      <Typography variant="body2">
-                        ₹{(getItemPrice(item) * quantity).toFixed(2)}
-                      </Typography>
-                     <DeleteIcon
-  onClick={() => handleDeleteOrder(order.id)}
-  sx={{
-    cursor: "pointer",
-    color: "red",
-    marginTop: "8px",
-  }}
-/>
                     </Box>
-                  </Box>
-                );
-              })}
+                  );
+                }
+              )}
+            </Box>
 
-              <Typography sx={{ marginTop: "10px", fontWeight: 600 }}>
-                Total: ₹{Number(order.total || 0).toFixed(2)}
-              </Typography>
-            </Paper>
-          ))}
-        </Box>
-      )}
+            <Divider />
+
+          
+
+            <Divider />
+
+          
+
+           
+          </Paper>
+        );
+      })}
     </Box>
   );
 }
