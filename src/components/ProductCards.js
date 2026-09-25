@@ -24,20 +24,20 @@ import StarIcon from "@mui/icons-material/Star";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
-import { optimizeCloudinaryImage } from "../utils/cloudinary";
 
+// ========================================
 // CONSTANTS
-
+// ========================================
 
 const GUEST_CART_KEY = "mamaearth_cart_guest";
 const USER_STORAGE_KEY = "user";
 
 
-
+// ========================================
 // GET CART KEY
+// ========================================
 
-
-const getCartKey = () => {
+const getCartInfo = () => {
   try {
     const user = JSON.parse(
       sessionStorage.getItem(USER_STORAGE_KEY) || "null"
@@ -48,20 +48,27 @@ const getCartKey = () => {
       Boolean(sessionStorage.getItem("token")) &&
       Boolean(user?.id);
 
-    if (isLoggedIn) {
-      return `mamaearth_cart_${user.id}`;
-    }
+    return {
+      cartKey: isLoggedIn
+        ? `mamaearth_cart_${user.id}`
+        : GUEST_CART_KEY,
 
-    return GUEST_CART_KEY;
+      storage: isLoggedIn
+        ? localStorage
+        : sessionStorage,
+    };
   } catch {
-    return GUEST_CART_KEY;
+    return {
+      cartKey: GUEST_CART_KEY,
+      storage: sessionStorage,
+    };
   }
 };
 
 
-
+// ========================================
 // GET PRODUCT IMAGES
-
+// ========================================
 
 const getProductImages = (product) => {
   if (
@@ -86,28 +93,13 @@ const getProductImages = (product) => {
 };
 
 
-
+// ========================================
 // GET CART QUANTITIES
-
+// ========================================
 
 const getCartQuantities = () => {
   try {
-    const user = JSON.parse(
-      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
-    );
-
-    const isLoggedIn =
-      sessionStorage.getItem("isLoggedIn") === "true" &&
-      Boolean(sessionStorage.getItem("token")) &&
-      Boolean(user?.id);
-
-    const cartKey = isLoggedIn
-      ? `mamaearth_cart_${user.id}`
-      : GUEST_CART_KEY;
-
-    const storage = isLoggedIn
-      ? localStorage
-      : sessionStorage;
+    const { cartKey, storage } = getCartInfo();
 
     const savedCart = JSON.parse(
       storage.getItem(cartKey) || "[]"
@@ -127,9 +119,9 @@ const getCartQuantities = () => {
 };
 
 
-
+// ========================================
 // GET SALE PRICE
-
+// ========================================
 
 const getSalePrice = (product) => {
   if (Number(product?.sale_price) > 0) {
@@ -152,9 +144,9 @@ const getSalePrice = (product) => {
 };
 
 
-
+// ========================================
 // GET PRODUCT PRICING
-
+// ========================================
 
 const getProductPricing = (product) => {
   const mrp = Number(product?.mrp) || 0;
@@ -187,9 +179,9 @@ const getProductPricing = (product) => {
 };
 
 
-
+// ========================================
 // PRODUCT CARD ITEM
-
+// ========================================
 
 const ProductCardItem = memo(
   function ProductCardItem({
@@ -202,27 +194,27 @@ const ProductCardItem = memo(
     onAddToCart,
     onQuantityChange,
   }) {
-   
+
     // PRODUCT IMAGES
-   
+
 
     const images = useMemo(
       () => getProductImages(product),
       [product]
     );
 
-   
+
     // CURRENT IMAGE
-   
+
 
     const currentImage =
       isHovered && images.length > 1
         ? images[1]
         : images[0] || "";
 
-   
+
     // PRICING
-   
+
 
     const {
       salePrice,
@@ -233,18 +225,18 @@ const ProductCardItem = memo(
       [product]
     );
 
-   
+
     // PRODUCT NAME
-   
+
 
     const productName =
       product?.name ||
       product?.heading ||
       "Product";
 
-   
+
     // BENEFITS
-   
+
 
     const benefits = Array.isArray(
       product?.benefits
@@ -252,9 +244,9 @@ const ProductCardItem = memo(
       ? product.benefits.join(" | ")
       : product?.benefits || "";
 
-   
+
     // CARD CLICK
-   
+
 
     const handleCardClick = useCallback(() => {
       onNavigate(product.id);
@@ -263,9 +255,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-   
+
     // MOUSE ENTER
-   
+
 
     const handleMouseEnter = useCallback(() => {
       if (images.length > 1) {
@@ -277,9 +269,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-   
+
     // MOUSE LEAVE
-   
+
 
     const handleMouseLeave = useCallback(() => {
       onMouseLeave(product.id);
@@ -287,11 +279,10 @@ const ProductCardItem = memo(
       onMouseLeave,
       product.id,
     ]);
-console.log("PRODUCT:", product);
-console.log("IMAGES:", images);
-   
+
+
     // ADD TO CART
-   
+
 
     const handleAdd = useCallback(
       (event) => {
@@ -303,9 +294,9 @@ console.log("IMAGES:", images);
       ]
     );
 
-   
+
     // DECREASE QUANTITY
-   
+
 
     const handleDecrease = useCallback(
       (event) => {
@@ -321,9 +312,9 @@ console.log("IMAGES:", images);
       ]
     );
 
-   
+
     // INCREASE QUANTITY
-   
+
 
     const handleIncrease = useCallback(
       (event) => {
@@ -359,24 +350,23 @@ console.log("IMAGES:", images);
           boxSizing: "border-box",
         }}
       >
-  <Card
-  sx={{
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    borderRadius: "10px",
-    overflow: "hidden",
-    border: "1px solid #ddd",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    cursor: "pointer",
-  }}
+        <Card
+          sx={{
+            height: "100%",
+            borderRadius: "10px",
+            overflow: "hidden",
+            border: "1px solid #ddd",
+            boxShadow:
+              "0 2px 8px rgba(0,0,0,0.08)",
+            cursor: "pointer",
+          }}
           onClick={handleCardClick}
         >
-        {/* ==================================
-    PRODUCT IMAGE
-================================== */}
+          {/* ==================================
+              PRODUCT IMAGE
+          ================================== */}
 
-{images.length > 0 && (
+         {currentImage && (
   <Box
     sx={{
       position: "relative",
@@ -389,8 +379,6 @@ console.log("IMAGES:", images);
       overflow: "hidden",
       flexShrink: 0,
     }}
-    onMouseEnter={handleMouseEnter}
-    onMouseLeave={handleMouseLeave}
   >
     {/* STATUS */}
     {product?.status && (
@@ -399,7 +387,7 @@ console.log("IMAGES:", images);
           position: "absolute",
           top: 2,
           left: 0,
-          zIndex: 3,
+          zIndex: 1,
           px: 0.3,
           py: 0.35,
           color: "#fff",
@@ -412,71 +400,32 @@ console.log("IMAGES:", images);
       </Box>
     )}
 
-    {/* FIRST IMAGE */}
     <CardMedia
       component="img"
-      image={optimizeCloudinaryImage(
-        images[0],
-        400
-      )}
-      srcSet={`
-        ${optimizeCloudinaryImage(images[0], 200)} 200w,
-        ${optimizeCloudinaryImage(images[0], 300)} 300w,
-        ${optimizeCloudinaryImage(images[0], 400)} 400w
-      `}
-      sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
+      image={currentImage}
       alt={productName}
       loading="lazy"
       decoding="async"
-      width={400}
-      height={400}
+      width={500}
+      height={500}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       sx={{
-        position: "absolute",
-        inset: 0,
         width: "100%",
         height: "100%",
         display: "block",
         objectFit: "cover",
+        boxSizing: "border-box",
         borderTopLeftRadius: "10px",
         borderTopRightRadius: "10px",
-        opacity: isHovered ? 0 : 1,
-        transition: "opacity 0.2s ease",
+        cursor: "pointer",
+        transition: "transform 0.2s ease",
+
+        "&:hover": {
+          transform: "scale(1.03)",
+        },
       }}
     />
-
-    {/* SECOND IMAGE */}
-    {images.length > 1 && (
-      <CardMedia
-        component="img"
-        image={optimizeCloudinaryImage(
-          images[1],
-          400
-        )}
-        srcSet={`
-          ${optimizeCloudinaryImage(images[1], 200)} 200w,
-          ${optimizeCloudinaryImage(images[1], 300)} 300w,
-          ${optimizeCloudinaryImage(images[1], 400)} 400w
-        `}
-        sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
-        alt={productName}
-        loading="lazy"
-        decoding="async"
-        width={400}
-        height={400}
-        sx={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          display: "block",
-          objectFit: "cover",
-          borderTopLeftRadius: "10px",
-          borderTopRightRadius: "10px",
-          opacity: isHovered ? 1 : 0,
-          transition: "opacity 0.2s ease",
-        }}
-      />
-    )}
   </Box>
 )}
 
@@ -485,24 +434,23 @@ console.log("IMAGES:", images);
           ================================== */}
 
           <CardContent
-  sx={{
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
+            sx={{
+              display: "flex",
+              flexDirection: "column",
 
-    p: {
-      xs: 1.2,
-      sm: 1.5,
-    },
+              p: {
+                xs: 1.2,
+                sm: 1.5,
+              },
 
-    "&:last-child": {
-      pb: {
-        xs: 1.2,
-        sm: 1.5,
-      },
-    },
-  }}
->
+              "&:last-child": {
+                pb: {
+                  xs: 1.2,
+                  sm: 1.5,
+                },
+              },
+            }}
+          >
             {/* ==================================
                 PRODUCT NAME
             ================================== */}
@@ -511,22 +459,29 @@ console.log("IMAGES:", images);
               sx={{
                 height: {
                   xs: "34px",
-                  sm: "36px",
+                  sm: "30px",
                 },
               }}
             >
               <Typography
-  variant="h6"
-  sx={{
-    fontSize: Theme.font12Bold,
-    lineHeight: "17px",
-    mb: 0.5,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  }}
->
+                variant="h6"
+                sx={{
+                  fontSize:
+                    Theme.font12Bold,
+
+                  mb: 0.5,
+
+                  display:
+                    "-webkit-box",
+
+                  WebkitLineClamp: 2,
+
+                  WebkitBoxOrient:
+                    "vertical",
+
+                  overflow: "hidden",
+                }}
+              >
                 {productName}
               </Typography>
             </Box>
@@ -544,17 +499,24 @@ console.log("IMAGES:", images);
               }}
             >
               <Typography
-  variant="h6"
-  sx={{
-    fontSize: Theme.font12Bold,
-    lineHeight: "17px",
-    mb: 0.5,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  }}
->
+                variant="h6"
+                sx={{
+                  fontSize:
+                    Theme.font12Bold,
+
+                  mb: 0.5,
+
+                  display:
+                    "-webkit-box",
+
+                  WebkitLineClamp: 2,
+
+                  WebkitBoxOrient:
+                    "vertical",
+
+                  overflow: "hidden",
+                }}
+              >
                 {product?.heading ||
                   "Product"}
               </Typography>
@@ -572,19 +534,27 @@ console.log("IMAGES:", images);
                 },
               }}
             >
-             <Typography
-  variant="h6"
-  sx={{
-    fontSize: Theme.font14SemiBold,
-    lineHeight: "17px",
-    fontWeight: 500,
-    mb: 0.5,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  }}
->
+              <Typography
+                variant="h6"
+                sx={{
+                  fontSize:
+                    Theme.font14SemiBold,
+
+                  fontWeight: 500,
+
+                  mb: 0.5,
+
+                  display:
+                    "-webkit-box",
+
+                  WebkitLineClamp: 2,
+
+                  WebkitBoxOrient:
+                    "vertical",
+
+                  overflow: "hidden",
+                }}
+              >
                 {benefits}
               </Typography>
             </Box>
@@ -618,7 +588,7 @@ console.log("IMAGES:", images);
                     whiteSpace:
                       "nowrap",
 
-                    mt: 0,
+                    mt: 2,
                   }}
                 >
                   {product.rating}
@@ -667,7 +637,7 @@ console.log("IMAGES:", images);
               {product?.net_content ? (
                 <Typography
                   sx={{
-                    ...Theme.font12Bold,
+                    ...Theme.font14Bold,
 
                     whiteSpace:
                       "nowrap",
@@ -744,7 +714,7 @@ console.log("IMAGES:", images);
                     color:
                       Colors.green,
 
-                    ...Theme.font12Bold,
+                    ...Theme.font14Bold,
 
                     whiteSpace:
                       "nowrap",
@@ -871,7 +841,7 @@ console.log("IMAGES:", images);
                   color:
                     Colors.background,
 
-                  ...Theme.font18Bold,
+                  ...Theme.font14Bold,
 
                   textTransform:
                     "none",
@@ -903,31 +873,32 @@ console.log("IMAGES:", images);
 );
 
 
-
+// ========================================
 // PRODUCT CARDS
-
+// ========================================
 
 function ProductCards({
   products = [],
 }) {
   const navigate = useNavigate();
 
-  
+  // ========================================
   // HOVER STATE
-  
+  // ========================================
 
-const [hoveredProductId, setHoveredProductId] = useState(null);
+  const [hoveredProducts, setHoveredProducts] =
+    useState({});
 
-  
+  // ========================================
   // CART QUANTITIES
-  
+  // ========================================
 
   const [cartQuantities, setCartQuantities] =
     useState(getCartQuantities);
 
-  
+  // ========================================
   // SNACKBAR
-  
+  // ========================================
 
   const [snackbarOpen, setSnackbarOpen] =
     useState(false);
@@ -935,9 +906,9 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
   const [snackbarMessage, setSnackbarMessage] =
     useState("");
 
-  
+  // ========================================
   // SYNC CART
-  
+  // ========================================
 
   const syncCartQuantities = useCallback(() => {
     setCartQuantities(
@@ -971,9 +942,9 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
     syncCartQuantities,
   ]);
 
-  
+  // ========================================
   // NAVIGATE
-  
+  // ========================================
 
   const handleNavigate = useCallback(
     (productId) => {
@@ -984,76 +955,70 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
     [navigate]
   );
 
-  
+  // ========================================
   // HOVER ENTER
-  
-const handleMouseEnter = useCallback((productId) => {
-  setHoveredProductId(productId);
-}, []);
+  // ========================================
 
-const handleMouseLeave = useCallback(() => {
-  setHoveredProductId(null);
-}, []);
+  const handleMouseEnter = useCallback(
+    (productId) => {
+      setHoveredProducts(
+        (previous) => {
+          if (previous[productId]) {
+            return previous;
+          }
 
-  
+          return {
+            ...previous,
+            [productId]: true,
+          };
+        }
+      );
+    },
+    []
+  );
+
+  // ========================================
+  // HOVER LEAVE
+  // ========================================
+
+  const handleMouseLeave = useCallback(
+    (productId) => {
+      setHoveredProducts(
+        (previous) => {
+          if (!previous[productId]) {
+            return previous;
+          }
+
+          const next = {
+            ...previous,
+          };
+
+          delete next[productId];
+
+          return next;
+        }
+      );
+    },
+    []
+  );
+
+  // ========================================
   // ADD TO CART
-  
+  // ========================================
 
- // ADD TO CART
-const handleAddToCart = useCallback(
+ const handleAddToCart = useCallback(
   (event, product) => {
     event.preventDefault();
     event.stopPropagation();
 
     try {
-      // ==========================================
-      // CHECK LOGIN
-      // ==========================================
-
-      const user = JSON.parse(
-        sessionStorage.getItem("user") || "null"
-      );
-
-      const isLoggedIn =
-        sessionStorage.getItem("isLoggedIn") === "true" &&
-        Boolean(sessionStorage.getItem("token")) &&
-        Boolean(user?.id);
-
-      // ==========================================
-      // CART KEY
-      // ==========================================
-
-      const cartKey = isLoggedIn
-        ? `mamaearth_cart_${user.id}`
-        : GUEST_CART_KEY;
-
-      // ==========================================
-      // STORAGE
-      // Logged in  -> localStorage
-      // Guest      -> sessionStorage
-      // ==========================================
-
-      const storage = isLoggedIn
-        ? localStorage
-        : sessionStorage;
-
-      // ==========================================
-      // GET EXISTING CART
-      // ==========================================
+      const { cartKey, storage } = getCartInfo();
 
       const existingCart = JSON.parse(
         storage.getItem(cartKey) || "[]"
       );
 
-      // ==========================================
-      // PRODUCT ID
-      // ==========================================
-
       const productId = String(product?.id);
-
-      // ==========================================
-      // CHECK PRODUCT ALREADY EXISTS
-      // ==========================================
 
       const existingIndex =
         existingCart.findIndex(
@@ -1069,7 +1034,8 @@ const handleAddToCart = useCallback(
             index === existingIndex
               ? {
                   ...item,
-                  quantity: 1,
+                  quantity:
+                    (Number(item.quantity) || 1) + 1,
                 }
               : item
         );
@@ -1083,36 +1049,28 @@ const handleAddToCart = useCallback(
         ];
       }
 
-      // ==========================================
       // SAVE CART
-      // ==========================================
-
       storage.setItem(
         cartKey,
         JSON.stringify(updatedCart)
       );
 
-      // ==========================================
-      // UPDATE LOCAL QUANTITY
-      // ==========================================
-
+      // UPDATE UI
       setCartQuantities((previous) => ({
         ...previous,
-        [productId]: 1,
+        [productId]:
+          updatedCart.find(
+            (item) =>
+              String(item.id) === productId
+          )?.quantity || 1,
       }));
 
-      // ==========================================
-      // TELL NAVBAR + CART PAGE
-      // ==========================================
-
+      // NOTIFY NAVBAR / CART
       window.dispatchEvent(
         new CustomEvent("cart:update")
       );
 
-      // ==========================================
       // SUCCESS MESSAGE
-      // ==========================================
-
       setSnackbarMessage("Added to cart");
       setSnackbarOpen(true);
 
@@ -1132,51 +1090,27 @@ const handleAddToCart = useCallback(
   []
 );
 
-  
+  // ========================================
   // CART QUANTITY CHANGE
-  
+  // ========================================
 
-  const handleCartQuantityChange =
+ const handleCartQuantityChange =
   useCallback(
     (
       event,
       product,
       change
     ) => {
+      event.preventDefault();
       event.stopPropagation();
 
       try {
-        const user = JSON.parse(
-          sessionStorage.getItem(
-            USER_STORAGE_KEY
-          ) || "null"
+        const { cartKey, storage } =
+          getCartInfo();
+
+        const existingCart = JSON.parse(
+          storage.getItem(cartKey) || "[]"
         );
-
-        const isLoggedIn =
-          sessionStorage.getItem(
-            "isLoggedIn"
-          ) === "true" &&
-          Boolean(
-            sessionStorage.getItem(
-              "token"
-            )
-          ) &&
-          Boolean(user?.id);
-
-        const cartKey = isLoggedIn
-          ? `mamaearth_cart_${user.id}`
-          : GUEST_CART_KEY;
-
-        const storage = isLoggedIn
-          ? localStorage
-          : sessionStorage;
-
-        const existingCart =
-          JSON.parse(
-            storage.getItem(
-              cartKey
-            ) || "[]"
-          );
 
         const productId =
           String(product.id);
@@ -1184,8 +1118,7 @@ const handleAddToCart = useCallback(
         const cartIndex =
           existingCart.findIndex(
             (item) =>
-              String(item.id) ===
-              productId
+              String(item.id) === productId
           );
 
         if (cartIndex < 0) {
@@ -1194,58 +1127,42 @@ const handleAddToCart = useCallback(
 
         const nextQuantity =
           (Number(
-            existingCart[
-              cartIndex
-            ].quantity
+            existingCart[cartIndex].quantity
           ) || 1) + change;
 
-        if (
-          nextQuantity <= 0
-        ) {
+        if (nextQuantity <= 0) {
           existingCart.splice(
             cartIndex,
             1
           );
         } else {
-          existingCart[
-            cartIndex
-          ].quantity =
+          existingCart[cartIndex].quantity =
             nextQuantity;
         }
 
         storage.setItem(
           cartKey,
-          JSON.stringify(
-            existingCart
-          )
+          JSON.stringify(existingCart)
         );
 
         window.dispatchEvent(
-          new CustomEvent(
-            "cart:update"
-          )
+          new CustomEvent("cart:update")
         );
 
-        setCartQuantities(
-          (previous) => {
-            const next = {
-              ...previous,
-            };
+        setCartQuantities((previous) => {
+          const next = {
+            ...previous,
+          };
 
-            if (
-              nextQuantity <= 0
-            ) {
-              delete next[
-                productId
-              ];
-            } else {
-              next[productId] =
-                nextQuantity;
-            }
-
-            return next;
+          if (nextQuantity <= 0) {
+            delete next[productId];
+          } else {
+            next[productId] =
+              nextQuantity;
           }
-        );
+
+          return next;
+        });
       } catch (error) {
         console.error(
           "Cart quantity update failed:",
@@ -1256,17 +1173,21 @@ const handleAddToCart = useCallback(
     []
   );
 
-  
+  // ========================================
   // PRODUCTS
-  
+  // ========================================
 
-const productList = Array.isArray(products)
-  ? products
-  : [];
+  const productList = useMemo(
+    () =>
+      Array.isArray(products)
+        ? products
+        : [],
+    [products]
+  );
 
-  
+  // ========================================
   // NO PRODUCTS
-  
+  // ========================================
 
   if (!productList.length) {
     return (
@@ -1292,9 +1213,9 @@ const productList = Array.isArray(products)
     );
   }
 
-  
+  // ========================================
   // UI
-  
+  // ========================================
 
   return (
     <>
@@ -1356,7 +1277,13 @@ const productList = Array.isArray(products)
                       productId
                     ] || 0
                   }
-                 isHovered={hoveredProductId === productId}
+                  isHovered={
+                    Boolean(
+                      hoveredProducts[
+                        productId
+                      ]
+                    )
+                  }
                   onNavigate={
                     handleNavigate
                   }
@@ -1418,9 +1345,9 @@ const productList = Array.isArray(products)
 }
 
 
-
+// ========================================
 // MEMOIZED EXPORT
-
+// ========================================
 
 export default memo(ProductCards);
 
