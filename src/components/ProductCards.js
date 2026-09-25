@@ -24,26 +24,31 @@ import StarIcon from "@mui/icons-material/Star";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
+import { optimizeCloudinaryImage } from "../utils/cloudinary";
 
-// ========================================
 // CONSTANTS
-// ========================================
+
 
 const GUEST_CART_KEY = "mamaearth_cart_guest";
 const USER_STORAGE_KEY = "user";
 
 
-// ========================================
+
 // GET CART KEY
-// ========================================
+
 
 const getCartKey = () => {
   try {
     const user = JSON.parse(
-      localStorage.getItem(USER_STORAGE_KEY) || "null"
+      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
     );
 
-    if (user?.id) {
+    const isLoggedIn =
+      sessionStorage.getItem("isLoggedIn") === "true" &&
+      Boolean(sessionStorage.getItem("token")) &&
+      Boolean(user?.id);
+
+    if (isLoggedIn) {
       return `mamaearth_cart_${user.id}`;
     }
 
@@ -54,9 +59,9 @@ const getCartKey = () => {
 };
 
 
-// ========================================
+
 // GET PRODUCT IMAGES
-// ========================================
+
 
 const getProductImages = (product) => {
   if (
@@ -81,31 +86,50 @@ const getProductImages = (product) => {
 };
 
 
-// ========================================
+
 // GET CART QUANTITIES
-// ========================================
+
 
 const getCartQuantities = () => {
   try {
-    const savedCart = JSON.parse(
-      localStorage.getItem(getCartKey()) || "[]"
+    const user = JSON.parse(
+      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
     );
 
-    return savedCart.reduce((quantities, item) => {
-      quantities[String(item.id)] =
-        Number(item.quantity) || 1;
+    const isLoggedIn =
+      sessionStorage.getItem("isLoggedIn") === "true" &&
+      Boolean(sessionStorage.getItem("token")) &&
+      Boolean(user?.id);
 
-      return quantities;
-    }, {});
+    const cartKey = isLoggedIn
+      ? `mamaearth_cart_${user.id}`
+      : GUEST_CART_KEY;
+
+    const storage = isLoggedIn
+      ? localStorage
+      : sessionStorage;
+
+    const savedCart = JSON.parse(
+      storage.getItem(cartKey) || "[]"
+    );
+
+    return Array.isArray(savedCart)
+      ? savedCart.reduce((quantities, item) => {
+          quantities[String(item.id)] =
+            Number(item.quantity) || 1;
+
+          return quantities;
+        }, {})
+      : {};
   } catch {
     return {};
   }
 };
 
 
-// ========================================
+
 // GET SALE PRICE
-// ========================================
+
 
 const getSalePrice = (product) => {
   if (Number(product?.sale_price) > 0) {
@@ -128,9 +152,9 @@ const getSalePrice = (product) => {
 };
 
 
-// ========================================
+
 // GET PRODUCT PRICING
-// ========================================
+
 
 const getProductPricing = (product) => {
   const mrp = Number(product?.mrp) || 0;
@@ -163,9 +187,9 @@ const getProductPricing = (product) => {
 };
 
 
-// ========================================
+
 // PRODUCT CARD ITEM
-// ========================================
+
 
 const ProductCardItem = memo(
   function ProductCardItem({
@@ -178,27 +202,27 @@ const ProductCardItem = memo(
     onAddToCart,
     onQuantityChange,
   }) {
-
+   
     // PRODUCT IMAGES
-
+   
 
     const images = useMemo(
       () => getProductImages(product),
       [product]
     );
 
-
+   
     // CURRENT IMAGE
-
+   
 
     const currentImage =
       isHovered && images.length > 1
         ? images[1]
         : images[0] || "";
 
-
+   
     // PRICING
-
+   
 
     const {
       salePrice,
@@ -209,18 +233,18 @@ const ProductCardItem = memo(
       [product]
     );
 
-
+   
     // PRODUCT NAME
-
+   
 
     const productName =
       product?.name ||
       product?.heading ||
       "Product";
 
-
+   
     // BENEFITS
-
+   
 
     const benefits = Array.isArray(
       product?.benefits
@@ -228,9 +252,9 @@ const ProductCardItem = memo(
       ? product.benefits.join(" | ")
       : product?.benefits || "";
 
-
+   
     // CARD CLICK
-
+   
 
     const handleCardClick = useCallback(() => {
       onNavigate(product.id);
@@ -239,9 +263,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-
+   
     // MOUSE ENTER
-
+   
 
     const handleMouseEnter = useCallback(() => {
       if (images.length > 1) {
@@ -253,9 +277,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-
+   
     // MOUSE LEAVE
-
+   
 
     const handleMouseLeave = useCallback(() => {
       onMouseLeave(product.id);
@@ -263,10 +287,11 @@ const ProductCardItem = memo(
       onMouseLeave,
       product.id,
     ]);
-
-
+console.log("PRODUCT:", product);
+console.log("IMAGES:", images);
+   
     // ADD TO CART
-
+   
 
     const handleAdd = useCallback(
       (event) => {
@@ -278,9 +303,9 @@ const ProductCardItem = memo(
       ]
     );
 
-
+   
     // DECREASE QUANTITY
-
+   
 
     const handleDecrease = useCallback(
       (event) => {
@@ -296,9 +321,9 @@ const ProductCardItem = memo(
       ]
     );
 
-
+   
     // INCREASE QUANTITY
-
+   
 
     const handleIncrease = useCallback(
       (event) => {
@@ -334,36 +359,37 @@ const ProductCardItem = memo(
           boxSizing: "border-box",
         }}
       >
-        <Card
-          sx={{
-            height: "100%",
-            borderRadius: "10px",
-            overflow: "hidden",
-            border: "1px solid #ddd",
-            boxShadow:
-              "0 2px 8px rgba(0,0,0,0.08)",
-            cursor: "pointer",
-          }}
+  <Card
+  sx={{
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: "10px",
+    overflow: "hidden",
+    border: "1px solid #ddd",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+  }}
           onClick={handleCardClick}
         >
-          {/* ==================================
-              PRODUCT IMAGE
-          ================================== */}
+        {/* ==================================
+    PRODUCT IMAGE
+================================== */}
 
-         {currentImage && (
-  <Box
-    sx={{
-      position: "relative",
-      width: "100%",
-      height: {
-        xs: "150px",
-        sm: "175px",
-        md: "210px",
-      },
-      overflow: "hidden",
-      flexShrink: 0,
-    }}
-  >
+{currentImage && (
+ <Box
+  sx={{
+    position: "relative",
+    width: "100%",
+    height: {
+      xs: "150px",
+      sm: "175px",
+      md: "210px",
+    },
+    overflow: "hidden",
+    flexShrink: 0,
+  }}
+>
     {/* STATUS */}
     {product?.status && (
       <Box
@@ -384,32 +410,44 @@ const ProductCardItem = memo(
       </Box>
     )}
 
-    <CardMedia
-      component="img"
-      image={currentImage}
-      alt={productName}
-      loading="lazy"
-      decoding="async"
-      width={500}
-      height={500}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      sx={{
-        width: "100%",
-        height: "100%",
-        display: "block",
-        objectFit: "cover",
-        boxSizing: "border-box",
-        borderTopLeftRadius: "10px",
-        borderTopRightRadius: "10px",
-        cursor: "pointer",
-        transition: "transform 0.2s ease",
+    {/* PRODUCT IMAGE */}
+<CardMedia
+  component="img"
+  image={optimizeCloudinaryImage(
+    currentImage,
+    400
+  )}
+  srcSet={`
+    ${optimizeCloudinaryImage(currentImage, 200)} 200w,
+    ${optimizeCloudinaryImage(currentImage, 300)} 300w,
+    ${optimizeCloudinaryImage(currentImage, 400)} 400w
+  `}
+  sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
+  alt={productName}
+  loading="lazy"
+  decoding="async"
+  width={400}
+  height={400}
 
-        "&:hover": {
-          transform: "scale(1.03)",
-        },
-      }}
-    />
+  onMouseEnter={handleMouseEnter}
+  onMouseLeave={handleMouseLeave}
+
+  sx={{
+    width: "100%",
+    height: "100%",
+    display: "block",
+    objectFit: "cover",
+    boxSizing: "border-box",
+    borderTopLeftRadius: "10px",
+    borderTopRightRadius: "10px",
+    cursor: "pointer",
+    transition: "transform 0.2s ease",
+
+    "&:hover": {
+      transform: "scale(1.03)",
+    },
+  }}
+/>
   </Box>
 )}
 
@@ -418,23 +456,24 @@ const ProductCardItem = memo(
           ================================== */}
 
           <CardContent
-            sx={{
-              display: "flex",
-              flexDirection: "column",
+  sx={{
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
 
-              p: {
-                xs: 1.2,
-                sm: 1.5,
-              },
+    p: {
+      xs: 1.2,
+      sm: 1.5,
+    },
 
-              "&:last-child": {
-                pb: {
-                  xs: 1.2,
-                  sm: 1.5,
-                },
-              },
-            }}
-          >
+    "&:last-child": {
+      pb: {
+        xs: 1.2,
+        sm: 1.5,
+      },
+    },
+  }}
+>
             {/* ==================================
                 PRODUCT NAME
             ================================== */}
@@ -443,29 +482,22 @@ const ProductCardItem = memo(
               sx={{
                 height: {
                   xs: "34px",
-                  sm: "30px",
+                  sm: "36px",
                 },
               }}
             >
               <Typography
-                variant="h6"
-                sx={{
-                  fontSize:
-                    Theme.font12Bold,
-
-                  mb: 0.5,
-
-                  display:
-                    "-webkit-box",
-
-                  WebkitLineClamp: 2,
-
-                  WebkitBoxOrient:
-                    "vertical",
-
-                  overflow: "hidden",
-                }}
-              >
+  variant="h6"
+  sx={{
+    fontSize: Theme.font12Bold,
+    lineHeight: "17px",
+    mb: 0.5,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  }}
+>
                 {productName}
               </Typography>
             </Box>
@@ -483,24 +515,17 @@ const ProductCardItem = memo(
               }}
             >
               <Typography
-                variant="h6"
-                sx={{
-                  fontSize:
-                    Theme.font12Bold,
-
-                  mb: 0.5,
-
-                  display:
-                    "-webkit-box",
-
-                  WebkitLineClamp: 2,
-
-                  WebkitBoxOrient:
-                    "vertical",
-
-                  overflow: "hidden",
-                }}
-              >
+  variant="h6"
+  sx={{
+    fontSize: Theme.font12Bold,
+    lineHeight: "17px",
+    mb: 0.5,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  }}
+>
                 {product?.heading ||
                   "Product"}
               </Typography>
@@ -518,27 +543,19 @@ const ProductCardItem = memo(
                 },
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontSize:
-                    Theme.font14SemiBold,
-
-                  fontWeight: 500,
-
-                  mb: 0.5,
-
-                  display:
-                    "-webkit-box",
-
-                  WebkitLineClamp: 2,
-
-                  WebkitBoxOrient:
-                    "vertical",
-
-                  overflow: "hidden",
-                }}
-              >
+             <Typography
+  variant="h6"
+  sx={{
+    fontSize: Theme.font14SemiBold,
+    lineHeight: "17px",
+    fontWeight: 500,
+    mb: 0.5,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  }}
+>
                 {benefits}
               </Typography>
             </Box>
@@ -572,7 +589,7 @@ const ProductCardItem = memo(
                     whiteSpace:
                       "nowrap",
 
-                    mt: 2,
+                    mt: 0,
                   }}
                 >
                   {product.rating}
@@ -621,7 +638,7 @@ const ProductCardItem = memo(
               {product?.net_content ? (
                 <Typography
                   sx={{
-                    ...Theme.font14Bold,
+                    ...Theme.font12Bold,
 
                     whiteSpace:
                       "nowrap",
@@ -698,7 +715,7 @@ const ProductCardItem = memo(
                     color:
                       Colors.green,
 
-                    ...Theme.font14Bold,
+                    ...Theme.font12Bold,
 
                     whiteSpace:
                       "nowrap",
@@ -825,7 +842,7 @@ const ProductCardItem = memo(
                   color:
                     Colors.background,
 
-                  ...Theme.font14Bold,
+                  ...Theme.font18Bold,
 
                   textTransform:
                     "none",
@@ -857,32 +874,31 @@ const ProductCardItem = memo(
 );
 
 
-// ========================================
+
 // PRODUCT CARDS
-// ========================================
+
 
 function ProductCards({
   products = [],
 }) {
   const navigate = useNavigate();
 
-  // ========================================
+  
   // HOVER STATE
-  // ========================================
+  
 
-  const [hoveredProducts, setHoveredProducts] =
-    useState({});
+const [hoveredProductId, setHoveredProductId] = useState(null);
 
-  // ========================================
+  
   // CART QUANTITIES
-  // ========================================
+  
 
   const [cartQuantities, setCartQuantities] =
     useState(getCartQuantities);
 
-  // ========================================
+  
   // SNACKBAR
-  // ========================================
+  
 
   const [snackbarOpen, setSnackbarOpen] =
     useState(false);
@@ -890,9 +906,9 @@ function ProductCards({
   const [snackbarMessage, setSnackbarMessage] =
     useState("");
 
-  // ========================================
+  
   // SYNC CART
-  // ========================================
+  
 
   const syncCartQuantities = useCallback(() => {
     setCartQuantities(
@@ -926,9 +942,9 @@ function ProductCards({
     syncCartQuantities,
   ]);
 
-  // ========================================
+  
   // NAVIGATE
-  // ========================================
+  
 
   const handleNavigate = useCallback(
     (productId) => {
@@ -939,68 +955,196 @@ function ProductCards({
     [navigate]
   );
 
-  // ========================================
+  
   // HOVER ENTER
-  // ========================================
+  
+const handleMouseEnter = useCallback((productId) => {
+  setHoveredProductId(productId);
+}, []);
 
-  const handleMouseEnter = useCallback(
-    (productId) => {
-      setHoveredProducts(
-        (previous) => {
-          if (previous[productId]) {
-            return previous;
-          }
+const handleMouseLeave = useCallback(() => {
+  setHoveredProductId(null);
+}, []);
 
-          return {
-            ...previous,
-            [productId]: true,
-          };
-        }
-      );
-    },
-    []
-  );
-
-  // ========================================
-  // HOVER LEAVE
-  // ========================================
-
-  const handleMouseLeave = useCallback(
-    (productId) => {
-      setHoveredProducts(
-        (previous) => {
-          if (!previous[productId]) {
-            return previous;
-          }
-
-          const next = {
-            ...previous,
-          };
-
-          delete next[productId];
-
-          return next;
-        }
-      );
-    },
-    []
-  );
-
-  // ========================================
+  
   // ADD TO CART
-  // ========================================
+  
 
-  const handleAddToCart = useCallback(
-    (event, product) => {
+ // ADD TO CART
+const handleAddToCart = useCallback(
+  (event, product) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      // ==========================================
+      // CHECK LOGIN
+      // ==========================================
+
+      const user = JSON.parse(
+        sessionStorage.getItem("user") || "null"
+      );
+
+      const isLoggedIn =
+        sessionStorage.getItem("isLoggedIn") === "true" &&
+        Boolean(sessionStorage.getItem("token")) &&
+        Boolean(user?.id);
+
+      // ==========================================
+      // CART KEY
+      // ==========================================
+
+      const cartKey = isLoggedIn
+        ? `mamaearth_cart_${user.id}`
+        : GUEST_CART_KEY;
+
+      // ==========================================
+      // STORAGE
+      // Logged in  -> localStorage
+      // Guest      -> sessionStorage
+      // ==========================================
+
+      const storage = isLoggedIn
+        ? localStorage
+        : sessionStorage;
+
+      // ==========================================
+      // GET EXISTING CART
+      // ==========================================
+
+      const existingCart = JSON.parse(
+        storage.getItem(cartKey) || "[]"
+      );
+
+      // ==========================================
+      // PRODUCT ID
+      // ==========================================
+
+      const productId = String(product?.id);
+
+      // ==========================================
+      // CHECK PRODUCT ALREADY EXISTS
+      // ==========================================
+
+      const existingIndex =
+        existingCart.findIndex(
+          (item) =>
+            String(item?.id) === productId
+        );
+
+      let updatedCart;
+
+      if (existingIndex !== -1) {
+        updatedCart = existingCart.map(
+          (item, index) =>
+            index === existingIndex
+              ? {
+                  ...item,
+                  quantity: 1,
+                }
+              : item
+        );
+      } else {
+        updatedCart = [
+          ...existingCart,
+          {
+            ...product,
+            quantity: 1,
+          },
+        ];
+      }
+
+      // ==========================================
+      // SAVE CART
+      // ==========================================
+
+      storage.setItem(
+        cartKey,
+        JSON.stringify(updatedCart)
+      );
+
+      // ==========================================
+      // UPDATE LOCAL QUANTITY
+      // ==========================================
+
+      setCartQuantities((previous) => ({
+        ...previous,
+        [productId]: 1,
+      }));
+
+      // ==========================================
+      // TELL NAVBAR + CART PAGE
+      // ==========================================
+
+      window.dispatchEvent(
+        new CustomEvent("cart:update")
+      );
+
+      // ==========================================
+      // SUCCESS MESSAGE
+      // ==========================================
+
+      setSnackbarMessage("Added to cart");
+      setSnackbarOpen(true);
+
+    } catch (error) {
+      console.error(
+        "Add to cart failed:",
+        error
+      );
+
+      setSnackbarMessage(
+        "Unable to add to cart"
+      );
+
+      setSnackbarOpen(true);
+    }
+  },
+  []
+);
+
+  
+  // CART QUANTITY CHANGE
+  
+
+  const handleCartQuantityChange =
+  useCallback(
+    (
+      event,
+      product,
+      change
+    ) => {
       event.stopPropagation();
 
       try {
-        const cartKey =
-          getCartKey();
+        const user = JSON.parse(
+          sessionStorage.getItem(
+            USER_STORAGE_KEY
+          ) || "null"
+        );
+
+        const isLoggedIn =
+          sessionStorage.getItem(
+            "isLoggedIn"
+          ) === "true" &&
+          Boolean(
+            sessionStorage.getItem(
+              "token"
+            )
+          ) &&
+          Boolean(user?.id);
+
+        const cartKey = isLoggedIn
+          ? `mamaearth_cart_${user.id}`
+          : GUEST_CART_KEY;
+
+        const storage = isLoggedIn
+          ? localStorage
+          : sessionStorage;
 
         const existingCart =
           JSON.parse(
-            localStorage.getItem(
+            storage.getItem(
               cartKey
             ) || "[]"
           );
@@ -1015,23 +1159,32 @@ function ProductCards({
               productId
           );
 
-        if (cartIndex >= 0) {
+        if (cartIndex < 0) {
+          return;
+        }
+
+        const nextQuantity =
+          (Number(
+            existingCart[
+              cartIndex
+            ].quantity
+          ) || 1) + change;
+
+        if (
+          nextQuantity <= 0
+        ) {
+          existingCart.splice(
+            cartIndex,
+            1
+          );
+        } else {
           existingCart[
             cartIndex
           ].quantity =
-            (Number(
-              existingCart[
-                cartIndex
-              ].quantity
-            ) || 1) + 1;
-        } else {
-          existingCart.push({
-            ...product,
-            quantity: 1,
-          });
+            nextQuantity;
         }
 
-        localStorage.setItem(
+        storage.setItem(
           cartKey,
           JSON.stringify(
             existingCart
@@ -1044,162 +1197,47 @@ function ProductCards({
           )
         );
 
-        const updatedIndex =
-          cartIndex >= 0
-            ? cartIndex
-            : existingCart.length - 1;
-
-        const newQuantity =
-          existingCart[
-            updatedIndex
-          ].quantity;
-
         setCartQuantities(
-          (previous) => ({
-            ...previous,
-            [productId]:
-              newQuantity,
-          })
-        );
+          (previous) => {
+            const next = {
+              ...previous,
+            };
 
-        setSnackbarMessage(
-          "Added to cart"
-        );
+            if (
+              nextQuantity <= 0
+            ) {
+              delete next[
+                productId
+              ];
+            } else {
+              next[productId] =
+                nextQuantity;
+            }
 
-        setSnackbarOpen(true);
+            return next;
+          }
+        );
       } catch (error) {
         console.error(
-          "Add to cart failed:",
+          "Cart quantity update failed:",
           error
         );
-
-        setSnackbarMessage(
-          "Unable to add to cart"
-        );
-
-        setSnackbarOpen(true);
       }
     },
     []
   );
 
-  // ========================================
-  // CART QUANTITY CHANGE
-  // ========================================
-
-  const handleCartQuantityChange =
-    useCallback(
-      (
-        event,
-        product,
-        change
-      ) => {
-        event.stopPropagation();
-
-        try {
-          const cartKey =
-            getCartKey();
-
-          const existingCart =
-            JSON.parse(
-              localStorage.getItem(
-                cartKey
-              ) || "[]"
-            );
-
-          const productId =
-            String(product.id);
-
-          const cartIndex =
-            existingCart.findIndex(
-              (item) =>
-                String(item.id) ===
-                productId
-            );
-
-          if (cartIndex < 0) {
-            return;
-          }
-
-          const nextQuantity =
-            (Number(
-              existingCart[
-                cartIndex
-              ].quantity
-            ) || 1) + change;
-
-          if (
-            nextQuantity <= 0
-          ) {
-            existingCart.splice(
-              cartIndex,
-              1
-            );
-          } else {
-            existingCart[
-              cartIndex
-            ].quantity =
-              nextQuantity;
-          }
-
-          localStorage.setItem(
-            cartKey,
-            JSON.stringify(
-              existingCart
-            )
-          );
-
-          window.dispatchEvent(
-            new CustomEvent(
-              "cart:update"
-            )
-          );
-
-          setCartQuantities(
-            (previous) => {
-              const next = {
-                ...previous,
-              };
-
-              if (
-                nextQuantity <= 0
-              ) {
-                delete next[
-                  productId
-                ];
-              } else {
-                next[productId] =
-                  nextQuantity;
-              }
-
-              return next;
-            }
-          );
-        } catch (error) {
-          console.error(
-            "Cart quantity update failed:",
-            error
-          );
-        }
-      },
-      []
-    );
-
-  // ========================================
+  
   // PRODUCTS
-  // ========================================
+  
 
-  const productList = useMemo(
-    () =>
-      Array.isArray(products)
-        ? products
-        : [],
-    [products]
-  );
+const productList = Array.isArray(products)
+  ? products
+  : [];
 
-  // ========================================
+  
   // NO PRODUCTS
-  // ========================================
+  
 
   if (!productList.length) {
     return (
@@ -1225,9 +1263,9 @@ function ProductCards({
     );
   }
 
-  // ========================================
+  
   // UI
-  // ========================================
+  
 
   return (
     <>
@@ -1289,13 +1327,7 @@ function ProductCards({
                       productId
                     ] || 0
                   }
-                  isHovered={
-                    Boolean(
-                      hoveredProducts[
-                        productId
-                      ]
-                    )
-                  }
+                 isHovered={hoveredProductId === productId}
                   onNavigate={
                     handleNavigate
                   }
@@ -1357,9 +1389,9 @@ function ProductCards({
 }
 
 
-// ========================================
+
 // MEMOIZED EXPORT
-// ========================================
+
 
 export default memo(ProductCards);
 
