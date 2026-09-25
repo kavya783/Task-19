@@ -287,7 +287,8 @@ const ProductCardItem = memo(
       onMouseLeave,
       product.id,
     ]);
-
+console.log("PRODUCT:", product);
+console.log("IMAGES:", images);
    
     // ADD TO CART
    
