@@ -24,31 +24,26 @@ import StarIcon from "@mui/icons-material/Star";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
-import { optimizeCloudinaryImage } from "../utils/cloudinary";
 
+// ========================================
 // CONSTANTS
-
+// ========================================
 
 const GUEST_CART_KEY = "mamaearth_cart_guest";
 const USER_STORAGE_KEY = "user";
 
 
-
+// ========================================
 // GET CART KEY
-
+// ========================================
 
 const getCartKey = () => {
   try {
     const user = JSON.parse(
-      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
+      localStorage.getItem(USER_STORAGE_KEY) || "null"
     );
 
-    const isLoggedIn =
-      sessionStorage.getItem("isLoggedIn") === "true" &&
-      Boolean(sessionStorage.getItem("token")) &&
-      Boolean(user?.id);
-
-    if (isLoggedIn) {
+    if (user?.id) {
       return `mamaearth_cart_${user.id}`;
     }
 
@@ -59,9 +54,9 @@ const getCartKey = () => {
 };
 
 
-
+// ========================================
 // GET PRODUCT IMAGES
-
+// ========================================
 
 const getProductImages = (product) => {
   if (
@@ -86,50 +81,31 @@ const getProductImages = (product) => {
 };
 
 
-
+// ========================================
 // GET CART QUANTITIES
-
+// ========================================
 
 const getCartQuantities = () => {
   try {
-    const user = JSON.parse(
-      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
-    );
-
-    const isLoggedIn =
-      sessionStorage.getItem("isLoggedIn") === "true" &&
-      Boolean(sessionStorage.getItem("token")) &&
-      Boolean(user?.id);
-
-    const cartKey = isLoggedIn
-      ? `mamaearth_cart_${user.id}`
-      : GUEST_CART_KEY;
-
-    const storage = isLoggedIn
-      ? localStorage
-      : sessionStorage;
-
     const savedCart = JSON.parse(
-      storage.getItem(cartKey) || "[]"
+      localStorage.getItem(getCartKey()) || "[]"
     );
 
-    return Array.isArray(savedCart)
-      ? savedCart.reduce((quantities, item) => {
-          quantities[String(item.id)] =
-            Number(item.quantity) || 1;
+    return savedCart.reduce((quantities, item) => {
+      quantities[String(item.id)] =
+        Number(item.quantity) || 1;
 
-          return quantities;
-        }, {})
-      : {};
+      return quantities;
+    }, {});
   } catch {
     return {};
   }
 };
 
 
-
+// ========================================
 // GET SALE PRICE
-
+// ========================================
 
 const getSalePrice = (product) => {
   if (Number(product?.sale_price) > 0) {
@@ -152,9 +128,9 @@ const getSalePrice = (product) => {
 };
 
 
-
+// ========================================
 // GET PRODUCT PRICING
-
+// ========================================
 
 const getProductPricing = (product) => {
   const mrp = Number(product?.mrp) || 0;
@@ -187,9 +163,9 @@ const getProductPricing = (product) => {
 };
 
 
-
+// ========================================
 // PRODUCT CARD ITEM
-
+// ========================================
 
 const ProductCardItem = memo(
   function ProductCardItem({
@@ -202,27 +178,27 @@ const ProductCardItem = memo(
     onAddToCart,
     onQuantityChange,
   }) {
-   
+
     // PRODUCT IMAGES
-   
+
 
     const images = useMemo(
       () => getProductImages(product),
       [product]
     );
 
-   
+
     // CURRENT IMAGE
-   
+
 
     const currentImage =
       isHovered && images.length > 1
         ? images[1]
         : images[0] || "";
 
-   
+
     // PRICING
-   
+
 
     const {
       salePrice,
@@ -233,18 +209,18 @@ const ProductCardItem = memo(
       [product]
     );
 
-   
+
     // PRODUCT NAME
-   
+
 
     const productName =
       product?.name ||
       product?.heading ||
       "Product";
 
-   
+
     // BENEFITS
-   
+
 
     const benefits = Array.isArray(
       product?.benefits
@@ -252,9 +228,9 @@ const ProductCardItem = memo(
       ? product.benefits.join(" | ")
       : product?.benefits || "";
 
-   
+
     // CARD CLICK
-   
+
 
     const handleCardClick = useCallback(() => {
       onNavigate(product.id);
@@ -263,9 +239,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-   
+
     // MOUSE ENTER
-   
+
 
     const handleMouseEnter = useCallback(() => {
       if (images.length > 1) {
@@ -277,9 +253,9 @@ const ProductCardItem = memo(
       product.id,
     ]);
 
-   
+
     // MOUSE LEAVE
-   
+
 
     const handleMouseLeave = useCallback(() => {
       onMouseLeave(product.id);
@@ -287,11 +263,10 @@ const ProductCardItem = memo(
       onMouseLeave,
       product.id,
     ]);
-console.log("PRODUCT:", product);
-console.log("IMAGES:", images);
-   
+
+
     // ADD TO CART
-   
+
 
     const handleAdd = useCallback(
       (event) => {
@@ -303,9 +278,9 @@ console.log("IMAGES:", images);
       ]
     );
 
-   
+
     // DECREASE QUANTITY
-   
+
 
     const handleDecrease = useCallback(
       (event) => {
@@ -321,9 +296,9 @@ console.log("IMAGES:", images);
       ]
     );
 
-   
+
     // INCREASE QUANTITY
-   
+
 
     const handleIncrease = useCallback(
       (event) => {
@@ -359,27 +334,24 @@ console.log("IMAGES:", images);
           boxSizing: "border-box",
         }}
       >
-  <Card
-  sx={{
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    borderRadius: "10px",
-    overflow: "hidden",
-    border: "1px solid #ddd",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    cursor: "pointer",
-  }}
+        <Card
+          sx={{
+            height: "100%",
+            borderRadius: "10px",
+            overflow: "hidden",
+            border: "1px solid #ddd",
+            boxShadow:
+              "0 2px 8px rgba(0,0,0,0.08)",
+            cursor: "pointer",
+          }}
           onClick={handleCardClick}
         >
-        {/* ==================================
-    PRODUCT IMAGE
-================================== */}
+          {/* ==================================
+              PRODUCT IMAGE
+          ================================== */}
 
-{currentImage && (
+         {currentImage && (
   <Box
-    onMouseEnter={handleMouseEnter}
-    onMouseLeave={handleMouseLeave}
     sx={{
       position: "relative",
       width: "100%",
@@ -412,24 +384,16 @@ console.log("IMAGES:", images);
       </Box>
     )}
 
-    {/* PRODUCT IMAGE */}
     <CardMedia
       component="img"
-      image={optimizeCloudinaryImage(
-        currentImage,
-        400
-      )}
-      srcSet={`
-        ${optimizeCloudinaryImage(currentImage, 200)} 200w,
-        ${optimizeCloudinaryImage(currentImage, 300)} 300w,
-        ${optimizeCloudinaryImage(currentImage, 400)} 400w
-      `}
-      sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
+      image={currentImage}
       alt={productName}
       loading="lazy"
       decoding="async"
-      width={400}
-      height={400}
+      width={500}
+      height={500}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       sx={{
         width: "100%",
         height: "100%",
@@ -454,24 +418,23 @@ console.log("IMAGES:", images);
           ================================== */}
 
           <CardContent
-  sx={{
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
+            sx={{
+              display: "flex",
+              flexDirection: "column",
 
-    p: {
-      xs: 1.2,
-      sm: 1.5,
-    },
+              p: {
+                xs: 1.2,
+                sm: 1.5,
+              },
 
-    "&:last-child": {
-      pb: {
-        xs: 1.2,
-        sm: 1.5,
-      },
-    },
-  }}
->
+              "&:last-child": {
+                pb: {
+                  xs: 1.2,
+                  sm: 1.5,
+                },
+              },
+            }}
+          >
             {/* ==================================
                 PRODUCT NAME
             ================================== */}
@@ -480,22 +443,29 @@ console.log("IMAGES:", images);
               sx={{
                 height: {
                   xs: "34px",
-                  sm: "36px",
+                  sm: "30px",
                 },
               }}
             >
               <Typography
-  variant="h6"
-  sx={{
-    fontSize: Theme.font12Bold,
-    lineHeight: "17px",
-    mb: 0.5,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  }}
->
+                variant="h6"
+                sx={{
+                  fontSize:
+                    Theme.font12Bold,
+
+                  mb: 0.5,
+
+                  display:
+                    "-webkit-box",
+
+                  WebkitLineClamp: 2,
+
+                  WebkitBoxOrient:
+                    "vertical",
+
+                  overflow: "hidden",
+                }}
+              >
                 {productName}
               </Typography>
             </Box>
@@ -513,17 +483,24 @@ console.log("IMAGES:", images);
               }}
             >
               <Typography
-  variant="h6"
-  sx={{
-    fontSize: Theme.font12Bold,
-    lineHeight: "17px",
-    mb: 0.5,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  }}
->
+                variant="h6"
+                sx={{
+                  fontSize:
+                    Theme.font12Bold,
+
+                  mb: 0.5,
+
+                  display:
+                    "-webkit-box",
+
+                  WebkitLineClamp: 2,
+
+                  WebkitBoxOrient:
+                    "vertical",
+
+                  overflow: "hidden",
+                }}
+              >
                 {product?.heading ||
                   "Product"}
               </Typography>
@@ -541,19 +518,27 @@ console.log("IMAGES:", images);
                 },
               }}
             >
-             <Typography
-  variant="h6"
-  sx={{
-    fontSize: Theme.font14SemiBold,
-    lineHeight: "17px",
-    fontWeight: 500,
-    mb: 0.5,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  }}
->
+              <Typography
+                variant="h6"
+                sx={{
+                  fontSize:
+                    Theme.font14SemiBold,
+
+                  fontWeight: 500,
+
+                  mb: 0.5,
+
+                  display:
+                    "-webkit-box",
+
+                  WebkitLineClamp: 2,
+
+                  WebkitBoxOrient:
+                    "vertical",
+
+                  overflow: "hidden",
+                }}
+              >
                 {benefits}
               </Typography>
             </Box>
@@ -587,7 +572,7 @@ console.log("IMAGES:", images);
                     whiteSpace:
                       "nowrap",
 
-                    mt: 0,
+                    mt: 2,
                   }}
                 >
                   {product.rating}
@@ -636,7 +621,7 @@ console.log("IMAGES:", images);
               {product?.net_content ? (
                 <Typography
                   sx={{
-                    ...Theme.font12Bold,
+                    ...Theme.font14Bold,
 
                     whiteSpace:
                       "nowrap",
@@ -713,7 +698,7 @@ console.log("IMAGES:", images);
                     color:
                       Colors.green,
 
-                    ...Theme.font12Bold,
+                    ...Theme.font14Bold,
 
                     whiteSpace:
                       "nowrap",
@@ -840,7 +825,7 @@ console.log("IMAGES:", images);
                   color:
                     Colors.background,
 
-                  ...Theme.font18Bold,
+                  ...Theme.font14Bold,
 
                   textTransform:
                     "none",
@@ -872,31 +857,32 @@ console.log("IMAGES:", images);
 );
 
 
-
+// ========================================
 // PRODUCT CARDS
-
+// ========================================
 
 function ProductCards({
   products = [],
 }) {
   const navigate = useNavigate();
 
-  
+  // ========================================
   // HOVER STATE
-  
+  // ========================================
 
-const [hoveredProductId, setHoveredProductId] = useState(null);
+  const [hoveredProducts, setHoveredProducts] =
+    useState({});
 
-  
+  // ========================================
   // CART QUANTITIES
-  
+  // ========================================
 
   const [cartQuantities, setCartQuantities] =
     useState(getCartQuantities);
 
-  
+  // ========================================
   // SNACKBAR
-  
+  // ========================================
 
   const [snackbarOpen, setSnackbarOpen] =
     useState(false);
@@ -904,9 +890,9 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
   const [snackbarMessage, setSnackbarMessage] =
     useState("");
 
-  
+  // ========================================
   // SYNC CART
-  
+  // ========================================
 
   const syncCartQuantities = useCallback(() => {
     setCartQuantities(
@@ -940,9 +926,9 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
     syncCartQuantities,
   ]);
 
-  
+  // ========================================
   // NAVIGATE
-  
+  // ========================================
 
   const handleNavigate = useCallback(
     (productId) => {
@@ -953,196 +939,68 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
     [navigate]
   );
 
-  
+  // ========================================
   // HOVER ENTER
-  
-const handleMouseEnter = useCallback((productId) => {
-  setHoveredProductId(productId);
-}, []);
+  // ========================================
 
-const handleMouseLeave = useCallback(() => {
-  setHoveredProductId(null);
-}, []);
+  const handleMouseEnter = useCallback(
+    (productId) => {
+      setHoveredProducts(
+        (previous) => {
+          if (previous[productId]) {
+            return previous;
+          }
 
-  
+          return {
+            ...previous,
+            [productId]: true,
+          };
+        }
+      );
+    },
+    []
+  );
+
+  // ========================================
+  // HOVER LEAVE
+  // ========================================
+
+  const handleMouseLeave = useCallback(
+    (productId) => {
+      setHoveredProducts(
+        (previous) => {
+          if (!previous[productId]) {
+            return previous;
+          }
+
+          const next = {
+            ...previous,
+          };
+
+          delete next[productId];
+
+          return next;
+        }
+      );
+    },
+    []
+  );
+
+  // ========================================
   // ADD TO CART
-  
+  // ========================================
 
- // ADD TO CART
-const handleAddToCart = useCallback(
-  (event, product) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    try {
-      // ==========================================
-      // CHECK LOGIN
-      // ==========================================
-
-      const user = JSON.parse(
-        sessionStorage.getItem("user") || "null"
-      );
-
-      const isLoggedIn =
-        sessionStorage.getItem("isLoggedIn") === "true" &&
-        Boolean(sessionStorage.getItem("token")) &&
-        Boolean(user?.id);
-
-      // ==========================================
-      // CART KEY
-      // ==========================================
-
-      const cartKey = isLoggedIn
-        ? `mamaearth_cart_${user.id}`
-        : GUEST_CART_KEY;
-
-      // ==========================================
-      // STORAGE
-      // Logged in  -> localStorage
-      // Guest      -> sessionStorage
-      // ==========================================
-
-      const storage = isLoggedIn
-        ? localStorage
-        : sessionStorage;
-
-      // ==========================================
-      // GET EXISTING CART
-      // ==========================================
-
-      const existingCart = JSON.parse(
-        storage.getItem(cartKey) || "[]"
-      );
-
-      // ==========================================
-      // PRODUCT ID
-      // ==========================================
-
-      const productId = String(product?.id);
-
-      // ==========================================
-      // CHECK PRODUCT ALREADY EXISTS
-      // ==========================================
-
-      const existingIndex =
-        existingCart.findIndex(
-          (item) =>
-            String(item?.id) === productId
-        );
-
-      let updatedCart;
-
-      if (existingIndex !== -1) {
-        updatedCart = existingCart.map(
-          (item, index) =>
-            index === existingIndex
-              ? {
-                  ...item,
-                  quantity: 1,
-                }
-              : item
-        );
-      } else {
-        updatedCart = [
-          ...existingCart,
-          {
-            ...product,
-            quantity: 1,
-          },
-        ];
-      }
-
-      // ==========================================
-      // SAVE CART
-      // ==========================================
-
-      storage.setItem(
-        cartKey,
-        JSON.stringify(updatedCart)
-      );
-
-      // ==========================================
-      // UPDATE LOCAL QUANTITY
-      // ==========================================
-
-      setCartQuantities((previous) => ({
-        ...previous,
-        [productId]: 1,
-      }));
-
-      // ==========================================
-      // TELL NAVBAR + CART PAGE
-      // ==========================================
-
-      window.dispatchEvent(
-        new CustomEvent("cart:update")
-      );
-
-      // ==========================================
-      // SUCCESS MESSAGE
-      // ==========================================
-
-      setSnackbarMessage("Added to cart");
-      setSnackbarOpen(true);
-
-    } catch (error) {
-      console.error(
-        "Add to cart failed:",
-        error
-      );
-
-      setSnackbarMessage(
-        "Unable to add to cart"
-      );
-
-      setSnackbarOpen(true);
-    }
-  },
-  []
-);
-
-  
-  // CART QUANTITY CHANGE
-  
-
-  const handleCartQuantityChange =
-  useCallback(
-    (
-      event,
-      product,
-      change
-    ) => {
+  const handleAddToCart = useCallback(
+    (event, product) => {
       event.stopPropagation();
 
       try {
-        const user = JSON.parse(
-          sessionStorage.getItem(
-            USER_STORAGE_KEY
-          ) || "null"
-        );
-
-        const isLoggedIn =
-          sessionStorage.getItem(
-            "isLoggedIn"
-          ) === "true" &&
-          Boolean(
-            sessionStorage.getItem(
-              "token"
-            )
-          ) &&
-          Boolean(user?.id);
-
-        const cartKey = isLoggedIn
-          ? `mamaearth_cart_${user.id}`
-          : GUEST_CART_KEY;
-
-        const storage = isLoggedIn
-          ? localStorage
-          : sessionStorage;
+        const cartKey =
+          getCartKey();
 
         const existingCart =
           JSON.parse(
-            storage.getItem(
+            localStorage.getItem(
               cartKey
             ) || "[]"
           );
@@ -1157,32 +1015,23 @@ const handleAddToCart = useCallback(
               productId
           );
 
-        if (cartIndex < 0) {
-          return;
-        }
-
-        const nextQuantity =
-          (Number(
-            existingCart[
-              cartIndex
-            ].quantity
-          ) || 1) + change;
-
-        if (
-          nextQuantity <= 0
-        ) {
-          existingCart.splice(
-            cartIndex,
-            1
-          );
-        } else {
+        if (cartIndex >= 0) {
           existingCart[
             cartIndex
           ].quantity =
-            nextQuantity;
+            (Number(
+              existingCart[
+                cartIndex
+              ].quantity
+            ) || 1) + 1;
+        } else {
+          existingCart.push({
+            ...product,
+            quantity: 1,
+          });
         }
 
-        storage.setItem(
+        localStorage.setItem(
           cartKey,
           JSON.stringify(
             existingCart
@@ -1195,47 +1044,162 @@ const handleAddToCart = useCallback(
           )
         );
 
+        const updatedIndex =
+          cartIndex >= 0
+            ? cartIndex
+            : existingCart.length - 1;
+
+        const newQuantity =
+          existingCart[
+            updatedIndex
+          ].quantity;
+
         setCartQuantities(
-          (previous) => {
-            const next = {
-              ...previous,
-            };
-
-            if (
-              nextQuantity <= 0
-            ) {
-              delete next[
-                productId
-              ];
-            } else {
-              next[productId] =
-                nextQuantity;
-            }
-
-            return next;
-          }
+          (previous) => ({
+            ...previous,
+            [productId]:
+              newQuantity,
+          })
         );
+
+        setSnackbarMessage(
+          "Added to cart"
+        );
+
+        setSnackbarOpen(true);
       } catch (error) {
         console.error(
-          "Cart quantity update failed:",
+          "Add to cart failed:",
           error
         );
+
+        setSnackbarMessage(
+          "Unable to add to cart"
+        );
+
+        setSnackbarOpen(true);
       }
     },
     []
   );
 
-  
+  // ========================================
+  // CART QUANTITY CHANGE
+  // ========================================
+
+  const handleCartQuantityChange =
+    useCallback(
+      (
+        event,
+        product,
+        change
+      ) => {
+        event.stopPropagation();
+
+        try {
+          const cartKey =
+            getCartKey();
+
+          const existingCart =
+            JSON.parse(
+              localStorage.getItem(
+                cartKey
+              ) || "[]"
+            );
+
+          const productId =
+            String(product.id);
+
+          const cartIndex =
+            existingCart.findIndex(
+              (item) =>
+                String(item.id) ===
+                productId
+            );
+
+          if (cartIndex < 0) {
+            return;
+          }
+
+          const nextQuantity =
+            (Number(
+              existingCart[
+                cartIndex
+              ].quantity
+            ) || 1) + change;
+
+          if (
+            nextQuantity <= 0
+          ) {
+            existingCart.splice(
+              cartIndex,
+              1
+            );
+          } else {
+            existingCart[
+              cartIndex
+            ].quantity =
+              nextQuantity;
+          }
+
+          localStorage.setItem(
+            cartKey,
+            JSON.stringify(
+              existingCart
+            )
+          );
+
+          window.dispatchEvent(
+            new CustomEvent(
+              "cart:update"
+            )
+          );
+
+          setCartQuantities(
+            (previous) => {
+              const next = {
+                ...previous,
+              };
+
+              if (
+                nextQuantity <= 0
+              ) {
+                delete next[
+                  productId
+                ];
+              } else {
+                next[productId] =
+                  nextQuantity;
+              }
+
+              return next;
+            }
+          );
+        } catch (error) {
+          console.error(
+            "Cart quantity update failed:",
+            error
+          );
+        }
+      },
+      []
+    );
+
+  // ========================================
   // PRODUCTS
-  
+  // ========================================
 
-const productList = Array.isArray(products)
-  ? products
-  : [];
+  const productList = useMemo(
+    () =>
+      Array.isArray(products)
+        ? products
+        : [],
+    [products]
+  );
 
-  
+  // ========================================
   // NO PRODUCTS
-  
+  // ========================================
 
   if (!productList.length) {
     return (
@@ -1261,9 +1225,9 @@ const productList = Array.isArray(products)
     );
   }
 
-  
+  // ========================================
   // UI
-  
+  // ========================================
 
   return (
     <>
@@ -1325,7 +1289,13 @@ const productList = Array.isArray(products)
                       productId
                     ] || 0
                   }
-                 isHovered={hoveredProductId === productId}
+                  isHovered={
+                    Boolean(
+                      hoveredProducts[
+                        productId
+                      ]
+                    )
+                  }
                   onNavigate={
                     handleNavigate
                   }
@@ -1387,9 +1357,9 @@ const productList = Array.isArray(products)
 }
 
 
-
+// ========================================
 // MEMOIZED EXPORT
-
+// ========================================
 
 export default memo(ProductCards);
 
