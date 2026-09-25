@@ -376,8 +376,10 @@ console.log("IMAGES:", images);
     PRODUCT IMAGE
 ================================== */}
 
-   {currentImage && (
+{currentImage && (
   <Box
+    onMouseEnter={handleMouseEnter}
+    onMouseLeave={handleMouseLeave}
     sx={{
       position: "relative",
       width: "100%",
@@ -410,16 +412,24 @@ console.log("IMAGES:", images);
       </Box>
     )}
 
+    {/* PRODUCT IMAGE */}
     <CardMedia
       component="img"
-      image={currentImage}
+      image={optimizeCloudinaryImage(
+        currentImage,
+        400
+      )}
+      srcSet={`
+        ${optimizeCloudinaryImage(currentImage, 200)} 200w,
+        ${optimizeCloudinaryImage(currentImage, 300)} 300w,
+        ${optimizeCloudinaryImage(currentImage, 400)} 400w
+      `}
+      sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
       alt={productName}
       loading="lazy"
       decoding="async"
-      width={500}
-      height={500}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      width={400}
+      height={400}
       sx={{
         width: "100%",
         height: "100%",
@@ -946,27 +956,13 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
   
   // HOVER ENTER
   
-  const handleMouseEnter = useCallback(() => {
-      if (images.length > 1) {
-        onMouseEnter(product.id);
-      }
-    }, [
-      images.length,
-      onMouseEnter,
-      product.id,
-    ]);
+const handleMouseEnter = useCallback((productId) => {
+  setHoveredProductId(productId);
+}, []);
 
-
-    // MOUSE LEAVE
-
-
-    const handleMouseLeave = useCallback(() => {
-      onMouseLeave(product.id);
-    }, [
-      onMouseLeave,
-      product.id,
-    ]);
-
+const handleMouseLeave = useCallback(() => {
+  setHoveredProductId(null);
+}, []);
 
   
   // ADD TO CART
