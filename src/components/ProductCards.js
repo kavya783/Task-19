@@ -946,13 +946,27 @@ const [hoveredProductId, setHoveredProductId] = useState(null);
   
   // HOVER ENTER
   
-const handleMouseEnter = useCallback((productId) => {
-  setHoveredProductId(productId);
-}, []);
+  const handleMouseEnter = useCallback(() => {
+      if (images.length > 1) {
+        onMouseEnter(product.id);
+      }
+    }, [
+      images.length,
+      onMouseEnter,
+      product.id,
+    ]);
 
-const handleMouseLeave = useCallback(() => {
-  setHoveredProductId(null);
-}, []);
+
+    // MOUSE LEAVE
+
+
+    const handleMouseLeave = useCallback(() => {
+      onMouseLeave(product.id);
+    }, [
+      onMouseLeave,
+      product.id,
+    ]);
+
 
   
   // ADD TO CART
