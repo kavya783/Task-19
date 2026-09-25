@@ -124,7 +124,7 @@ const getCartQuantities = () => {
   } catch {
     return {};
   }
-};;
+};
 
 
 
@@ -416,38 +416,48 @@ console.log("IMAGES:", images);
 
   {/* PRODUCT IMAGE */}
   {currentImage && (
-   <CardMedia
-  component="img"
-  image={optimizeCloudinaryImage(currentImage, 400)}
-  srcSet={`
-    ${optimizeCloudinaryImage(currentImage, 200)} 200w,
-    ${optimizeCloudinaryImage(currentImage, 300)} 300w,
-    ${optimizeCloudinaryImage(currentImage, 400)} 400w
-  `}
-  sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
-  alt={productName}
-  loading="lazy"
-  decoding="async"
-  width={400}
-  height={400}
+ <Box
   onMouseEnter={handleMouseEnter}
   onMouseLeave={handleMouseLeave}
   sx={{
+    position: "relative",
     width: "100%",
-    height: "100%",
-    display: "block",
-    objectFit: "cover",
-    boxSizing: "border-box",
+    height: 250,
+    overflow: "hidden",
     borderTopLeftRadius: "10px",
     borderTopRightRadius: "10px",
-    cursor: "pointer",
-    transition: "transform 0.2s ease",
-
-    "&:hover": {
-      transform: "scale(1.03)",
-    },
   }}
-/>
+>
+  <CardMedia
+    component="img"
+    image={optimizeCloudinaryImage(currentImage, 400)}
+    srcSet={`
+      ${optimizeCloudinaryImage(currentImage, 200)} 200w,
+      ${optimizeCloudinaryImage(currentImage, 300)} 300w,
+      ${optimizeCloudinaryImage(currentImage, 400)} 400w
+    `}
+    sizes="(max-width: 600px) 155px, (max-width: 900px) 190px, 225px"
+    alt={productName}
+    loading="lazy"
+    decoding="async"
+    width={400}
+    height={400}
+    sx={{
+      width: "100%",
+      height: "100%",
+      display: "block",
+      objectFit: "cover",
+      boxSizing: "border-box",
+      borderTopLeftRadius: "10px",
+      borderTopRightRadius: "10px",
+      cursor: "pointer",
+      transition: "transform 0.2s ease",
+      "&:hover": {
+        transform: "scale(1.03)",
+      },
+    }}
+  />
+</Box>
   )}
 </Box>
           {/* ==================================
