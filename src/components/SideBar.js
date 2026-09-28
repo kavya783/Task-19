@@ -28,29 +28,29 @@ function SideBar({
   const [mobileMenuOpen, setMobileMenuOpen] =
     useState(false);
 
-  // =====================================================
+
   // LOGOUT
-  // =====================================================
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
 
-    window.location.href = "/login";
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("user");
 
-  // =====================================================
+  //   window.location.href = "/login";
+  // };
+
+
   // MENU CLICK
-  // =====================================================
+
 
   const handleMenuClick = (section) => {
     setSelectedSection(section);
     setMobileMenuOpen(false);
   };
 
-  // =====================================================
+
   // MENU ITEMS
-  // =====================================================
+
 
   const menuItems = [
     {
@@ -64,15 +64,15 @@ function SideBar({
       icon: <AddBoxOutlinedIcon />,
     },
     {
-      label: "Product Count",
+      label: "Orders",
       value: "orders",
       icon: <NumbersOutlinedIcon />,
     },
   ];
 
-  // =====================================================
+
   // SIDEBAR CONTENT
-  // =====================================================
+
 
   const sidebarContent = (
     <Box
@@ -265,13 +265,13 @@ function SideBar({
 
             p: 1,
 
-            color: "#000",
+            color:Colors.black,
 
             zIndex: 1160,
 
             "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
+              backgroundColor:Colors.background,
+                      },
           }}
         >
           <MenuIcon
