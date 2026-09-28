@@ -28,15 +28,17 @@ import {
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
-// ============================================================
+
 // LOCAL BACKEND API
-// ============================================================
 
-const API_URL = "http://localhost:3000/api/v1";
 
-// ============================================================
+const API_URL =
+  process.env.REACT_APP_API_URL ||
+  "http://localhost:3000/api/v1";
+
+
 // STATUS OPTIONS
-// ============================================================
+
 
 const statusOptions = [
   {
@@ -78,9 +80,9 @@ function SellerOrdersTable() {
     severity: "success",
   });
 
-  // ============================================================
+  
   // FETCH ALL ORDERS
-  // ============================================================
+  
 
   const fetchOrders = useCallback(
     async (showLoader = false) => {
@@ -126,9 +128,9 @@ function SellerOrdersTable() {
     []
   );
 
-  // ============================================================
+  
   // INITIAL FETCH + AUTO REFRESH
-  // ============================================================
+  
 
   useEffect(() => {
     fetchOrders(true);
@@ -142,17 +144,17 @@ function SellerOrdersTable() {
     };
   }, [fetchOrders]);
 
-  // ============================================================
+  
   // VIEW ORDER
-  // ============================================================
+  
 
   const handleView = (order) => {
     setSelectedOrder(order);
   };
 
-  // ============================================================
+  
   // EDIT ORDER
-  // ============================================================
+  
 
   const handleEdit = (order) => {
     setEditOrder(order);
@@ -160,9 +162,9 @@ function SellerOrdersTable() {
     setStatus(order.status || "pending");
   };
 
-  // ============================================================
+  
   // UPDATE ORDER STATUS
-  // ============================================================
+  
 
   const handleStatusUpdate = async () => {
     if (!editOrder?.id || !status) {
@@ -231,9 +233,9 @@ function SellerOrdersTable() {
     }
   };
 
-  // ============================================================
+  
   // STATUS LABEL
-  // ============================================================
+  
 
   const getStatusLabel = (value) => {
     const statusItem = statusOptions.find(
@@ -247,9 +249,9 @@ function SellerOrdersTable() {
     );
   };
 
-  // ============================================================
+  
   // LOADING
-  // ============================================================
+  
 
   if (loading) {
     return (
@@ -266,9 +268,9 @@ function SellerOrdersTable() {
     );
   }
 
-  // ============================================================
+  
   // UI
-  // ============================================================
+  
 
   return (
     <Box
