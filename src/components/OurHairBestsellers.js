@@ -31,9 +31,9 @@ import {
 import Colors from "../themes/colors";
 
 
-// ========================================
+
 // NORMALIZE CATEGORY
-// ========================================
+
 
 const normalizeCategory = (
   category = ""
@@ -43,9 +43,9 @@ const normalizeCategory = (
     .replace(/[\s_-]+/g, "");
 
 
-// ========================================
+
 // HAIR CATEGORY MAP
-// ========================================
+
 
 const HAIR_CATEGORY_MAP = {
   shampoo: [
@@ -81,9 +81,9 @@ const HAIR_CATEGORY_MAP = {
 };
 
 
-// ========================================
+
 // GET PRODUCT CATEGORY
-// ========================================
+
 
 const getProductCategory = (
   product
@@ -104,9 +104,9 @@ const getProductCategory = (
 };
 
 
-// ========================================
+
 // CATEGORY ITEM
-// ========================================
+
 
 const CategoryItem = memo(
   function CategoryItem({
@@ -290,9 +290,9 @@ const CategoryItem = memo(
 );
 
 
-// ========================================
+
 // CATEGORY LIST
-// ========================================
+
 
 const CategoryList = memo(
   function CategoryList({
@@ -392,9 +392,9 @@ const CategoryList = memo(
 );
 
 
-// ========================================
+
 // MAIN COMPONENT
-// ========================================
+
 
 function OurHairBestsellers({
   products: initialProducts = [],
@@ -404,9 +404,9 @@ function OurHairBestsellers({
     useDispatch();
 
 
-  // ========================================
+  
   // CONTENT SELECTORS
-  // ========================================
+  
 
   const OurHairBestsellersImages =
     useSelector(
@@ -428,9 +428,9 @@ function OurHairBestsellers({
     );
 
 
-  // ========================================
+  
   // PRODUCT SELECTORS
-  // ========================================
+  
 
   const productData =
     useSelector(
@@ -451,9 +451,9 @@ function OurHairBestsellers({
     );
 
 
-  // ========================================
+  
   // SELECTED CATEGORY
-  // ========================================
+  
 
   const [
     selectedCategory,
@@ -461,9 +461,9 @@ function OurHairBestsellers({
   ] = useState("Shampoo");
 
 
-  // ========================================
+  
   // GET DATA
-  // ========================================
+  
 
   
 
@@ -474,9 +474,9 @@ function OurHairBestsellers({
 
 
 
-  // ========================================
+  
   // NORMALIZE PRODUCTS
-  // ========================================
+  
 
   const products =
     useMemo(() => {
@@ -520,9 +520,9 @@ function OurHairBestsellers({
     ]);
 
 
-  // ========================================
+  
   // SELECTED CATEGORY KEY
-  // ========================================
+  
 
   const selectedCategoryKey =
     useMemo(
@@ -536,9 +536,9 @@ function OurHairBestsellers({
     );
 
 
-  // ========================================
+  
   // FILTER PRODUCTS
-  // ========================================
+  
 
   const filteredProducts =
     useMemo(() => {
@@ -585,9 +585,9 @@ function OurHairBestsellers({
     ]);
 
 
-  // ========================================
+  
   // CATEGORY CLICK
-  // ========================================
+  
 
   const handleCategoryClick =
     useCallback(
@@ -602,9 +602,9 @@ function OurHairBestsellers({
     );
 
 
-  // ========================================
+  
   // CATEGORY DATA
-  // ========================================
+  
 
   const categories =
     useMemo(() => {
@@ -620,9 +620,9 @@ function OurHairBestsellers({
     ]);
 
 
-  // ========================================
+  
   // LOADING
-  // ========================================
+  
 
   if (
     contentLoading ||
@@ -639,18 +639,16 @@ function OurHairBestsellers({
         }}
       >
 
-        <Typography>
-          Loading...
-        </Typography>
+      
 
       </Box>
     );
   }
 
 
-  // ========================================
+  
   // ERROR
-  // ========================================
+  
 
   if (
     contentError ||
@@ -682,16 +680,16 @@ function OurHairBestsellers({
   }
 
 
-  // ========================================
+  
   // MAIN UI
-  // ========================================
+  
 
   return (
     <Box
       sx={{
         width: "100%",
 
-        py: 3,
+        py: 0,
 
         px: {
           xs: 2,
@@ -897,9 +895,9 @@ function OurHairBestsellers({
 }
 
 
-// ========================================
+
 // MEMOIZED EXPORT
-// ========================================
+
 
 export default memo(
   OurHairBestsellers
