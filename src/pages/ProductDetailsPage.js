@@ -97,17 +97,31 @@ function getProductImages(product) {
 const GUEST_CART_KEY = "mamaearth_cart_guest";
 const USER_STORAGE_KEY = "user";
 
-const getCartKey = () => {
+const getCartInfo = () => {
     try {
         const user = JSON.parse(
-            localStorage.getItem(USER_STORAGE_KEY) || "null"
+            sessionStorage.getItem(USER_STORAGE_KEY) || "null"
         );
 
-        return user?.id
-            ? `mamaearth_cart_${user.id}`
-            : GUEST_CART_KEY;
+        const isLoggedIn =
+            sessionStorage.getItem("isLoggedIn") === "true" &&
+            Boolean(sessionStorage.getItem("token")) &&
+            Boolean(user?.id);
+
+        return {
+            cartKey: isLoggedIn
+                ? `mamaearth_cart_${user.id}`
+                : GUEST_CART_KEY,
+
+            storage: isLoggedIn
+                ? localStorage
+                : sessionStorage,
+        };
     } catch {
-        return GUEST_CART_KEY;
+        return {
+            cartKey: GUEST_CART_KEY,
+            storage: sessionStorage,
+        };
     }
 };
 
@@ -188,29 +202,57 @@ function ProductDetailsPage() {
         setSelectedVariant(0);
     }, [id]);
 
-    useEffect(() => {
-        const syncProductQuantity = () => {
-            try {
-                const cartKey = getCartKey();
+   useEffect(() => {
+    const syncProductQuantity = () => {
+        try {
+            const { cartKey, storage } = getCartInfo();
 
-                const cart = JSON.parse(
-                    localStorage.getItem(cartKey) || "[]"
-                );
+            const cart = JSON.parse(
+                storage.getItem(cartKey) || "[]"
+            );
 
-                const cartItem = cart.find(
-                    (item) => String(item.id) === String(id)
-                );
+            const cartItem = cart.find(
+                (item) =>
+                    String(item.id) === String(id)
+            );
 
-                setCartQuantity(Number(cartItem?.quantity) || 0);
-            } catch {
-                setCartQuantity(0);
-            }
-        };
-        syncProductQuantity();
-        window.addEventListener("cart:update", syncProductQuantity);
+            setCartQuantity(
+                Number(cartItem?.quantity) || 0
+            );
+        } catch (error) {
+            console.error(
+                "Product cart sync failed:",
+                error
+            );
 
-        return () => window.removeEventListener("cart:update", syncProductQuantity);
-    }, [id]);
+            setCartQuantity(0);
+        }
+    };
+
+    syncProductQuantity();
+
+    window.addEventListener(
+        "cart:update",
+        syncProductQuantity
+    );
+
+    window.addEventListener(
+        "auth:changed",
+        syncProductQuantity
+    );
+
+    return () => {
+        window.removeEventListener(
+            "cart:update",
+            syncProductQuantity
+        );
+
+        window.removeEventListener(
+            "auth:changed",
+            syncProductQuantity
+        );
+    };
+}, [id]);
 
 
     // SELECT DEFAULT VARIANT
@@ -425,96 +467,154 @@ function ProductDetailsPage() {
     };
     // ADD TO CART
     const handleAddToCart = () => {
-        try {
-            const cartKey = getCartKey();
+    try {
+        const { cartKey, storage } = getCartInfo();
 
-            const existingCart = JSON.parse(
-                localStorage.getItem(cartKey) || "[]"
+        const existingCart = JSON.parse(
+            storage.getItem(cartKey) || "[]"
+        );
+
+        const productId = String(product.id);
+
+        const cartIndex =
+            existingCart.findIndex(
+                (item) =>
+                    String(item.id) === productId
             );
 
-            const productId = String(product.id);
+        let updatedCart;
+        let newQuantity;
 
-            const cartIndex = existingCart.findIndex(
-                (item) => String(item.id) === productId
+        if (cartIndex >= 0) {
+            newQuantity =
+                (Number(
+                    existingCart[cartIndex].quantity
+                ) || 1) + 1;
+
+            updatedCart = existingCart.map(
+                (item, index) =>
+                    index === cartIndex
+                        ? {
+                            ...item,
+                            quantity: newQuantity,
+                        }
+                        : item
             );
+        } else {
+            newQuantity = 1;
 
-            if (cartIndex >= 0) {
-                existingCart[cartIndex].quantity =
-                    (Number(existingCart[cartIndex].quantity) || 1) + 1;
-            } else {
-                existingCart.push({
+            updatedCart = [
+                ...existingCart,
+                {
                     ...product,
                     quantity: 1,
-                });
-            }
-
-            localStorage.setItem(
-                cartKey,
-                JSON.stringify(existingCart)
-            );
-
-            window.dispatchEvent(
-                new CustomEvent("cart:update")
-            );
-
-            setCartQuantity(
-                cartIndex >= 0
-                    ? Number(existingCart[cartIndex].quantity) || 1
-                    : 1
-            );
-
-            setSnackbarMessage("Added to cart");
-            setSnackbarOpen(true);
-        } catch (error) {
-            console.error("Add to cart failed:", error);
-
-            setSnackbarMessage("Unable to add to cart");
-            setSnackbarOpen(true);
+                },
+            ];
         }
-    };
 
-    const handleCartQuantityChange = (change) => {
-        try {
-            const cartKey = getCartKey();
+        storage.setItem(
+            cartKey,
+            JSON.stringify(updatedCart)
+        );
 
-            const existingCart = JSON.parse(
-                localStorage.getItem(cartKey) || "[]"
+        setCartQuantity(newQuantity);
+
+        window.dispatchEvent(
+            new CustomEvent("cart:update")
+        );
+
+        setSnackbarMessage(
+            "Added to cart"
+        );
+
+        setSnackbarOpen(true);
+
+    } catch (error) {
+        console.error(
+            "Add to cart failed:",
+            error
+        );
+
+        setSnackbarMessage(
+            "Unable to add to cart"
+        );
+
+        setSnackbarOpen(true);
+    }
+};
+
+  const handleCartQuantityChange = (
+    change
+) => {
+    try {
+        const { cartKey, storage } =
+            getCartInfo();
+
+        const existingCart = JSON.parse(
+            storage.getItem(cartKey) || "[]"
+        );
+
+        const productId =
+            String(product.id);
+
+        const cartIndex =
+            existingCart.findIndex(
+                (item) =>
+                    String(item.id) ===
+                    productId
             );
 
-            const productId = String(product.id);
-
-            const cartIndex = existingCart.findIndex(
-                (item) => String(item.id) === productId
-            );
-
-            if (cartIndex < 0) return;
-
-            const nextQuantity =
-                (Number(existingCart[cartIndex].quantity) || 1) + change;
-
-            if (nextQuantity <= 0) {
-                existingCart.splice(cartIndex, 1);
-            } else {
-                existingCart[cartIndex].quantity = nextQuantity;
-            }
-
-            localStorage.setItem(
-                cartKey,
-                JSON.stringify(existingCart)
-            );
-
-            setCartQuantity(Math.max(0, nextQuantity));
-
-            window.dispatchEvent(
-                new CustomEvent("cart:update")
-            );
-        } catch (error) {
-            console.error(
-                "Cart quantity update failed:",
-                error
-            );
+        if (cartIndex < 0) {
+            return;
         }
-    };
+
+        const nextQuantity =
+            (Number(
+                existingCart[cartIndex].quantity
+            ) || 1) + change;
+
+        let updatedCart;
+
+        if (nextQuantity <= 0) {
+            updatedCart =
+                existingCart.filter(
+                    (_, index) =>
+                        index !== cartIndex
+                );
+        } else {
+            updatedCart =
+                existingCart.map(
+                    (item, index) =>
+                        index === cartIndex
+                            ? {
+                                ...item,
+                                quantity:
+                                    nextQuantity,
+                            }
+                            : item
+                );
+        }
+
+        storage.setItem(
+            cartKey,
+            JSON.stringify(updatedCart)
+        );
+
+        setCartQuantity(
+            Math.max(0, nextQuantity)
+        );
+
+        window.dispatchEvent(
+            new CustomEvent("cart:update")
+        );
+
+    } catch (error) {
+        console.error(
+            "Cart quantity update failed:",
+            error
+        );
+    }
+};
 
     // PINCODE CHANGE
 

@@ -62,80 +62,79 @@
                 return null;
             }
         };
+const GUEST_CART_KEY = "mamaearth_cart_guest";
+const USER_STORAGE_KEY = "user";
 
+const getCartInfo = () => {
+    try {
+        const user = JSON.parse(
+            sessionStorage.getItem(USER_STORAGE_KEY) || "null"
+        );
 
-        const user =
-            getCurrentUser();
+        const isLoggedIn =
+            sessionStorage.getItem("isLoggedIn") === "true" &&
+            Boolean(sessionStorage.getItem("token")) &&
+            Boolean(user?.id);
+
+        return {
+            cartKey: isLoggedIn
+                ? `mamaearth_cart_${user.id}`
+                : GUEST_CART_KEY,
+            storage: isLoggedIn
+                ? localStorage
+                : sessionStorage,
+        };
+    } catch (error) {
+        return {
+            cartKey: GUEST_CART_KEY,
+            storage: sessionStorage,
+        };
+    }
+};
+
+        // const user =
+        //     getCurrentUser();
 
 
         // LOGIN STATUS
 
-        const isLoggedIn =
-            sessionStorage.getItem(
-                "isLoggedIn"
-            ) === "true" &&
-            Boolean(
-                sessionStorage.getItem(
-                    "token"
-                )
-            ) &&
-            Boolean(user?.id);
+        // const isLoggedIn =
+        //     sessionStorage.getItem(
+        //         "isLoggedIn"
+        //     ) === "true" &&
+        //     Boolean(
+        //         sessionStorage.getItem(
+        //             "token"
+        //         )
+        //     ) &&
+        //     Boolean(user?.id);
 
 
-        // CART KEY
-        // Logged in:
-        // mamaearth_cart_USER_ID
-        //
-        // Logged out:
-        // mamaearth_cart_guest
+        
 
-        const cartKey =
-            isLoggedIn
-                ? `mamaearth_cart_${user.id}`
-                : "mamaearth_cart_guest";
+        // const cartKey =
+        //     isLoggedIn
+        //         ? `mamaearth_cart_${user.id}`
+        //         : "mamaearth_cart_guest";
 
 
         // CART ITEMS
 
- const [
-  cartItems,
-  setCartItems,
-] = useState(() => {
-  try {
-    const currentUser =
-      JSON.parse(
-        sessionStorage.getItem("user") || "null"
-      );
+ const [cartItems, setCartItems] = useState(() => {
+    try {
+        const { cartKey, storage } = getCartInfo();
 
-    const loggedIn =
-      sessionStorage.getItem("isLoggedIn") === "true" &&
-      Boolean(
-        sessionStorage.getItem("token")
-      ) &&
-      Boolean(currentUser?.id);
+        const savedCart = JSON.parse(
+            storage.getItem(cartKey) || "[]"
+        );
 
-    const currentCartKey = loggedIn
-      ? `mamaearth_cart_${currentUser.id}`
-      : "mamaearth_cart_guest";
-
-    const storage = loggedIn
-      ? localStorage
-      : sessionStorage;
-
-    const savedCart =
-      JSON.parse(
-        storage.getItem(
-          currentCartKey
-        ) || "[]"
-      );
-
-    return Array.isArray(savedCart)
-      ? savedCart
-      : [];
-
-  } catch {
-    return [];
-  }
+        return Array.isArray(savedCart)
+            ? savedCart
+            : [];
+    } catch (error) {
+        console.error("Initial cart load failed:", error);
+        return [];
+    }
 });
         // OFFERS
 
@@ -150,83 +149,62 @@
 // SYNC CART
 
 useEffect(() => {
-  const syncCartItems = () => {
-    try {
-      const currentUser =
-        JSON.parse(
-          sessionStorage.getItem("user") || "null"
-        );
+    const syncCartItems = () => {
+        try {
+            const { cartKey, storage } = getCartInfo();
 
-      const loggedIn =
-        sessionStorage.getItem("isLoggedIn") === "true" &&
-        Boolean(
-          sessionStorage.getItem("token")
-        ) &&
-        Boolean(currentUser?.id);
+            const latestCart = JSON.parse(
+                storage.getItem(cartKey) || "[]"
+            );
 
-      const currentCartKey = loggedIn
-        ? `mamaearth_cart_${currentUser.id}`
-        : "mamaearth_cart_guest";
+            setCartItems(
+                Array.isArray(latestCart)
+                    ? latestCart
+                    : []
+            );
 
-      const storage = loggedIn
-        ? localStorage
-        : sessionStorage;
+            console.log("Cart synced:", latestCart);
+        } catch (error) {
+            console.error(
+                "Cart sync failed:",
+                error
+            );
 
-      const latestCart =
-        JSON.parse(
-          storage.getItem(
-            currentCartKey
-          ) || "[]"
-        );
+            setCartItems([]);
+        }
+    };
 
-      setCartItems(
-        Array.isArray(latestCart)
-          ? latestCart
-          : []
-      );
-
-      console.log(
-        "Cart synced:",
-        latestCart
-      );
-
-    } catch (error) {
-      console.error(
-        "Cart sync failed:",
-        error
-      );
-
-      setCartItems([]);
-    }
-  };
-
-  syncCartItems();
-
-  if (open) {
+    // Initial load
     syncCartItems();
-  }
 
-  window.addEventListener(
-    "cart:update",
-    syncCartItems
-  );
+    // When CartPage opens
+    if (open) {
+        syncCartItems();
+    }
 
-  window.addEventListener(
-    "auth:changed",
-    syncCartItems
-  );
-
-  return () => {
-    window.removeEventListener(
-      "cart:update",
-      syncCartItems
+    // Add/remove/update cart
+    window.addEventListener(
+        "cart:update",
+        syncCartItems
     );
 
-    window.removeEventListener(
-      "auth:changed",
-      syncCartItems
+    // Login/logout
+    window.addEventListener(
+        "auth:changed",
+        syncCartItems
     );
-  };
+
+    return () => {
+        window.removeEventListener(
+            "cart:update",
+            syncCartItems
+        );
+
+        window.removeEventListener(
+            "auth:changed",
+            syncCartItems
+        );
+    };
 }, [open]);
 
         // REMOVE CART ITEM
@@ -250,45 +228,27 @@ useEffect(() => {
 
         // UPDATE CART
 
-        const updateCart = (updatedCart) => {
-  try {
-    const currentUser =
-      JSON.parse(
-        sessionStorage.getItem("user") || "null"
-      );
+const updateCart = (updatedCart) => {
+    try {
+        const { cartKey, storage } = getCartInfo();
 
-    const loggedIn =
-      sessionStorage.getItem("isLoggedIn") === "true" &&
-      Boolean(
-        sessionStorage.getItem("token")
-      ) &&
-      Boolean(currentUser?.id);
+        storage.setItem(
+            cartKey,
+            JSON.stringify(updatedCart)
+        );
 
-    const currentCartKey = loggedIn
-      ? `mamaearth_cart_${currentUser.id}`
-      : "mamaearth_cart_guest";
+        setCartItems(updatedCart);
 
-    const storage = loggedIn
-      ? localStorage
-      : sessionStorage;
+        window.dispatchEvent(
+            new CustomEvent("cart:update")
+        );
 
-    storage.setItem(
-      currentCartKey,
-      JSON.stringify(updatedCart)
-    );
-
-    setCartItems(updatedCart);
-
-    window.dispatchEvent(
-      new CustomEvent("cart:update")
-    );
-
-  } catch (error) {
-    console.error(
-      "Update cart failed:",
-      error
-    );
-  }
+    } catch (error) {
+        console.error(
+            "Update cart failed:",
+            error
+        );
+    }
 };
 
         // CHANGE QUANTITY
@@ -648,6 +608,7 @@ useEffect(() => {
                 }
             };
 
+            
 
         return (
 
