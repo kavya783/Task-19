@@ -2,7 +2,8 @@
 
     background: "#ffff",
     black: "#060606",
-   blue:"#00aeef",
+    blue:"#00aeef",
+    blue1:"#88c6dd",
     green:"#0add4a",
     orange:"#FF9D50"
 
