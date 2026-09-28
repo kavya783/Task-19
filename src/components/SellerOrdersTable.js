@@ -84,49 +84,64 @@ function SellerOrdersTable() {
   // FETCH ALL ORDERS
   
 
-  const fetchOrders = useCallback(
-    async (showLoader = false) => {
-      try {
-        if (showLoader) {
-          setLoading(true);
-        }
-
-        const response = await fetch(
-          `${API_URL}/seller/orders`
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            "Failed to fetch orders"
-          );
-        }
-
-        const data = await response.json();
-
-        setOrders(
-          Array.isArray(data) ? data : []
-        );
-      } catch (error) {
-        console.error(
-          "Fetch orders error:",
-          error
-        );
-
-        if (showLoader) {
-          setSnackbar({
-            open: true,
-            message: "Unable to fetch orders",
-            severity: "error",
-          });
-        }
-      } finally {
-        if (showLoader) {
-          setLoading(false);
-        }
+const fetchOrders = useCallback(
+  async (showLoader = false) => {
+    try {
+      if (showLoader) {
+        setLoading(true);
       }
-    },
-    []
-  );
+
+      console.log(
+        "SELLER API URL:",
+        API_URL
+      );
+
+      const response = await fetch(
+        `${API_URL}/seller/orders`
+      );
+
+      console.log(
+        "SELLER RESPONSE STATUS:",
+        response.status
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to fetch orders"
+        );
+      }
+
+      const data = await response.json();
+
+      console.log(
+        "SELLER ORDERS DATA:",
+        data
+      );
+
+      setOrders(
+        Array.isArray(data) ? data : []
+      );
+    } catch (error) {
+      console.error(
+        "Fetch orders error:",
+        error
+      );
+
+      if (showLoader) {
+        setSnackbar({
+          open: true,
+          message: "Unable to fetch orders",
+          severity: "error",
+        });
+      }
+    } finally {
+      if (showLoader) {
+        setLoading(false);
+      }
+    }
+  },
+  []
+);
 
   
   // INITIAL FETCH + AUTO REFRESH
