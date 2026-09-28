@@ -21,7 +21,9 @@ import {
   getOurMakeupDataActionInitiate,
 } from "../redux/actions/contentActions";
 
-
+import {
+  getProductsDataActionInitiate,
+} from "../redux/actions/productActions";
 
 import ProductCards from "./ProductCards";
 
@@ -29,9 +31,9 @@ import { Theme } from "../themes/GlobalStyles";
 import Colors from "../themes/colors";
 
 
-// ========================================
+
 // HELPERS
-// ========================================
+
 
 const normalizeText = (value = "") =>
   String(value)
@@ -102,9 +104,9 @@ const getProductsArray = (
 };
 
 
-// ========================================
+
 // GET PRODUCT SEARCH VALUES
-// ========================================
+
 
 const getProductSearchValues = (
   product
@@ -127,9 +129,9 @@ const getProductSearchValues = (
 };
 
 
-// ========================================
+
 // CATEGORY ITEM
-// ========================================
+
 
 const CategoryItem = memo(
   function CategoryItem({
@@ -284,9 +286,9 @@ const CategoryItem = memo(
 );
 
 
-// ========================================
+
 // CATEGORY LIST
-// ========================================
+
 
 const CategoryList = memo(
   function CategoryList({
@@ -372,9 +374,9 @@ const CategoryList = memo(
 );
 
 
-// ========================================
+
 // MAIN COMPONENT
-// ========================================
+
 
 function OurMakeupBestSellers({
   products: initialProducts = [],
@@ -382,9 +384,9 @@ function OurMakeupBestSellers({
   const dispatch = useDispatch();
 
 
-  // ========================================
+  
   // OPTIMIZED REDUX SELECTORS
-  // ========================================
+  
 
   const OurMakeupBestsellersImages =
     useSelector(
@@ -424,9 +426,9 @@ function OurMakeupBestSellers({
     );
 
 
-  // ========================================
+  
   // STATE
-  // ========================================
+  
 
   const [
     selectedCategory,
@@ -434,22 +436,24 @@ function OurMakeupBestSellers({
   ] = useState("");
 
 
-  // ========================================
+  
   // API CALL
-  // ========================================
+  
 
   useEffect(() => {
     dispatch(
       getOurMakeupDataActionInitiate()
     );
 
-  
+    dispatch(
+      getProductsDataActionInitiate()
+    );
   }, [dispatch]);
 
 
-  // ========================================
+  
   // CATEGORY DATA
-  // ========================================
+  
 
   const categories = useMemo(() => {
     return Array.isArray(
@@ -462,9 +466,9 @@ function OurMakeupBestSellers({
   ]);
 
 
-  // ========================================
+  
   // SET FIRST CATEGORY
-  // ========================================
+  
 
   useEffect(() => {
     if (!categories.length) {
@@ -486,9 +490,9 @@ function OurMakeupBestSellers({
   }, [categories]);
 
 
-  // ========================================
+  
   // PRODUCTS
-  // ========================================
+  
 
   const products = useMemo(() => {
     return getProductsArray(
@@ -501,9 +505,9 @@ function OurMakeupBestSellers({
   ]);
 
 
-  // ========================================
+  
   // SELECTED CATEGORY KEY
-  // ========================================
+  
 
   const selectedCategoryKey =
     useMemo(
@@ -515,9 +519,9 @@ function OurMakeupBestSellers({
     );
 
 
-  // ========================================
+  
   // NORMALIZED CATEGORY KEY
-  // ========================================
+  
 
   const categoryKey =
     useMemo(() => {
@@ -540,9 +544,9 @@ function OurMakeupBestSellers({
     ]);
 
 
-  // ========================================
+  
   // FILTER PRODUCTS
-  // ========================================
+  
 
   const filteredProducts = useMemo(() => {
     if (
@@ -575,9 +579,9 @@ function OurMakeupBestSellers({
   ]);
 
 
-  // ========================================
+  
   // CATEGORY CLICK
-  // ========================================
+  
 
   const handleCategoryClick =
     useCallback((heading) => {
@@ -594,9 +598,9 @@ function OurMakeupBestSellers({
     }, []);
 
 
-  // ========================================
+  
   // LOADING
-  // ========================================
+  
 
   if (
     contentLoading ||
@@ -618,9 +622,9 @@ function OurMakeupBestSellers({
   }
 
 
-  // ========================================
+  
   // ERROR
-  // ========================================
+  
 
   if (
     contentError ||
@@ -647,9 +651,9 @@ function OurMakeupBestSellers({
   }
 
 
-  // ========================================
+  
   // UI
-  // ========================================
+  
 
   return (
     <Box
@@ -685,20 +689,37 @@ function OurMakeupBestSellers({
 
       {/* SUB HEADING */}
 
-      <Typography
+     <Typography
         sx={{
-          textAlign: "center",
+          mt: 1,
 
-          fontSize:
-            Theme.font12Regular,
+        
+          px: {
+            xs: 3,
+            sm: 5,
+            md: 8,
+          },
 
-          mt: 0.5,
+          textAlign:
+            "center",
+
+          whiteSpace:
+            "normal",
+  ...Theme.font12Regular,
+
+          lineHeight: 1.5,
+
+          color:
+            Colors.black,
+
+          boxSizing:
+            "border-box",
         }}
       >
-        Enhance your natural beauty
+         Enhance your natural beauty
         with our makeup bestsellers
       </Typography>
-
+      
 
       {/* DESKTOP CATEGORY */}
 
@@ -837,9 +858,9 @@ function OurMakeupBestSellers({
 }
 
 
-// ========================================
+
 // MEMOIZED EXPORT
-// ========================================
+
 
 export default memo(
   OurMakeupBestSellers

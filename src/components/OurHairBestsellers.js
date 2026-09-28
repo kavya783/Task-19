@@ -21,6 +21,9 @@ import {
   getOurHairDataActionInitiate,
 } from "../redux/actions/contentActions";
 
+import {
+  getProductsDataActionInitiate,
+} from "../redux/actions/productActions";
 
 import ProductCards from "./ProductCards";
 
@@ -465,13 +468,17 @@ function OurHairBestsellers({
   // GET DATA
   
 
-  
-
   useEffect(() => {
-  dispatch(getOurHairDataActionInitiate());
-}, [dispatch]);
 
+    dispatch(
+      getOurHairDataActionInitiate()
+    );
 
+    dispatch(
+      getProductsDataActionInitiate()
+    );
+
+  }, [dispatch]);
 
 
   
@@ -639,7 +646,9 @@ function OurHairBestsellers({
         }}
       >
 
-      
+        <Typography>
+          Loading...
+        </Typography>
 
       </Box>
     );
@@ -689,12 +698,12 @@ function OurHairBestsellers({
       sx={{
         width: "100%",
 
-        py: 0,
+        py: 3,
 
         px: {
           xs: 2,
           sm: 3,
-          md: 5,
+          md: 1,
         },
       }}
     >
@@ -724,61 +733,94 @@ function OurHairBestsellers({
           SUB HEADING
       ==================================== */}
 
-      <Typography
+       <Typography
         sx={{
+          mt: 1,
+
+        
+          px: {
+            xs: 3,
+            sm: 5,
+            md: 8,
+          },
+
           textAlign:
             "center",
 
-          fontSize:
-            Theme.font12Regular,
+          whiteSpace:
+            "normal",
 
-          mt: 0.5,
+          fontFamily:
+            '"OpenSans", sans-serif',
+
+          fontSize: {
+            xs: "12px",
+            sm: "13px",
+            md: "14px",
+          },
+
+          fontWeight: 400,
+
+          lineHeight: 1.5,
+
+          color:
+            Colors.black,
+
+          boxSizing:
+            "border-box",
         }}
       >
-        Formulated with the goodness of
-        natural ingredients and no harmful
-        chemicals
+        Formulated with the goodness
+        of natural ingredients and no
+        harmful chemicals
       </Typography>
+  {/* DESKTOP CATEGORIES */}
+
+      <Box
+        sx={{
+          display: {
+            xs: "none",
+            md: "block",
+          },
+        }}
+      >
+
+        <CategoryList
+          categories={categories}
+          selectedCategory={
+            selectedCategory
+          }
+          onCategoryClick={
+            handleCategoryClick
+          }
+        />
+
+      </Box>
 
 
-      {/* ====================================
-          DESKTOP CATEGORIES
-      ==================================== */}
+      {/* MOBILE CATEGORIES */}
 
-      <CategoryList
-        categories={
-          categories
-        }
+      <Box
+        sx={{
+          display: {
+            xs: "block",
+            md: "none",
+          },
+        }}
+      >
 
-        selectedCategory={
-          selectedCategory
-        }
+        <CategoryList
+          categories={categories}
+          selectedCategory={
+            selectedCategory
+          }
+          onCategoryClick={
+            handleCategoryClick
+          }
+          mobile
+        />
 
-        onCategoryClick={
-          handleCategoryClick
-        }
-      />
-
-
-      {/* ====================================
-          MOBILE CATEGORIES
-      ==================================== */}
-
-      <CategoryList
-        categories={
-          categories
-        }
-
-        selectedCategory={
-          selectedCategory
-        }
-
-        onCategoryClick={
-          handleCategoryClick
-        }
-
-        mobile
-      />
+      </Box>
 
 
       {/* ====================================

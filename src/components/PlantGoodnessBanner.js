@@ -61,7 +61,7 @@ function PlantGoodnessBanner() {
           },
           gap: {
             xs: 3,
-            md: 5,
+            md: 0,
           },
           alignItems: "center",
         }}
@@ -82,7 +82,8 @@ function PlantGoodnessBanner() {
             },
             px: {
               xs: 1,
-              md: 3,
+              md: 0,
+              lg:3
             },
           }}
         >
@@ -90,9 +91,9 @@ function PlantGoodnessBanner() {
           <Box
             sx={{
               width: {
-                xs: "180px",
-                sm: "220px",
-                md: "300px",
+                xs: "220px",
+                sm: "300px",
+                md: "600px",
               },
               aspectRatio: "1600 / 427",
               flexShrink: 0,
@@ -120,15 +121,12 @@ function PlantGoodnessBanner() {
           {/* MAIN HEADING */}
           <Typography
             sx={{
-              fontSize: Theme.font20Regular,
+              fontSize: Theme.font24Bold,
               color: Colors.black,
-              ml: 3,
+              ml:{xs:0,md:23},
             }}
           >
-            Plant a tree with
-            <br />
-            your next <br />
-            purchase
+            Plant a tree with your next purchase
           </Typography>
         </Box>
 
@@ -138,6 +136,7 @@ function PlantGoodnessBanner() {
             width: "100%",
             display: "flex",
             justifyContent: "center",
+            mr:10
           }}
         >
           <Box
@@ -148,28 +147,24 @@ function PlantGoodnessBanner() {
               border: `2px solid ${Colors.green}`,
               borderRadius: "24px",
               px: {
-                xs: 3,
-                sm: 4,
-                md: 5,
+                xs: 1,
+                sm: 0,
+                md: 2,
               },
               py: {
                 xs: 4,
                 sm: 5,
                 md: 6,
               },
+              
               textAlign: "center",
               boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
             }}
           >
             <Typography
               sx={{
-                fontSize: {
-                  xs: "20px",
-                  sm: "24px",
-                  md: "28px",
-                },
-                fontWeight: 600,
-                color: "#174C32",
+                ...Theme.font16SemiBold,
+                color:Colors.black,
                 lineHeight: 1.3,
                 mb: 3,
               }}
@@ -181,17 +176,12 @@ function PlantGoodnessBanner() {
 
             <Typography
               sx={{
-                fontSize: {
-                  xs: "48px",
-                  sm: "64px",
-                  md: "76px",
-                },
-                fontWeight: 700,
+                ...Theme.headings,
                 letterSpacing: {
                   xs: "4px",
                   md: "8px",
                 },
-                color: "#247A45",
+                color:Colors.green,
                 lineHeight: 1,
                 fontVariantNumeric: "tabular-nums",
               }}
@@ -202,12 +192,10 @@ function PlantGoodnessBanner() {
             <Typography
               sx={{
                 mt: 2,
-                fontSize: {
-                  xs: "15px",
-                  sm: "17px",
-                },
+               ...Theme.font16SemiBold,
+              
                 color: "#4A604F",
-                fontWeight: 500,
+                
               }}
             >
               trees planted, thanks to you

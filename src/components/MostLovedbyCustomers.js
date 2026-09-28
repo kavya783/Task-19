@@ -34,9 +34,9 @@ import ProductCards from "./ProductCards";
 import Colors from "../themes/colors";
 
 
-// ========================================
+
 // NORMALIZE TEXT
-// ========================================
+
 
 const normalizeText = (value) => {
 
@@ -55,9 +55,9 @@ const normalizeText = (value) => {
 };
 
 
-// ========================================
+
 // CATEGORY MAPPINGS
-// ========================================
+
 
 const CATEGORY_MAPPINGS = {
 
@@ -131,9 +131,9 @@ const CATEGORY_MAPPINGS = {
 };
 
 
-// ========================================
+
 // CATEGORY MATCHING
-// ========================================
+
 
 const isProductMatchingCategory = (
   product,
@@ -160,9 +160,9 @@ const isProductMatchingCategory = (
     );
 
 
-  // ----------------------------------------
+ 
   // DIRECT MATCH
-  // ----------------------------------------
+ 
 
   if (
     productCategory &&
@@ -174,9 +174,9 @@ const isProductMatchingCategory = (
   }
 
 
-  // ----------------------------------------
+ 
   // MAPPED CATEGORY MATCH
-  // ----------------------------------------
+ 
 
   for (
     const key in CATEGORY_MAPPINGS
@@ -211,9 +211,9 @@ const isProductMatchingCategory = (
 };
 
 
-// ========================================
+
 // CATEGORY ITEM
-// ========================================
+
 
 const CategoryItem = memo(
   function CategoryItem({
@@ -275,7 +275,7 @@ const CategoryItem = memo(
 
           borderRadius:
             "10px",
-
+            mr:{xs:0,sm:3,md:1},
           backgroundColor:
             isSelected
               ? Colors.background
@@ -302,7 +302,7 @@ const CategoryItem = memo(
           }
           sx={{
             display: "block",
-
+          
             width: mobile
               ? 42
               : {
@@ -359,7 +359,7 @@ const CategoryItem = memo(
             mt: mobile
               ? 1
               : 0.5,
-
+          
             textAlign:
               "center",
 
@@ -392,9 +392,9 @@ const CategoryItem = memo(
 );
 
 
-// ========================================
+
 // CATEGORY LIST
-// ========================================
+
 
 const CategoryList = memo(
   function CategoryList({
@@ -420,9 +420,9 @@ const CategoryList = memo(
           width: "100%",
 
           gap: mobile
-            ? 2
+            ? 1
             : {
-                sm: 2,
+                sm: 1,
                 md: 3,
                 lg: 4,
               },
@@ -479,9 +479,9 @@ const CategoryList = memo(
 );
 
 
-// ========================================
+
 // MAIN COMPONENT
-// ========================================
+
 
 function MostLovedbyCustomers() {
 
@@ -489,9 +489,9 @@ function MostLovedbyCustomers() {
     useDispatch();
 
 
-  // ========================================
+  
   // CONTENT DATA
-  // ========================================
+  
 
   const mostLovedImages =
     useSelector(
@@ -513,9 +513,9 @@ function MostLovedbyCustomers() {
     );
 
 
-  // ========================================
+  
   // PRODUCT DATA
-  // ========================================
+  
 
   const productData =
     useSelector(
@@ -536,19 +536,17 @@ function MostLovedbyCustomers() {
     );
 
 
-  // ========================================
+  
   // SELECTED CATEGORY
-  // ========================================
+  
 
   const [
     selectedCategory,
     setSelectedCategory,
   ] = useState(null);
 
-
-  // ========================================
   // GET CONTENT
-  // ========================================
+  
 
   useEffect(() => {
 
@@ -559,9 +557,8 @@ function MostLovedbyCustomers() {
   }, [dispatch]);
 
 
-  // ========================================
   // GET PRODUCTS
-  // ========================================
+  
 
   useEffect(() => {
 
@@ -572,9 +569,9 @@ function MostLovedbyCustomers() {
   }, [dispatch]);
 
 
-  // ========================================
+  
   // SELECT FIRST CATEGORY
-  // ========================================
+  
 
   useEffect(() => {
 
@@ -597,9 +594,9 @@ function MostLovedbyCustomers() {
   ]);
 
 
-  // ========================================
+  
   // NORMALIZE PRODUCTS
-  // ========================================
+  
 
   const products =
     useMemo(() => {
@@ -615,9 +612,9 @@ function MostLovedbyCustomers() {
     ]);
 
 
-  // ========================================
+  
   // SELECTED CATEGORY OBJECT
-  // ========================================
+  
 
   const selectedCategoryObject =
     useMemo(() => {
@@ -647,9 +644,9 @@ function MostLovedbyCustomers() {
     ]);
 
 
-  // ========================================
+  
   // FILTER PRODUCTS
-  // ========================================
+  
 
   const filteredProducts =
     useMemo(() => {
@@ -676,9 +673,9 @@ function MostLovedbyCustomers() {
     ]);
 
 
-  // ========================================
+  
   // CATEGORY CLICK
-  // ========================================
+  
 
   const handleCategoryClick =
     useCallback((categoryId) => {
@@ -690,11 +687,9 @@ function MostLovedbyCustomers() {
     }, []);
 
 
-  // ========================================
+  
   // CATEGORY DATA
-  // ========================================
-
-  const categories =
+    const categories =
     useMemo(() => {
 
       return Array.isArray(
@@ -706,12 +701,7 @@ function MostLovedbyCustomers() {
     }, [
       mostLovedImages,
     ]);
-
-
-  // ========================================
   // LOADING
-  // ========================================
-
   if (
     contentLoading ||
     productLoading
@@ -732,14 +722,9 @@ function MostLovedbyCustomers() {
 
       </Box>
     );
-  }
-
-
-  // ========================================
+  }  
   // ERROR
-  // ========================================
-
-  if (
+ if (
     contentError ||
     productError
   ) {
@@ -765,15 +750,9 @@ function MostLovedbyCustomers() {
 
       </Box>
     );
-  }
-
-
-  // ========================================
+  }  
   // MAIN UI
-  // ========================================
-
-  return (
-
+    return (
     <Box
       sx={{
         width: "100%",
@@ -781,7 +760,7 @@ function MostLovedbyCustomers() {
         py: 4,
 
         px: {
-          xs: 2,
+          xs: 0,
           sm: 3,
           md: 5,
         },
@@ -790,22 +769,14 @@ function MostLovedbyCustomers() {
           "hidden",
       }}
     >
-
       {/* ====================================
           HEADING
       ==================================== */}
-
       <Typography
         sx={{
           textAlign:
             "center",
-
-          fontSize: {
-            xs: "20px",
-            sm:
-              Theme.font24Regular,
-          },
-
+          ...Theme.font24Bold,
           mb: 4,
         }}
       >
@@ -814,8 +785,6 @@ function MostLovedbyCustomers() {
           by Customers
         </strong>
       </Typography>
-
-
       {/* ====================================
           DESKTOP CATEGORIES
       ==================================== */}
@@ -824,102 +793,65 @@ function MostLovedbyCustomers() {
         sx={{
           display: {
             xs: "none",
-            sm: "block",
+            md: "block",
           },
         }}
       >
-
         <CategoryList
           categories={
             categories
           }
-
           selectedCategory={
             selectedCategory
           }
-
           onCategoryClick={
             handleCategoryClick
           }
         />
-
       </Box>
-
-
       {/* ====================================
           MOBILE CATEGORIES
       ==================================== */}
-
       <Box
         sx={{
           display: {
             xs: "block",
-            sm: "none",
+            md: "none",
           },
         }}
       >
-
         <CategoryList
           categories={
             categories
           }
-
           selectedCategory={
             selectedCategory
           }
-
           onCategoryClick={
             handleCategoryClick
           }
-
           mobile
         />
-
       </Box>
-
-
       {/* ====================================
           PRODUCT SECTION
       ==================================== */}
-
       <Box
         sx={{
           width: "100%",
-
           maxWidth:
             "1200px",
-
           mx: "auto",
-
           mt: 4,
-
           mb: 3,
+          ml:1,
         }}
       >
-
-        <Typography
-          sx={{
-            fontSize:
-              Theme.font20Bold,
-
-            textAlign:
-              "left",
-          }}
-        >
-          {
-            selectedCategoryObject
-              ?.heading ||
-            "Most-Loved Products"
-          }
-        </Typography>
-
-
+    
         <Typography
           sx={{
             mt: 0.5,
-
-            fontSize:
-              Theme.font14Regular,
+            ...Theme.font14Regular,
 
             color:
               Colors.black,

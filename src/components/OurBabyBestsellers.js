@@ -21,6 +21,10 @@ import {
   getOurBabyDataActionInitiate,
 } from "../redux/actions/contentActions";
 
+import {
+  getProductsDataActionInitiate,
+} from "../redux/actions/productActions";
+
 import ProductCards from "./ProductCards";
 
 import {
@@ -30,9 +34,9 @@ import {
 import Colors from "../themes/colors";
 
 
-// ========================================
+
 // NORMALIZE CATEGORY
-// ========================================
+
 
 const normalizeCategory = (
   category = ""
@@ -43,9 +47,9 @@ const normalizeCategory = (
     .replace(/[\s_-]+/g, "");
 
 
-// ========================================
+
 // BABY CATEGORY MAP
-// ========================================
+
 
 const BABY_CATEGORY_MAP = {
   shampoo: [
@@ -86,9 +90,9 @@ const BABY_CATEGORY_MAP = {
 };
 
 
-// ========================================
+
 // GET PRODUCT CATEGORY
-// ========================================
+
 
 const getProductCategory = (
   product
@@ -133,9 +137,9 @@ const getProductCategory = (
 };
 
 
-// ========================================
+
 // CATEGORY ITEM
-// ========================================
+
 
 const CategoryItem = memo(
   function CategoryItem({
@@ -149,11 +153,24 @@ const CategoryItem = memo(
       item?.heading?.trim() || "";
 
 
-   const normalizedCategoryName =
-  normalizeCategory(categoryName);
+    const normalizedCategoryName =
+      useMemo(
+        () =>
+          normalizeCategory(
+            categoryName
+          ),
+        [categoryName]
+      );
 
-const normalizedSelectedCategory =
-  normalizeCategory(selectedCategory);
+
+    const normalizedSelectedCategory =
+      useMemo(
+        () =>
+          normalizeCategory(
+            selectedCategory
+          ),
+        [selectedCategory]
+      );
 
 
     const isSelected =
@@ -331,9 +348,9 @@ const normalizedSelectedCategory =
 );
 
 
-// ========================================
+
 // CATEGORY LIST
-// ========================================
+
 
 const CategoryList = memo(
   function CategoryList({
@@ -441,9 +458,9 @@ const CategoryList = memo(
 );
 
 
-// ========================================
+
 // MAIN COMPONENT
-// ========================================
+
 
 function OurBabyBestsellers() {
 
@@ -451,9 +468,9 @@ function OurBabyBestsellers() {
     useDispatch();
 
 
-  // ========================================
+  
   // CONTENT SELECTORS
-  // ========================================
+  
 
   const OurBabyBestsellersImages =
     useSelector(
@@ -475,9 +492,9 @@ function OurBabyBestsellers() {
     );
 
 
-  // ========================================
+  
   // PRODUCT SELECTORS
-  // ========================================
+  
 
   const productData =
     useSelector(
@@ -498,9 +515,9 @@ function OurBabyBestsellers() {
     );
 
 
-  // ========================================
+  
   // SELECTED CATEGORY
-  // ========================================
+  
 
   const [
     selectedCategory,
@@ -510,18 +527,26 @@ function OurBabyBestsellers() {
   );
 
 
-  // ========================================
+  
   // GET DATA
-  // ========================================
+  
 
- useEffect(() => {
-  dispatch(getOurBabyDataActionInitiate());
-}, [dispatch]);
+  useEffect(() => {
+
+    dispatch(
+      getOurBabyDataActionInitiate()
+    );
+
+    dispatch(
+      getProductsDataActionInitiate()
+    );
+
+  }, [dispatch]);
 
 
-  // ========================================
+  
   // NORMALIZE PRODUCTS
-  // ========================================
+  
 
   const products =
     useMemo(() => {
@@ -560,9 +585,9 @@ function OurBabyBestsellers() {
     ]);
 
 
-  // ========================================
+  
   // SELECTED CATEGORY KEY
-  // ========================================
+  
 
   const selectedCategoryKey =
     useMemo(
@@ -576,9 +601,9 @@ function OurBabyBestsellers() {
     );
 
 
-  // ========================================
+  
   // SELECTED CATEGORY VALUES
-  // ========================================
+  
 
   const selectedCategoryValues =
     useMemo(
@@ -592,9 +617,9 @@ function OurBabyBestsellers() {
     );
 
 
-  // ========================================
+  
   // FILTER PRODUCTS
-  // ========================================
+  
 
   const filteredProducts =
     useMemo(() => {
@@ -629,9 +654,9 @@ function OurBabyBestsellers() {
     ]);
 
 
-  // ========================================
+  
   // CATEGORY CLICK
-  // ========================================
+  
 
   const handleCategoryClick =
     useCallback(
@@ -646,9 +671,9 @@ function OurBabyBestsellers() {
     );
 
 
-  // ========================================
+  
   // CATEGORY DATA
-  // ========================================
+  
 
   const categories =
     useMemo(() => {
@@ -664,9 +689,9 @@ function OurBabyBestsellers() {
     ]);
 
 
-  // ========================================
+  
   // LOADING
-  // ========================================
+  
 
   if (
     contentLoading ||
@@ -692,9 +717,9 @@ function OurBabyBestsellers() {
   }
 
 
-  // ========================================
+  
   // ERROR
-  // ========================================
+  
 
   if (
     contentError ||
@@ -726,9 +751,9 @@ function OurBabyBestsellers() {
   }
 
 
-  // ========================================
+  
   // MAIN UI
-  // ========================================
+  
 
   return (
     <Box
@@ -772,19 +797,35 @@ function OurBabyBestsellers() {
 
       <Typography
         sx={{
+          mt: 1,
+
+        
+          px: {
+            xs: 3,
+            sm: 5,
+            md: 8,
+          },
+
           textAlign:
             "center",
 
-          fontSize:
-            Theme.font12Regular,
+          whiteSpace:
+            "normal",
+  ...Theme.font12Regular,
 
-          mt: 0.5,
+          lineHeight: 1.5,
+
+          color:
+            Colors.black,
+
+          boxSizing:
+            "border-box",
         }}
       >
-        Give your little one the
+          Give your little one the
         care they deserve
       </Typography>
-
+       
 
       {/* ====================================
           DESKTOP CATEGORIES
@@ -936,9 +977,9 @@ function OurBabyBestsellers() {
 }
 
 
-// ========================================
+
 // MEMOIZED EXPORT
-// ========================================
+
 
 export default memo(
   OurBabyBestsellers

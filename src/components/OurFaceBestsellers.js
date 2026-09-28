@@ -1,3 +1,4 @@
+
 import React, {
   memo,
   useCallback,
@@ -20,6 +21,10 @@ import {
   getOurFaceDataActionInitiate,
 } from "../redux/actions/contentActions";
 
+import {
+  getProductsDataActionInitiate,
+} from "../redux/actions/productActions";
+
 import ProductCards from "./ProductCards";
 
 import { Theme } from "../themes/GlobalStyles";
@@ -27,7 +32,6 @@ import Colors from "../themes/colors";
 
 
 // HELPER FUNCTIONS
-
 
 const normalizeCategory = (category = "") => {
   return String(category)
@@ -38,7 +42,6 @@ const normalizeCategory = (category = "") => {
 
 
 // CATEGORY MAP
-
 
 const FACE_CATEGORY_MAP = {
   facewash: [
@@ -82,10 +85,11 @@ const FACE_CATEGORY_MAP = {
 
 // GET PRODUCT CATEGORY
 
-
 const getProductCategory = (product) => {
+
   if (
-    typeof product?.category === "string"
+    typeof product?.category ===
+    "string"
   ) {
     return product.category;
   }
@@ -100,7 +104,6 @@ const getProductCategory = (product) => {
 
 // CATEGORY ITEM
 
-
 const CategoryItem = memo(
   function CategoryItem({
     item,
@@ -108,27 +111,39 @@ const CategoryItem = memo(
     onClick,
     mobile = false,
   }) {
+
     const categoryName =
       item?.heading?.trim() || "";
 
-    const handleClick = useCallback(() => {
-      if (categoryName) {
-        onClick(categoryName);
-      }
-    }, [
-      categoryName,
-      onClick,
-    ]);
+
+    const handleClick =
+      useCallback(() => {
+
+        if (categoryName) {
+          onClick(categoryName);
+        }
+
+      }, [
+        categoryName,
+        onClick,
+      ]);
+
 
     return (
       <Box
         onClick={handleClick}
         sx={{
           display: "flex",
+
           flexDirection: "column",
+
           alignItems: "center",
-          justifyContent: "flex-start",
+
+          justifyContent: "center",
+
           flexShrink: 0,
+
+          cursor: "pointer",
 
           width: mobile
             ? "auto"
@@ -136,23 +151,22 @@ const CategoryItem = memo(
 
           minWidth: mobile
             ? "75px"
-            : "50px",
+            : "auto",
 
           minHeight: mobile
-            ? "76px"
-            : "60px",
+            ? "auto"
+            : 30,
 
           padding: mobile
             ? "8px"
             : 0,
 
-          boxSizing: "border-box",
-
           borderRadius: "10px",
 
-          backgroundColor: isSelected
-            ? Colors.background
-            : "transparent",
+          backgroundColor:
+            isSelected
+              ? Colors.background
+              : "transparent",
 
           transition:
             "background-color 0.3s ease",
@@ -163,6 +177,7 @@ const CategoryItem = memo(
           },
         }}
       >
+
         {/* CATEGORY IMAGE */}
 
         <Box
@@ -171,38 +186,20 @@ const CategoryItem = memo(
           aria-label={categoryName}
           sx={{
             display: "block",
-            flex: "0 0 auto",
-            position: "relative",
 
             width: mobile
-              ? "42px"
+              ? 42
               : {
-                  sm: "32px",
-                  md: "36px",
+                  sm: 32,
+                  md: 36,
                 },
 
             height: mobile
-              ? "42px"
+              ? 42
               : {
-                  sm: "32px",
-                  md: "36px",
+                  sm: 32,
+                  md: 36,
                 },
-
-            minWidth: mobile
-              ? "42px"
-              : {
-                  sm: "32px",
-                  md: "36px",
-                },
-
-            minHeight: mobile
-              ? "42px"
-              : {
-                  sm: "32px",
-                  md: "36px",
-                },
-
-            aspectRatio: "1 / 1",
 
             backgroundColor:
               isSelected
@@ -210,14 +207,10 @@ const CategoryItem = memo(
                 : Colors.black,
 
             WebkitMaskImage:
-              item?.image_url
-                ? `url(${item.image_url})`
-                : "none",
+              `url(${item?.image_url})`,
 
             maskImage:
-              item?.image_url
-                ? `url(${item.image_url})`
-                : "none",
+              `url(${item?.image_url})`,
 
             WebkitMaskRepeat:
               "no-repeat",
@@ -242,35 +235,31 @@ const CategoryItem = memo(
           }}
         />
 
+
         {/* CATEGORY NAME */}
 
         <Typography
           sx={{
-            mt: mobile ? 1 : 0.5,
-
-            height: "18px",
-            minHeight: "18px",
-
-            lineHeight: "18px",
-
-            width: "100%",
+            mt: mobile
+              ? 1
+              : 0.5,
 
             textAlign: "center",
 
             whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
 
             fontSize:
               Theme.font12Regular,
 
-            color: isSelected
-              ? Colors.blue
-              : Colors.black,
+            color:
+              isSelected
+                ? Colors.blue
+                : Colors.black,
 
-            fontWeight: isSelected
-              ? 600
-              : 400,
+            fontWeight:
+              isSelected
+                ? 600
+                : 400,
 
             transition:
               "color 0.3s ease",
@@ -278,6 +267,7 @@ const CategoryItem = memo(
         >
           {categoryName}
         </Typography>
+
       </Box>
     );
   }
@@ -286,7 +276,6 @@ const CategoryItem = memo(
 
 // CATEGORY LIST
 
-
 const CategoryList = memo(
   function CategoryList({
     categories,
@@ -294,13 +283,16 @@ const CategoryList = memo(
     onCategoryClick,
     mobile = false,
   }) {
-    const selectedKey = useMemo(
-      () =>
-        normalizeCategory(
-          selectedCategory
-        ),
-      [selectedCategory]
-    );
+
+    const selectedKey =
+      useMemo(
+        () =>
+          normalizeCategory(
+            selectedCategory
+          ),
+        [selectedCategory]
+      );
+
 
     return (
       <Box
@@ -325,6 +317,7 @@ const CategoryList = memo(
               },
 
           overflowX: "auto",
+
           overflowY: "hidden",
 
           pb: mobile
@@ -332,16 +325,6 @@ const CategoryList = memo(
             : 1,
 
           mt: 3,
-
-          boxSizing: "border-box",
-
-          minHeight: mobile
-            ? "92px"
-            : "72px",
-
-          height: mobile
-            ? "92px"
-            : "72px",
 
           WebkitOverflowScrolling:
             "touch",
@@ -357,31 +340,37 @@ const CategoryList = memo(
             "none",
         }}
       >
-        {categories.map((item) => {
-          const categoryName =
-            item?.heading?.trim() ||
-            "";
 
-          const isSelected =
-            selectedKey ===
-            normalizeCategory(
-              categoryName
+        {categories.map(
+          (item) => {
+
+            const categoryName =
+              item?.heading?.trim() ||
+              "";
+
+            const isSelected =
+              selectedKey ===
+              normalizeCategory(
+                categoryName
+              );
+
+
+            return (
+              <CategoryItem
+                key={item.id}
+                item={item}
+                isSelected={
+                  isSelected
+                }
+                onClick={
+                  onCategoryClick
+                }
+                mobile={mobile}
+              />
             );
+          }
+        )}
 
-          return (
-            <CategoryItem
-              key={item.id}
-              item={item}
-              isSelected={
-                isSelected
-              }
-              onClick={
-                onCategoryClick
-              }
-              mobile={mobile}
-            />
-          );
-        })}
       </Box>
     );
   }
@@ -390,16 +379,16 @@ const CategoryList = memo(
 
 // MAIN COMPONENT
 
-
 function OurFaceBestsellers({
   products: initialProducts = [],
 }) {
-  const dispatch = useDispatch();
 
-  
-  // CONTENT DATA
-  
+  const dispatch =
+    useDispatch();
 
+
+    // CONTENT DATA
+  
   const OurFaceBestsellersImages =
     useSelector(
       (state) =>
@@ -419,10 +408,9 @@ function OurFaceBestsellers({
         state.content?.error
     );
 
-  
-  // PRODUCT DATA
-  
 
+    // PRODUCT DATA
+  
   const productData =
     useSelector(
       (state) =>
@@ -441,50 +429,59 @@ function OurFaceBestsellers({
         state.product?.error
     );
 
-  
-  // STATE
-  
 
+    // STATE
+  
   const [
     selectedCategory,
     setSelectedCategory,
-  ] = useState("Facewash");
+  ] = useState(
+    "Facewash"
+  );
 
-  
-  // API CALL
-  
 
+    // API CALLS
+  
   useEffect(() => {
+
     dispatch(
       getOurFaceDataActionInitiate()
     );
+
+    dispatch(
+      getProductsDataActionInitiate()
+    );
+
   }, [dispatch]);
 
-  
-  // NORMALIZE PRODUCTS
-  
 
-  const products = useMemo(() => {
-    if (
-      Array.isArray(productData)
-    ) {
-      return productData;
-    }
-
-    return Array.isArray(
-      initialProducts
-    )
-      ? initialProducts
-      : [];
-  }, [
-    productData,
-    initialProducts,
-  ]);
-
+    // NORMALIZE PRODUCTS
   
-  // SELECTED CATEGORY KEY
-  
+  const products =
+    useMemo(() => {
 
+      if (
+        Array.isArray(
+          productData
+        )
+      ) {
+        return productData;
+      }
+
+      return Array.isArray(
+        initialProducts
+      )
+        ? initialProducts
+        : [];
+
+    }, [
+      productData,
+      initialProducts,
+    ]);
+
+
+    // SELECTED CATEGORY KEY
+  
   const selectedCategoryKey =
     useMemo(
       () =>
@@ -494,18 +491,19 @@ function OurFaceBestsellers({
       [selectedCategory]
     );
 
-  
-  // FILTER PRODUCTS
-  
 
+    // FILTER PRODUCTS
+  
   const filteredProducts =
     useMemo(() => {
+
       if (
         products.length === 0 ||
         !selectedCategoryKey
       ) {
         return [];
       }
+
 
       const selectedCategoryValues =
         FACE_CATEGORY_MAP[
@@ -514,8 +512,10 @@ function OurFaceBestsellers({
           selectedCategoryKey,
         ];
 
+
       return products.filter(
         (product) => {
+
           const productCategory =
             normalizeCategory(
               getProductCategory(
@@ -523,23 +523,25 @@ function OurFaceBestsellers({
               )
             );
 
+
           return selectedCategoryValues.includes(
             productCategory
           );
         }
       );
+
     }, [
       products,
       selectedCategoryKey,
     ]);
 
-  
-  // CATEGORY CLICK
-  
 
+    // CATEGORY CLICK
+  
   const handleCategoryClick =
     useCallback(
       (heading) => {
+
         if (!heading) {
           return;
         }
@@ -547,148 +549,76 @@ function OurFaceBestsellers({
         setSelectedCategory(
           heading.trim()
         );
+
       },
       []
     );
 
-  
-  // CATEGORY DATA
-  
 
-  const categories = useMemo(() => {
-    return Array.isArray(
-      OurFaceBestsellersImages
-    )
-      ? OurFaceBestsellersImages
-      : [];
-  }, [
-    OurFaceBestsellersImages,
-  ]);
-
+    // CATEGORY DATA
   
-  // LOADING
-  
+  const categories =
+    useMemo(() => {
 
+      return Array.isArray(
+        OurFaceBestsellersImages
+      )
+        ? OurFaceBestsellersImages
+        : [];
+
+    }, [
+      OurFaceBestsellersImages,
+    ]);
+
+
+    // LOADING
+  
   if (
     contentLoading ||
     productLoading
   ) {
+
     return (
       <Box
         sx={{
           width: "100%",
-          minHeight: {
-            xs: "850px",
-            sm: "900px",
-            md: "950px",
-          },
 
-          py: 3,
+          py: 5,
 
-          px: {
-            xs: 2,
-            sm: 3,
-            md: 5,
-          },
-
-          boxSizing: "border-box",
+          textAlign:
+            "center",
         }}
       >
-        <Typography
-          component="h2"
-          sx={{
-            textAlign: "center",
-            fontSize:
-              Theme.font24SemiBold,
-
-            minHeight: "36px",
-            lineHeight: "36px",
-          }}
-        >
-          Our{" "}
-          <strong>
-            Face
-          </strong>{" "}
-          Bestsellers
+        <Typography>
+          Loading...
         </Typography>
-
-        <Typography
-          sx={{
-            textAlign: "center",
-
-            fontSize:
-              Theme.font12Regular,
-
-            mt: 0.5,
-
-            minHeight: "18px",
-            lineHeight: "18px",
-          }}
-        >
-          Formulated with love and
-          the goodness of natural
-          ingredients
-        </Typography>
-
-        {/* Reserve category space */}
-        <Box
-          sx={{
-            height: {
-              xs: "108px",
-              sm: "96px",
-            },
-          }}
-        />
-
-        {/* Reserve product space */}
-        <Box
-          sx={{
-            minHeight: {
-              xs: "280px",
-              sm: "320px",
-              md: "350px",
-            },
-          }}
-        />
       </Box>
     );
   }
 
-  
-  // ERROR
-  
 
+    // ERROR
+  
   if (
     contentError ||
     productError
   ) {
+
     return (
       <Box
         sx={{
           width: "100%",
 
-          minHeight: {
-            xs: "850px",
-            sm: "900px",
-            md: "950px",
-          },
-
           py: 5,
 
-          px: {
-            xs: 2,
-            sm: 3,
-            md: 5,
-          },
-
-          boxSizing: "border-box",
-
-          textAlign: "center",
+          textAlign:
+            "center",
         }}
       >
         <Typography
           sx={{
-            color: Colors.red,
+            color:
+              Colors.orange,
           }}
         >
           {contentError ||
@@ -698,10 +628,9 @@ function OurFaceBestsellers({
     );
   }
 
-  
-  // MAIN UI
-  
 
+    // MAIN UI
+  
   return (
     <Box
       sx={{
@@ -710,35 +639,21 @@ function OurFaceBestsellers({
         py: 3,
 
         px: {
-          xs: 2,
+          xs: 0,
           sm: 3,
           md: 5,
         },
-
-        boxSizing: "border-box",
-
-        /*
-         * Reserve a stable section height.
-         */
-        minHeight: {
-          xs: "850px",
-          sm: "900px",
-          md: "950px",
-        },
       }}
     >
+
       {/* HEADING */}
 
       <Typography
-        component="h2"
         sx={{
           textAlign: "center",
 
           fontSize:
             Theme.font24SemiBold,
-
-          minHeight: "36px",
-          lineHeight: "36px",
         }}
       >
         Our{" "}
@@ -748,25 +663,51 @@ function OurFaceBestsellers({
         Bestsellers
       </Typography>
 
+
       {/* SUB HEADING */}
 
-      <Typography
+        <Typography
         sx={{
-          textAlign: "center",
+          mt: 1,
 
-          fontSize:
-            Theme.font12Regular,
+        
+          px: {
+            xs: 3,
+            sm: 5,
+            md: 8,
+          },
 
-          mt: 0.5,
+          textAlign:
+            "center",
 
-          minHeight: "18px",
-          lineHeight: "18px",
+          whiteSpace:
+            "normal",
+
+          fontFamily:
+            '"OpenSans", sans-serif',
+
+          fontSize: {
+            xs: "12px",
+            sm: "13px",
+            md: "14px",
+          },
+
+          fontWeight: 400,
+
+          lineHeight: 1.5,
+
+          color:
+            Colors.black,
+
+          boxSizing:
+            "border-box",
         }}
       >
-        Formulated with love and
-        the goodness of natural
-        ingredients
+        Formulated with the goodness
+        of natural ingredients and no
+        harmful chemicals
       </Typography>
+
 
       {/* DESKTOP CATEGORIES */}
 
@@ -774,21 +715,11 @@ function OurFaceBestsellers({
         sx={{
           display: {
             xs: "none",
-            sm: "block",
+            md: "block",
           },
-
-          /*
-           * Fixed height prevents the
-           * category SVGs from changing
-           * the section height after load.
-           */
-          height: "96px",
-
-          overflow: "hidden",
-
-          boxSizing: "border-box",
         }}
       >
+
         <CategoryList
           categories={categories}
           selectedCategory={
@@ -798,7 +729,9 @@ function OurFaceBestsellers({
             handleCategoryClick
           }
         />
+
       </Box>
+
 
       {/* MOBILE CATEGORIES */}
 
@@ -806,19 +739,11 @@ function OurFaceBestsellers({
         sx={{
           display: {
             xs: "block",
-            sm: "none",
+            md: "none",
           },
-
-          /*
-           * Fixed mobile category area.
-           */
-          height: "108px",
-
-          overflow: "hidden",
-
-          boxSizing: "border-box",
         }}
       >
+
         <CategoryList
           categories={categories}
           selectedCategory={
@@ -829,11 +754,13 @@ function OurFaceBestsellers({
           }
           mobile
         />
+
       </Box>
+
 
       {/* SELECTED CATEGORY */}
 
-      <Box
+      {/* <Box
         sx={{
           width: "100%",
 
@@ -844,40 +771,33 @@ function OurFaceBestsellers({
           mt: 4,
 
           mb: 3,
-
-          minHeight: "30px",
-
-          height: "30px",
-
-          boxSizing: "border-box",
         }}
       >
+
         <Typography
-          component="h3"
           sx={{
             fontSize:
               Theme.font20Bold,
 
-            textAlign: "left",
+            textAlign:
+              "left",
 
             ml: {
               xs: 0,
               sm: 5,
             },
-
-            minHeight: "30px",
-            height: "30px",
-
-            lineHeight: "30px",
           }}
         >
           {selectedCategory}
         </Typography>
-      </Box>
+
+      </Box> */}
+
 
       {/* PRODUCTS */}
 
       {filteredProducts.length > 0 ? (
+
         <Box
           sx={{
             width: "100%",
@@ -886,24 +806,21 @@ function OurFaceBestsellers({
 
             mx: "auto",
 
-            minHeight: {
-              xs: "280px",
-              sm: "320px",
-              md: "350px",
-            },
-
-            overflow: "visible",
-
-            boxSizing: "border-box",
+            overflow:
+              "visible",
           }}
         >
+
           <ProductCards
             products={
               filteredProducts
             }
           />
+
         </Box>
+
       ) : (
+
         <Box
           sx={{
             width: "100%",
@@ -914,15 +831,14 @@ function OurFaceBestsellers({
 
             py: 5,
 
-            minHeight: "150px",
+            textAlign:
+              "center",
 
-            textAlign: "center",
-
-            borderRadius: "10px",
-
-            boxSizing: "border-box",
+            borderRadius:
+              "10px",
           }}
         >
+
           <Typography
             sx={{
               color:
@@ -936,11 +852,15 @@ function OurFaceBestsellers({
             for{" "}
             {selectedCategory}
           </Typography>
+
         </Box>
+
       )}
+
     </Box>
   );
 }
+
 
 export default memo(
   OurFaceBestsellers
