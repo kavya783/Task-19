@@ -18,9 +18,9 @@ import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
 
-// ========================================
+
 // LAZY LOADED COMPONENTS
-// ========================================
+
 
 const MostLovedbyCustomers = lazy(
   () => import("../components/MostLovedbyCustomers")
@@ -59,9 +59,9 @@ const FooterBelowContent = lazy(
 );
 
 
-// ========================================
+
 // CART CONSTANTS
-// ========================================
+
 
 const GUEST_CART_KEY =
   "mamaearth_cart_guest";
@@ -70,9 +70,9 @@ const USER_STORAGE_KEY =
   "user";
 
 
-// ========================================
+
 // CART HELPER
-// ========================================
+
 
 const getCartKey = () => {
 
@@ -114,9 +114,9 @@ const getCartItems = () => {
 };
 
 
-// ========================================
+
 // MOBILE FLOATING CART
-// ========================================
+
 
 const MobileFloatingCart = memo(
   function MobileFloatingCart({
@@ -334,9 +334,9 @@ height: {
 );
 
 
-// ========================================
+
 // HOME PAGE
-// ========================================
+
 
 function HomePage() {
 
@@ -346,9 +346,9 @@ function HomePage() {
   ] = useState(getCartItems);
 
 
-  // ========================================
+  
   // CART SYNC
-  // ========================================
+  
 
   useEffect(() => {
 
@@ -388,9 +388,9 @@ function HomePage() {
   }, []);
 
 
-  // ========================================
+  
   // TOTAL CART ITEMS
-  // ========================================
+  
 
   const totalItems =
     useMemo(() => {
@@ -405,9 +405,9 @@ function HomePage() {
     }, [cartItems]);
 
 
-  // ========================================
+  
   // OPEN CART
-  // ========================================
+  
 
   const handleOpenCart =
     useCallback(() => {

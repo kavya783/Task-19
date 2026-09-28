@@ -25,9 +25,9 @@ import ProductCards from "./ProductCards";
 import { Theme } from "../themes/GlobalStyles";
 import Colors from "../themes/colors";
 
-// ========================================
+
 // HELPER FUNCTIONS
-// ========================================
+
 
 const normalizeCategory = (category = "") => {
   return String(category)
@@ -36,9 +36,9 @@ const normalizeCategory = (category = "") => {
     .replace(/[\s_-]+/g, "");
 };
 
-// ========================================
+
 // CATEGORY MAP
-// ========================================
+
 
 const FACE_CATEGORY_MAP = {
   facewash: [
@@ -79,9 +79,9 @@ const FACE_CATEGORY_MAP = {
   ],
 };
 
-// ========================================
+
 // GET PRODUCT CATEGORY
-// ========================================
+
 
 const getProductCategory = (product) => {
   if (
@@ -97,9 +97,9 @@ const getProductCategory = (product) => {
   );
 };
 
-// ========================================
+
 // CATEGORY ITEM
-// ========================================
+
 
 const CategoryItem = memo(
   function CategoryItem({
@@ -283,9 +283,9 @@ const CategoryItem = memo(
   }
 );
 
-// ========================================
+
 // CATEGORY LIST
-// ========================================
+
 
 const CategoryList = memo(
   function CategoryList({
@@ -387,18 +387,18 @@ const CategoryList = memo(
   }
 );
 
-// ========================================
+
 // MAIN COMPONENT
-// ========================================
+
 
 function OurFaceBestsellers({
   products: initialProducts = [],
 }) {
   const dispatch = useDispatch();
 
-  // ========================================
+  
   // CONTENT DATA
-  // ========================================
+  
 
   const OurFaceBestsellersImages =
     useSelector(
@@ -419,9 +419,9 @@ function OurFaceBestsellers({
         state.content?.error
     );
 
-  // ========================================
+  
   // PRODUCT DATA
-  // ========================================
+  
 
   const productData =
     useSelector(
@@ -441,18 +441,18 @@ function OurFaceBestsellers({
         state.product?.error
     );
 
-  // ========================================
+  
   // STATE
-  // ========================================
+  
 
   const [
     selectedCategory,
     setSelectedCategory,
   ] = useState("Facewash");
 
-  // ========================================
+  
   // API CALL
-  // ========================================
+  
 
   useEffect(() => {
     dispatch(
@@ -460,9 +460,9 @@ function OurFaceBestsellers({
     );
   }, [dispatch]);
 
-  // ========================================
+  
   // NORMALIZE PRODUCTS
-  // ========================================
+  
 
   const products = useMemo(() => {
     if (
@@ -481,9 +481,9 @@ function OurFaceBestsellers({
     initialProducts,
   ]);
 
-  // ========================================
+  
   // SELECTED CATEGORY KEY
-  // ========================================
+  
 
   const selectedCategoryKey =
     useMemo(
@@ -494,9 +494,9 @@ function OurFaceBestsellers({
       [selectedCategory]
     );
 
-  // ========================================
+  
   // FILTER PRODUCTS
-  // ========================================
+  
 
   const filteredProducts =
     useMemo(() => {
@@ -533,9 +533,9 @@ function OurFaceBestsellers({
       selectedCategoryKey,
     ]);
 
-  // ========================================
+  
   // CATEGORY CLICK
-  // ========================================
+  
 
   const handleCategoryClick =
     useCallback(
@@ -551,9 +551,9 @@ function OurFaceBestsellers({
       []
     );
 
-  // ========================================
+  
   // CATEGORY DATA
-  // ========================================
+  
 
   const categories = useMemo(() => {
     return Array.isArray(
@@ -565,9 +565,9 @@ function OurFaceBestsellers({
     OurFaceBestsellersImages,
   ]);
 
-  // ========================================
+  
   // LOADING
-  // ========================================
+  
 
   if (
     contentLoading ||
@@ -577,13 +577,6 @@ function OurFaceBestsellers({
       <Box
         sx={{
           width: "100%",
-
-          /*
-           * Reserve the same vertical space
-           * as the final Face Bestsellers section.
-           * This helps prevent CLS while API
-           * data is loading.
-           */
           minHeight: {
             xs: "850px",
             sm: "900px",
@@ -661,9 +654,9 @@ function OurFaceBestsellers({
     );
   }
 
-  // ========================================
+  
   // ERROR
-  // ========================================
+  
 
   if (
     contentError ||
@@ -705,9 +698,9 @@ function OurFaceBestsellers({
     );
   }
 
-  // ========================================
+  
   // MAIN UI
-  // ========================================
+  
 
   return (
     <Box
