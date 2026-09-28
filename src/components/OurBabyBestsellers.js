@@ -867,11 +867,9 @@ function OurBabyBestsellers() {
       />
 
 
-      {/* ====================================
-          SELECTED CATEGORY
-      ==================================== */}
+     
 
-      <Box
+      {/* <Box
         sx={{
           width: "100%",
 
@@ -903,7 +901,7 @@ function OurBabyBestsellers() {
           {selectedCategory}
         </Typography>
 
-      </Box>
+      </Box> */}
 
 
       {/* ====================================

@@ -768,7 +768,7 @@ function OurMakeupBestSellers({
 
       {/* SELECTED CATEGORY */}
 
-      <Box
+      {/* <Box
         sx={{
           width: "100%",
 
@@ -800,7 +800,7 @@ function OurMakeupBestSellers({
         >
           {selectedCategory}
         </Typography>
-      </Box>
+      </Box> */}
 
 
       {/* PRODUCTS */}

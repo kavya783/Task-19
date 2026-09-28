@@ -255,6 +255,7 @@ const ProductCardItem = memo(
             boxShadow:
               "0 2px 8px rgba(0,0,0,0.08)",
             cursor: "pointer",
+            mt:5,
           }}
           onClick={handleCardClick}
         >

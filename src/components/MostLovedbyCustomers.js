@@ -844,7 +844,7 @@ function MostLovedbyCustomers() {
           mx: "auto",
           mt: 4,
           mb: 3,
-          ml:1,
+          ml:{xs:0,lg:20,},
         }}
       >
     

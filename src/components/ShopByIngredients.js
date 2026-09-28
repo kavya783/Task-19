@@ -21,6 +21,9 @@ import {
   getShopByIngredientsDataActionInitiate,
 } from "../redux/actions/contentActions";
 
+import {
+  getProductsDataActionInitiate,
+} from "../redux/actions/productActions";
 
 import ProductCards from "./ProductCards";
 
@@ -440,7 +443,9 @@ function ShopByIngredients() {
       getShopByIngredientsDataActionInitiate()
     );
 
-  
+    dispatch(
+      getProductsDataActionInitiate()
+    );
   }, [dispatch]);
 
 
@@ -542,9 +547,9 @@ function ShopByIngredients() {
 
     return products.filter(
       (product) => {
-        // ==================================
+      
         // SPECIAL INGREDIENTS
-        // ==================================
+      
 
         if (isSpecialIngredient) {
           const values =
@@ -563,9 +568,9 @@ function ShopByIngredients() {
         }
 
 
-        // ==================================
+      
         // NORMAL INGREDIENTS
-        // ==================================
+      
 
         const headingValues =
           getProductHeadingAndNameValues(
@@ -753,7 +758,7 @@ function ShopByIngredients() {
 
       {/* SELECTED INGREDIENT */}
 
-      <Box
+      {/* <Box
         sx={{
           width: "100%",
           maxWidth: "1200px",
@@ -777,7 +782,7 @@ function ShopByIngredients() {
         >
           {selectedIngredient}
         </Typography>
-      </Box>
+      </Box> */}
 
 
       {/* PRODUCTS */}
