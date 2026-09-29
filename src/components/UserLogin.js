@@ -350,22 +350,9 @@ function Login({
                 // Store current login
                 // only in sessionStorage.
 
-                sessionStorage.setItem(
-                    "isLoggedIn",
-                    "true"
-                );
-
-                sessionStorage.setItem(
-                    "token",
-                    "twilio_verified"
-                );
-
-                sessionStorage.setItem(
-                    "user",
-                    JSON.stringify(
-                        data.user
-                    )
-                );
+               localStorage.setItem("isLoggedIn", "true");
+localStorage.setItem("token", "twilio_verified");
+localStorage.setItem("user", JSON.stringify(data.user));
 
 
                 console.log(
@@ -704,7 +691,7 @@ function Login({
                                 "border-box",
 
                             backgroundColor:
-                                Colors.blue,
+                                Colors.blue1,
 
                             display:
                                 "flex",
@@ -997,7 +984,7 @@ function Login({
                                                 "8px",
 
                                             backgroundColor:
-                                                Colors.blue,
+                                                Colors.blue1,
 
                                             textTransform:
                                                 "none",
