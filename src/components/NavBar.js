@@ -1325,7 +1325,7 @@ function NavBar() {
                         color:
                             Colors.black,
 
-                       ...Theme.font12Bold,
+                        ...Theme.font12Bold,
 
                         textAlign:
                             "center",
@@ -1583,10 +1583,13 @@ function NavBar() {
                                                 );
 
                                             const price =
-                                                product?.sale_price ||
-                                                product?.price ||
-                                                0;
-
+                                                Number(product?.sale_price) > 0
+                                                    ? product.sale_price
+                                                    : Number(product?.price) > 0
+                                                        ? product.price
+                                                        : Number(product?.mrp) > 0
+                                                            ? product.mrp
+                                                            : 0;
                                             return (
 
                                                 <Box
