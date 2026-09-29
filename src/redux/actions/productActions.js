@@ -9,9 +9,9 @@ import {
 } from "../apis/productsApi";
 
 
-// ========================================
+
 // PRODUCT - CREATE
-// ========================================
+
 
 export const createProductDataStart = () => ({
   type: types.CREATE_PRODUCT_START,
@@ -60,9 +60,9 @@ export const createProductDataActionInitiate = (data) => {
 };
 
 
-// ========================================
+
 // PRODUCT - GET
-// ========================================
+
 
 export const getProductsDataStart = () => ({
   type: types.FETCH_PRODUCTS_START,
@@ -79,53 +79,26 @@ export const getProductsDataError = (error) => ({
 });
 
 
-// ========================================
+
 // GET PRODUCTS - OPTIMIZED
-// ========================================
+
 
 export const getProductsDataActionInitiate = () => {
 
-  return async (dispatch, getState) => {
-
-    const {
-      products = [],
-      loading = false,
-    } = getState().product || {};
-
-
-    // ========================================
-    // PREVENT DUPLICATE API CALL
-    // ========================================
-
-    if (products.length > 0) {
-      return products;
-    }
-
-
-    // ========================================
-    // PREVENT MULTIPLE REQUESTS
-    // ========================================
-
-    if (loading) {
-      return products;
-    }
-
+  return async (dispatch) => {
 
     dispatch(
       getProductsDataStart()
     );
-
 
     try {
 
       const res =
         await getProductsApi();
 
-
       dispatch(
         getProductsDataSuccess(res)
       );
-
 
       return res;
 
@@ -143,9 +116,9 @@ export const getProductsDataActionInitiate = () => {
 };
 
 
-// ========================================
+
 // PRODUCT - UPDATE
-// ========================================
+
 
 export const updateProductDataStart = () => ({
   type: types.UPDATE_PRODUCT_START,
@@ -202,9 +175,9 @@ export const updateProductDataActionInitiate = (
 };
 
 
-// ========================================
+
 // PRODUCT - DELETE
-// ========================================
+
 
 export const deleteProductDataStart = () => ({
   type: types.DELETE_PRODUCT_START,
@@ -255,9 +228,9 @@ export const deleteProductDataActionInitiate = (
 };
 
 
-// ========================================
+
 // CATEGORIES - FROM ADMIN PANEL
-// ========================================
+
 
 export const getCategoriesDataStart = () => ({
   type: types.FETCH_CATEGORIES_START,
