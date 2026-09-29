@@ -769,7 +769,7 @@ function NavBar() {
             handleMenuClose();
 
             navigate(
-                "/ProfilePage"
+                "/profile-page"
             );
         };
 

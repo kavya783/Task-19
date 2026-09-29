@@ -350,9 +350,22 @@ function Login({
                 // Store current login
                 // only in sessionStorage.
 
-               localStorage.setItem("isLoggedIn", "true");
-localStorage.setItem("token", "twilio_verified");
-localStorage.setItem("user", JSON.stringify(data.user));
+                sessionStorage.setItem(
+                    "isLoggedIn",
+                    "true"
+                );
+
+                sessionStorage.setItem(
+                    "token",
+                    "twilio_verified"
+                );
+
+                sessionStorage.setItem(
+                    "user",
+                    JSON.stringify(
+                        data.user
+                    )
+                );
 
 
                 console.log(
@@ -691,7 +704,7 @@ localStorage.setItem("user", JSON.stringify(data.user));
                                 "border-box",
 
                             backgroundColor:
-                                Colors.blue1,
+                                Colors.blue,
 
                             display:
                                 "flex",
@@ -984,7 +997,7 @@ localStorage.setItem("user", JSON.stringify(data.user));
                                                 "8px",
 
                                             backgroundColor:
-                                                Colors.blue1,
+                                                Colors.blue,
 
                                             textTransform:
                                                 "none",
@@ -1262,7 +1275,7 @@ localStorage.setItem("user", JSON.stringify(data.user));
                                                 },
                                         }}
                                     />
-
+                                                
 
                                     <Button
                                         fullWidth
