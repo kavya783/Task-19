@@ -73,9 +73,22 @@ const Search = styled("div")(({ theme }) => ({
 
     marginLeft: theme.spacing(2),
 
+    flex: "0 1 500px",
+
+    minWidth: 0,
+
     width: "100%",
 
     maxWidth: "500px",
+
+    [theme.breakpoints.down("sm")]: {
+        marginLeft: 0,
+        marginRight: 0,
+        flex: 1,
+        width: "auto",
+        maxWidth: "none",
+        minWidth: 0,
+    },
 
     [theme.breakpoints.up("sm")]: {
         width: "300px",
@@ -89,7 +102,6 @@ const Search = styled("div")(({ theme }) => ({
         width: "500px",
     },
 }));
-
 
 const SearchIconWrapper = styled("div")(() => ({
     position: "absolute",
@@ -122,32 +134,27 @@ const SearchIconWrapper = styled("div")(() => ({
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: "inherit",
-
     width: "100%",
-
     height: "100%",
 
     "& .MuiInputBase-input": {
-        padding: theme.spacing(
-            1,
-            1,
-            1,
-            0
-        ),
-
+        padding: theme.spacing(1, 1, 1, 0),
         paddingLeft: "42px",
-
         width: "100%",
-
         height: "100%",
-
         boxSizing: "border-box",
-
         fontSize: "16px",
+
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
 
         "&::placeholder": {
             opacity: 1,
             color: "#555555",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
         },
     },
 }));
@@ -158,10 +165,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 const bannerTexts = [
-    "Buy Any 3 & Pay for 2 | Use Code : B3P2 | Shop Now",
+    "Buy Any 3 & Pay for 2 | Use Code : B3P2",
     "Get Flat 20% Off on Your First Order | Shop Now",
     "Free Shipping on Orders Above ₹499 | Shop Now",
-    "Natural Care Products for Healthy Skin & Hair | Shop Now",
+    "Natural Care Products for Healthy Skin & Hair",
 ];
 
 const searchPlaceholders = [
@@ -187,35 +194,35 @@ const USER_STORAGE_KEY =
 // GET CART KEY
 
 
-const getCartKey = () => {
-    try {
-        const user = JSON.parse(
-            sessionStorage.getItem(
-                USER_STORAGE_KEY
-            ) || "null"
-        );
+// const getCartKey = () => {
+//     try {
+//         const user = JSON.parse(
+//             sessionStorage.getItem(
+//                 USER_STORAGE_KEY
+//             ) || "null"
+//         );
 
-        const isLoggedIn =
-            sessionStorage.getItem(
-                "isLoggedIn"
-            ) === "true" &&
-            Boolean(
-                sessionStorage.getItem(
-                    "token"
-                )
-            ) &&
-            Boolean(user?.id);
+//         const isLoggedIn =
+//             sessionStorage.getItem(
+//                 "isLoggedIn"
+//             ) === "true" &&
+//             Boolean(
+//                 sessionStorage.getItem(
+//                     "token"
+//                 )
+//             ) &&
+//             Boolean(user?.id);
 
-        if (!isLoggedIn) {
-            return GUEST_CART_KEY;
-        }
+//         if (!isLoggedIn) {
+//             return GUEST_CART_KEY;
+//         }
 
-        return `mamaearth_cart_${user.id}`;
+//         return `mamaearth_cart_${user.id}`;
 
-    } catch {
-        return GUEST_CART_KEY;
-    }
-};
+//     } catch {
+//         return GUEST_CART_KEY;
+//     }
+// };
 
 
 
@@ -310,23 +317,23 @@ function NavBar() {
         useNavigate();
 
 
-       // CHECK CURRENT LOGIN STATE
-   
-  useEffect(() => {
-    const loggedIn =
-        sessionStorage.getItem("isLoggedIn") === "true" &&
-        Boolean(sessionStorage.getItem("token")) &&
-        Boolean(sessionStorage.getItem("user"));
+    // CHECK CURRENT LOGIN STATE
 
-    setIsLoggedIn(loggedIn);
+    useEffect(() => {
+        const loggedIn =
+            sessionStorage.getItem("isLoggedIn") === "true" &&
+            Boolean(sessionStorage.getItem("token")) &&
+            Boolean(sessionStorage.getItem("user"));
 
-    
-    setCartItems(getCartItems());
-}, []);
+        setIsLoggedIn(loggedIn);
 
 
-       // MENU STATES
-   
+        setCartItems(getCartItems());
+    }, []);
+
+
+    // MENU STATES
+
     const [
         anchorEl,
         setAnchorEl,
@@ -338,8 +345,8 @@ function NavBar() {
     ] = useState(null);
 
 
-       // BANNER STATES
-   
+    // BANNER STATES
+
     const [
         currentText,
         setCurrentText,
@@ -351,8 +358,8 @@ function NavBar() {
     ] = useState(0);
 
 
-       // SEARCH STATES
-   
+    // SEARCH STATES
+
     const [
         searchText,
         setSearchText,
@@ -364,8 +371,8 @@ function NavBar() {
     ] = useState("");
 
 
-       // AUTH STATES
-   
+    // AUTH STATES
+
     const [
         isLoggedIn,
         setIsLoggedIn,
@@ -391,23 +398,23 @@ function NavBar() {
     ] = useState(false);
 
 
-       // CART STATES
-   
+    // CART STATES
+
     const [
         cartOpen,
         setCartOpen,
     ] = useState(false);
 
-   const [
-    cartItems,
-    setCartItems,
-] = useState(() => {
-    return getCartItems();
-});
+    const [
+        cartItems,
+        setCartItems,
+    ] = useState(() => {
+        return getCartItems();
+    });
 
 
-       // PRODUCTS FROM REDUX
-   
+    // PRODUCTS FROM REDUX
+
     const productData =
         useSelector(
             (state) =>
@@ -434,8 +441,8 @@ function NavBar() {
     }, [productData]);
 
 
-       // CART COUNT
-   
+    // CART COUNT
+
     const cartItemCount =
         useMemo(() => {
 
@@ -456,8 +463,8 @@ function NavBar() {
         }, [cartItems]);
 
 
-       // MENU STATUS
-   
+    // MENU STATUS
+
     const isMenuOpen =
         Boolean(anchorEl);
 
@@ -467,8 +474,8 @@ function NavBar() {
         );
 
 
-       // SEARCH RESULTS
-   
+    // SEARCH RESULTS
+
     const searchResults =
         useMemo(() => {
 
@@ -502,7 +509,7 @@ function NavBar() {
 
                         const category =
                             typeof product?.category ===
-                            "object"
+                                "object"
                                 ? String(
                                     product
                                         ?.category
@@ -571,8 +578,8 @@ function NavBar() {
         ]);
 
 
-       // TOP BANNER ROTATION
-   
+    // TOP BANNER ROTATION
+
     useEffect(() => {
 
         const interval =
@@ -596,13 +603,13 @@ function NavBar() {
     }, []);
 
 
-       // SEARCH PLACEHOLDER ANIMATION
-   
+    // SEARCH PLACEHOLDER ANIMATION
+
     useEffect(() => {
 
         const text =
             searchPlaceholders[
-                currentSearch
+            currentSearch
             ];
 
         let index = 0;
@@ -706,8 +713,8 @@ function NavBar() {
     }, [currentSearch]);
 
 
-       // MENU HANDLERS
-   
+    // MENU HANDLERS
+
     const handleProfileMenuOpen =
         (event) => {
 
@@ -744,8 +751,8 @@ function NavBar() {
         };
 
 
-       // LOGIN
-   
+    // LOGIN
+
     const handleLogin = () => {
 
         handleMenuClose();
@@ -754,8 +761,8 @@ function NavBar() {
     };
 
 
-       // PROFILE
-   
+    // PROFILE
+
     const handleMyProfile =
         () => {
 
@@ -767,8 +774,8 @@ function NavBar() {
         };
 
 
-       // LOGOUT
-   
+    // LOGOUT
+
     const handleLogout =
         () => {
 
@@ -796,10 +803,10 @@ function NavBar() {
                 "isLoggedIn"
             );
 
-           setIsLoggedIn(false);
+            setIsLoggedIn(false);
 
-// After logout, show guest session cart if available
-setCartItems(getCartItems());
+            // After logout, show guest session cart if available
+            setCartItems(getCartItems());
             handleMenuClose();
 
             navigate("/");
@@ -816,8 +823,8 @@ setCartItems(getCartItems());
         };
 
 
-       // LOGIN CLOSE
-   
+    // LOGIN CLOSE
+
     const handleLoginClose =
         () => {
 
@@ -825,15 +832,15 @@ setCartItems(getCartItems());
         };
 
 
-       // SYNC CART
-   
-   const syncCartItems = () => {
-    setCartItems(getCartItems());
-};
+    // SYNC CART
+
+    const syncCartItems = () => {
+        setCartItems(getCartItems());
+    };
 
 
-       // CART EVENTS
-   
+    // CART EVENTS
+
     useEffect(() => {
 
         const handleCartUpdate =
@@ -852,34 +859,34 @@ setCartItems(getCartItems());
             };
 
 
-      const handleAuthChanged =
-    () => {
+        const handleAuthChanged =
+            () => {
 
-        const loggedIn =
-            sessionStorage.getItem(
-                "isLoggedIn"
-            ) === "true" &&
-            Boolean(
-                sessionStorage.getItem(
-                    "token"
-                )
-            ) &&
-            Boolean(
-                sessionStorage.getItem(
-                    "user"
-                )
-            );
+                const loggedIn =
+                    sessionStorage.getItem(
+                        "isLoggedIn"
+                    ) === "true" &&
+                    Boolean(
+                        sessionStorage.getItem(
+                            "token"
+                        )
+                    ) &&
+                    Boolean(
+                        sessionStorage.getItem(
+                            "user"
+                        )
+                    );
 
-        setIsLoggedIn(
-            loggedIn
-        );
+                setIsLoggedIn(
+                    loggedIn
+                );
 
-        // Login -> user cart
-        // Logout -> guest cart
-        setCartItems(
-            getCartItems()
-        );
-    };
+                // Login -> user cart
+                // Logout -> guest cart
+                setCartItems(
+                    getCartItems()
+                );
+            };
 
         window.addEventListener(
             "cart:update",
@@ -918,8 +925,8 @@ setCartItems(getCartItems());
     }, []);
 
 
-       // CART OPEN
-   
+    // CART OPEN
+
     const handleCartOpen =
         () => {
 
@@ -929,8 +936,8 @@ setCartItems(getCartItems());
         };
 
 
-       // LOGIN SUCCESS
-   
+    // LOGIN SUCCESS
+
     const handleLoginSuccess =
         (user) => {
 
@@ -960,12 +967,12 @@ setCartItems(getCartItems());
 
                 try {
 
-                   const guestCart =
-    JSON.parse(
-        sessionStorage.getItem(
-            GUEST_CART_KEY
-        ) || "[]"
-    );
+                    const guestCart =
+                        JSON.parse(
+                            sessionStorage.getItem(
+                                GUEST_CART_KEY
+                            ) || "[]"
+                        );
 
                     const userCartKey =
                         `mamaearth_cart_${user.id}`;
@@ -1006,7 +1013,7 @@ setCartItems(getCartItems());
                                     existingIndex
                                 ] = {
                                     ...mergedCart[
-                                        existingIndex
+                                    existingIndex
                                     ],
 
                                     quantity:
@@ -1042,9 +1049,9 @@ setCartItems(getCartItems());
                     );
 
 
-                   sessionStorage.removeItem(
-    GUEST_CART_KEY
-);
+                    sessionStorage.removeItem(
+                        GUEST_CART_KEY
+                    );
 
                 } catch (error) {
 
@@ -1075,8 +1082,8 @@ setCartItems(getCartItems());
         };
 
 
-       // SEARCH PRODUCT CLICK
-   
+    // SEARCH PRODUCT CLICK
+
     const handleSearchProductClick =
         (product) => {
 
@@ -1088,8 +1095,8 @@ setCartItems(getCartItems());
         };
 
 
-       // ENTER SEARCH
-   
+    // ENTER SEARCH
+
     const handleSearchKeyDown =
         (event) => {
 
@@ -1105,8 +1112,8 @@ setCartItems(getCartItems());
         };
 
 
-       // MENU IDS
-   
+    // MENU IDS
+
     const menuId =
         "primary-search-account-menu";
 
@@ -1114,8 +1121,8 @@ setCartItems(getCartItems());
         "primary-search-account-menu-mobile";
 
 
-       // DESKTOP MENU
-   
+    // DESKTOP MENU
+
     const renderMenu = (
 
         <Menu
@@ -1182,8 +1189,8 @@ setCartItems(getCartItems());
     );
 
 
-       // MOBILE MENU
-   
+    // MOBILE MENU
+
     const renderMobileMenu = (
 
         <Menu
@@ -1287,8 +1294,8 @@ setCartItems(getCartItems());
     );
 
 
-       // UI
-   
+    // UI
+
     return (
 
         <Box
@@ -1309,7 +1316,7 @@ setCartItems(getCartItems());
                     alignItems: "center",
                     justifyContent: "center",
                     overflow: "hidden",
-                    px: 2,
+                    px: 1,
                 }}
             >
 
@@ -1318,13 +1325,7 @@ setCartItems(getCartItems());
                         color:
                             Colors.black,
 
-                        fontSize: {
-                            xs: "12px",
-                            sm: "14px",
-                            md: "16px",
-                        },
-
-                        fontWeight: 600,
+                       ...Theme.font12Bold,
 
                         textAlign:
                             "center",
@@ -1335,7 +1336,7 @@ setCartItems(getCartItems());
                 >
                     {
                         bannerTexts[
-                            currentText
+                        currentText
                         ]
                     }
                 </Typography>
@@ -1362,23 +1363,28 @@ setCartItems(getCartItems());
                 <Toolbar
                     sx={{
                         minHeight: {
-                            xs: "64px",
+                            xs: "60px",
                             sm: "70px",
                         },
 
                         px: {
-                            xs: 1.5,
+                            xs: 1,
                             sm: 3,
                             md: 5,
                         },
 
                         gap: {
-                            xs: 1,
+                            xs: 0.75,
                             sm: 2,
                         },
+
+                        width: "100%",
+
+                        boxSizing: "border-box",
+
+                        overflow: "visible",
                     }}
                 >
-
                     {/* LOGO */}
 
                     <Box
@@ -1394,7 +1400,7 @@ setCartItems(getCartItems());
 
                         sx={{
                             width: {
-                                xs: 120,
+                                xs: 90,
                                 sm: 140,
                                 md: 160,
                             },
@@ -1406,13 +1412,12 @@ setCartItems(getCartItems());
                             flexShrink: 0,
 
                             mr: {
-                                xs: 0,
+                                xs: 0.5,
                                 sm: 1,
                                 md: 2,
                             },
 
-                            cursor:
-                                "pointer",
+                            cursor: "pointer",
                         }}
                     />
 
@@ -1421,26 +1426,34 @@ setCartItems(getCartItems());
 
                     <Search
                         sx={{
-                            flexGrow: 1,
+                            flex: {
+                                xs: 1,
+                                sm: "0 1 300px",
+                                md: "0 1 400px",
+                                lg: "0 1 500px",
+                            },
+
+                            minWidth: 0,
 
                             width: {
-                                xs: "100%",
+                                xs: "auto",
                                 sm: "300px",
                                 md: "400px",
                                 lg: "500px",
                             },
 
                             maxWidth: {
-                                xs: "100%",
-                                sm: "700px",
+                                xs: "none",
+                                sm: "300px",
                                 md: "400px",
                                 lg: "500px",
                             },
 
                             marginLeft: {
                                 xs: 0,
-                                sm: 10,
-                                lg: 40,
+                                sm: 3,
+                                md: 10,
+                                lg: 20,
                             },
 
                             marginRight: {
@@ -1448,7 +1461,10 @@ setCartItems(getCartItems());
                                 sm: 1,
                             },
 
-                            height: "50px",
+                            height: {
+                                xs: "44px",
+                                sm: "50px",
+                            },
 
                             backgroundColor:
                                 Colors.background,
@@ -1459,7 +1475,7 @@ setCartItems(getCartItems());
                             border:
                                 "1px solid #8e7373",
 
-                            borderRadius: 8,
+                            borderRadius: 7,
 
                             position:
                                 "relative",
@@ -1468,6 +1484,9 @@ setCartItems(getCartItems());
 
                             alignItems:
                                 "center",
+
+                            boxSizing:
+                                "border-box",
                         }}
                     >
 
@@ -1513,30 +1532,16 @@ setCartItems(getCartItems());
 
                             <Box
                                 sx={{
-                                    position:
-                                        "absolute",
+                                    position: "absolute",
 
                                     top:
                                         "calc(100% + 8px)",
 
-                                    width: {
-                                        xs:
-                                            "calc(100vw - 20px)",
-                                        sm:
-                                            "100%",
-                                    },
+                                    left: 0,
 
-                                    left: {
-                                        xs: "25%",
-                                        sm: 0,
-                                    },
+                                    width: "100%",
 
-                                    transform: {
-                                        xs:
-                                            "translateX(-50%)",
-                                        sm:
-                                            "none",
-                                    },
+                                    transform: "none",
 
                                     backgroundColor:
                                         Colors.background,
@@ -1544,8 +1549,7 @@ setCartItems(getCartItems());
                                     color:
                                         Colors.black,
 
-                                    borderRadius:
-                                        1.5,
+                                    borderRadius: 1.5,
 
                                     boxShadow:
                                         "0 4px 15px rgba(0,0,0,0.18)",
@@ -1556,7 +1560,7 @@ setCartItems(getCartItems());
                                     zIndex: 1500,
 
                                     maxHeight: {
-                                        xs: 360,
+                                        xs: 320,
                                         sm: 420,
                                     },
 
@@ -1567,9 +1571,8 @@ setCartItems(getCartItems());
                                         "border-box",
                                 }}
                             >
-
                                 {searchResults.length >
-                                0 ? (
+                                    0 ? (
 
                                     searchResults.map(
                                         (product) => {
@@ -1615,10 +1618,10 @@ setCartItems(getCartItems());
                                                             "1px solid #eeeeee",
 
                                                         "&:hover":
-                                                            {
-                                                                backgroundColor:
-                                                                    Colors.background,
-                                                            },
+                                                        {
+                                                            backgroundColor:
+                                                                Colors.background,
+                                                        },
                                                     }}
                                                 >
 
@@ -1841,16 +1844,16 @@ setCartItems(getCartItems());
 
                                 sx={{
                                     "& .MuiBadge-badge":
-                                        {
-                                            fontSize:
-                                                10,
+                                    {
+                                        fontSize:
+                                            10,
 
-                                            minWidth:
-                                                18,
+                                        minWidth:
+                                            18,
 
-                                            height:
-                                                18,
-                                        },
+                                        height:
+                                            18,
+                                    },
                                 }}
                             >
 
