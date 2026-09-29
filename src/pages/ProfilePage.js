@@ -43,9 +43,9 @@ import NavBar from "../components/NavBar";
 import Colors from "../themes/colors";
 import { Theme } from "../themes/GlobalStyles";
 
-// ========================================
+
 // LAZY LOAD NON-INITIAL PROFILE SECTIONS
-// ========================================
+
 
 const YourOrders = lazy(
 () => import("../components/YourOrders")
@@ -63,22 +63,22 @@ const TrackOrder = lazy(
 () => import("../components/TrackOrder")
 );
 
-// ========================================
+
 // COMPONENT
-// ========================================
+
 
 function ProfilePage() {
-// ========================================
+
 // RESPONSIVE
-// ========================================
+
 
 const isMobile = useMediaQuery(
 "(max-width:599.95px)"
 );
 
-// ========================================
+
 // USER
-// ========================================
+
 
 const getStoredUser = useCallback(() => {
   try {
@@ -102,16 +102,16 @@ const [user, setUser] = useState(
 getStoredUser
 );
 
-// ========================================
+
 // HOOKS
-// ========================================
+
 
 const navigate = useNavigate();
 const dispatch = useDispatch();
 
-// ========================================
+
 // STATE
-// ========================================
+
 
 const [isEditing, setIsEditing] =
 useState(false);
@@ -124,9 +124,9 @@ name: user?.name || "",
 email: user?.email || "",
 });
 
-// ========================================
+
 // FORM CHANGE
-// ========================================
+
 
 const handleChange = useCallback(
 (event) => {
@@ -146,9 +146,9 @@ value,
 
 );
 
-// ========================================
+
 // EDIT
-// ========================================
+
 
 const handleEdit = useCallback(() => {
 setFormData({
@@ -160,9 +160,9 @@ setIsEditing(true);
 
 }, [user]);
 
-// ========================================
+
 // CANCEL
-// ========================================
+
 
 const handleCancel = useCallback(() => {
 setFormData({
@@ -174,9 +174,9 @@ setIsEditing(false);
 
 }, [user]);
 
-// ========================================
+
 // SAVE
-// ========================================
+
 
 const handleSave = useCallback(
 async () => {
@@ -283,9 +283,9 @@ return;
 
 );
 
-// ========================================
+
 // LOGOUT
-// ========================================
+
 
 const handleLogout = useCallback(() => {
   sessionStorage.removeItem("user");
@@ -295,9 +295,9 @@ const handleLogout = useCallback(() => {
   window.location.href = "/";
 }, []);
 
-// ========================================
+
 // SECTION SELECT
-// ========================================
+
 
 const selectSection = useCallback(
 (section) => {
@@ -306,9 +306,9 @@ setSelectedSection(section);
 []
 );
 
-// ========================================
+
 // SIDEBAR STYLE
-// ========================================
+
 
 const sidebarItemSx = useCallback(
 (section) => ({
@@ -337,9 +337,9 @@ selectedSection === section
 
 );
 
-// ========================================
+
 // SECTION TITLE
-// ========================================
+
 
 const getSectionTitle = () => {
 switch (selectedSection) {
@@ -361,9 +361,9 @@ return "Your orders";
 
 };
 
-// ========================================
+
 // LAZY SECTION CONTENT
-// ========================================
+
 
 const renderSelectedSection = () => {
 if (
@@ -420,9 +420,9 @@ return (
 
 };
 
-// ========================================
+
 // MOBILE PROFILE
-// ========================================
+
 
 const renderMobileProfile =
 () => (
@@ -1183,9 +1183,9 @@ const renderMobileProfile =
   </>
 );
 
-// ========================================
+
 // MOBILE UI
-// ========================================
+
 
 const renderMobile =
 () => (
@@ -1454,8 +1454,11 @@ overflowX:
               "55px",
             borderRadius:
               "30px",
-            backgroundColor:
-              Colors.background,
+           backgroundColor:
+              selectedSection ===
+              "mamacash"
+                ? Colors.blue
+                : Colors.background,
             display:
               "flex",
             alignItems:
@@ -1477,7 +1480,10 @@ overflowX:
               width:
                 "30px",
               color:
-                Colors.black,
+                selectedSection ===
+                "mamacash"
+                  ? Colors.background
+                  : Colors.black,
             }}
           />
 
@@ -1487,8 +1493,11 @@ overflowX:
                 Theme.font12Regular,
               whiteSpace:
                 "nowrap",
-              color:
-                Colors.blue,
+             color:
+                selectedSection ===
+                "mamacash"
+                  ? Colors.background
+                  : Colors.black,
             }}
           >
             MamaCash
@@ -1608,7 +1617,7 @@ overflowX:
               color:
                 selectedSection ===
                 "referrals"
-                  ? Colors.blue
+                  ? Colors.background
                   : Colors.black,
             }}
           />
@@ -1620,7 +1629,10 @@ overflowX:
               whiteSpace:
                 "nowrap",
               color:
-                Colors.blue,
+                selectedSection ===
+                "orders"
+                  ? Colors.black
+                  : Colors.background,
               fontWeight:
                 selectedSection ===
                 "referrals"
@@ -1765,9 +1777,9 @@ overflowX:
   </Box>
 );
 
-// ========================================
+
 // DESKTOP PROFILE
-// ========================================
+
 
 const renderDesktopProfile =
 () => (
@@ -2100,10 +2112,10 @@ const renderDesktopProfile =
             textTransform:
               "none",
             backgroundColor:
-              Colors.profile,
+              Colors.blue,
             "&:hover": {
               backgroundColor:
-                Colors.profile,
+                Colors.blue1,
             },
           }}
         >
@@ -2591,9 +2603,9 @@ const renderDesktopProfile =
   </>
 );
 
-// ========================================
+
 // DESKTOP UI
-// ========================================
+
 
 const renderDesktop =
 () => (
@@ -2964,9 +2976,9 @@ boxSizing:
   </Box>
 );
 
-// ========================================
+
 // MAIN RETURN
-// ========================================
+
 
 return (
 <>
