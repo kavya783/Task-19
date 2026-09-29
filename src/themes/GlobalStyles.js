@@ -1,12 +1,9 @@
-const systemFont =
-  "'Open Sans', sans-serif";
-
 export const Theme = {
   container: {
     minHeight: "100vh",
     width: "100%",
     maxWidth: "100%",
-    padding: 20,
+    padding: 10,
     boxSizing: "border-box",
     display: "flex",
     alignItems: "center",
@@ -14,92 +11,98 @@ export const Theme = {
   },
 
   headings: {
-    fontFamily: systemFont,
-    fontSize: 32,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize:"2rem",
     fontWeight: 700,
   },
 
   font14Regular: {
-    fontFamily: systemFont,
-    fontSize: 16,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "0.875rem",
     fontWeight: 400,
   },
 
   font24Bold: {
-    fontFamily: systemFont,
-    fontSize: 24,
-    fontWeight: 700,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "1.5rem",
+  
   },
+
   font12SemiBold: {
-    fontFamily: systemFont,
-    fontSize: 12,
-    fontWeight: 500,
-  },
-  font12Regular: {
-    fontFamily: systemFont,
-    fontSize: 12,
-    fontWeight: 500,
-  },
-   font20Regular: {
-    fontFamily: systemFont,
-    fontSize: 20,
-    fontWeight: 500,
-  },
-  font18Regular: {
-    fontFamily: systemFont,
-    fontSize: 18,
-    fontWeight: 500,
-  },
- font24Regular: {
-    fontFamily: systemFont,
-    fontSize: 24,
-    fontWeight: 500,
-  },
-font24SemiBold: {
-    fontFamily: systemFont,
-    fontSize: 24,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "0.75rem",
     fontWeight: 600,
   },
 
+  font12Regular: {
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "0.75rem",
+    fontWeight: 400,
+  },
+
+  font20Regular: {
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize:"0.75rem",
+    fontWeight: 400,
+  },
+
+  font18Regular: {
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize:"1.125rem",
+    fontWeight: 400,
+  },
+
+  font24Regular: {
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "1.5rem",
+    fontWeight: 400,
+  },
+
+  font24SemiBold: {
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "1.5rem",
+    fontWeight: 600,
+  },
 
   font14SemiBold: {
-    fontFamily: systemFont,
-    fontSize: 14,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "0.875rem",
     fontWeight: 600,
   },
 
   font12Bold: {
-    fontFamily: systemFont,
-    fontSize: 12,
-    fontWeight: 600,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "0.75rem",
+    fontWeight: 700,
   },
-   font18Bold: {
-    fontFamily: systemFont,
-    fontSize: 18,
-    fontWeight: 600,
+
+  font18Bold: {
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "1.125rem",
+    fontWeight: 700,
   },
 
   font16SemiBold: {
-    fontFamily: systemFont,
-    fontSize: 16,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "1rem",
     fontWeight: 600,
   },
 
   font16Bold: {
-    fontFamily: systemFont,
-    fontSize: 16,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "1rem",
     fontWeight: 700,
   },
 
   font20Bold: {
-    fontFamily: systemFont,
-    fontSize: 20,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize:"0.75rem",
     fontWeight: 700,
   },
 
   font14Bold: {
-    fontFamily: systemFont,
-    fontSize: 14,
+    fontFamily: '"Open Sans", sans-serif',
+    fontSize: "0.875rem",
     fontWeight: 700,
   },
 };
