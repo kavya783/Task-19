@@ -159,7 +159,7 @@ function Referrals() {
 
           <Typography
             sx={{
-              ...Theme.font20Bold,
+              ...Theme.headings,
 
               lineHeight: 1.5,
 
@@ -176,7 +176,7 @@ function Referrals() {
 
           <Typography
             sx={{
-              ...Theme.font16SemiBold,
+              ...Theme.font14Regular,
               lineHeight: 1.6,
 
               color:Colors.black,
@@ -197,7 +197,7 @@ function Referrals() {
           >
             <Typography
               sx={{
-                fontSize: Theme.font14Bold,
+                fontSize: Theme.font12Bold,
                 mb: 1,
                 color: Colors.black,
               }}
@@ -307,7 +307,7 @@ function Referrals() {
             >
               <Typography
                 sx={{
-                  ...Theme.font16Bold,
+                  ...Theme.font14Bold,
                   color:Colors.black,
                 }}
               >
@@ -487,16 +487,8 @@ function Referrals() {
 
             <Typography
               sx={{
-                color: Colors.blue,
-
-                fontSize: {
-                  xs: "14px",
-                  sm: "15px",
-                  md: "16px",
-                },
-
-              
-
+                color: Colors.blue,    
+                ...Theme.font14SemiBold,
                 whiteSpace: "nowrap",
               }}
             >
@@ -571,7 +563,7 @@ function Referrals() {
                 sx={{
                   color: Colors.background,
 
-                 ...Theme.font18Bold,
+                 ...Theme.font14Bold,
                  
 
                   whiteSpace: "nowrap",

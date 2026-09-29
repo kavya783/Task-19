@@ -5,7 +5,7 @@ import {
   Typography,
   Paper,
   Divider,
-  IconButton,
+ 
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   getOrdersActionInitiate,
-  deleteOrderActionInitiate,
+ 
 } from "../redux/actions/ordersActions";
 
 import { Theme } from "../themes/GlobalStyles";
@@ -22,7 +22,7 @@ import Colors from "../themes/colors";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import DeleteIcon from "@mui/icons-material/Delete";
+
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 
@@ -159,18 +159,18 @@ function YourOrders() {
   // DELETE ORDER
  
 
-  const handleDeleteOrder = async (orderId) => {
-    try {
-      await dispatch(
-        deleteOrderActionInitiate(orderId)
-      );
-    } catch (error) {
-      console.error(
-        "Failed to delete order:",
-        error
-      );
-    }
-  };
+  // const handleDeleteOrder = async (orderId) => {
+  //   try {
+  //     await dispatch(
+  //       deleteOrderActionInitiate(orderId)
+  //     );
+  //   } catch (error) {
+  //     console.error(
+  //       "Failed to delete order:",
+  //       error
+  //     );
+  //   }
+  // };
 
  
   // STATUS
@@ -299,8 +299,7 @@ function YourOrders() {
         >
           <Typography
             sx={{
-              fontSize: "14px",
-              fontWeight: 600,
+              ...Theme.font16Bold
             }}
           >
             <Link
@@ -373,8 +372,8 @@ function YourOrders() {
               borderRadius: "6px",
               overflow: "hidden",
               marginBottom: "20px",
-              backgroundColor:
-                "#ffffff",
+              backgroundColor:Colors.background,
+            
             }}
           >
             {/* ==================================================
@@ -388,7 +387,7 @@ function YourOrders() {
                   sm: "18px 20px",
                 },
                 backgroundColor:
-                  "#fafafa",
+                  Colors.background,
               }}
             >
               <Box
@@ -404,9 +403,9 @@ function YourOrders() {
                 <Box>
                   <Typography
                     sx={{
-                      fontSize: "13px",
-                      color:
-                        "text.secondary",
+                     ...Theme.font14Bold,
+                      color:Colors.black,
+                        
                       marginBottom:
                         "3px",
                     }}
@@ -416,8 +415,7 @@ function YourOrders() {
 
                   <Typography
                     sx={{
-                      fontWeight: 700,
-                      fontSize: "15px",
+                     ...Theme.font14Regular,
                     }}
                   >
                     {createdDate}
@@ -425,9 +423,9 @@ function YourOrders() {
 
                   <Typography
                     sx={{
-                      fontSize: "12px",
-                      color:
-                        "text.secondary",
+                    ...Theme.font14Bold,
+                      color:Colors.black,
+                       
                       marginTop: "3px",
                     }}
                   >
@@ -437,7 +435,7 @@ function YourOrders() {
                   </Typography>
                 </Box>
 
-                <IconButton
+                {/* <IconButton
                   onClick={() =>
                     handleDeleteOrder(
                       order.id
@@ -448,7 +446,7 @@ function YourOrders() {
                   }}
                 >
                 <DeleteIcon />
-                </IconButton>
+                </IconButton> */}
               </Box>
             </Box>
 
@@ -468,8 +466,8 @@ function YourOrders() {
             >
               <Typography
                 sx={{
-                  fontSize: "15px",
-                  fontWeight: 700,
+                 ...Theme.font14Regular,
+                  
                   marginBottom: "3px",
                 }}
               >
@@ -479,9 +477,9 @@ function YourOrders() {
 
               <Typography
                 sx={{
-                  fontSize: "12px",
-                  color:
-                    "text.secondary",
+                 ...Theme.font12Regular,
+                  color:Colors.black,
+                    
                   marginBottom:
                     "18px",
                 }}
@@ -495,6 +493,7 @@ function YourOrders() {
                 sx={{
                   position: "relative",
                   marginLeft: "5px",
+                
                 }}
               >
                 {trackingSteps.map(
@@ -537,7 +536,8 @@ function YourOrders() {
                                 stepNumber <
                                 currentStep
                                   ? Colors.green
-                                  : "#dedede",
+                                  : Colors.background,
+                                    ...Theme.font12Regular,
                             }}
                           />
                         )}
@@ -547,25 +547,23 @@ function YourOrders() {
                         {completed ? (
                           <CheckCircleIcon
                             sx={{
-                              fontSize:
-                                "14px",
+                             ...Theme.font12Regular,
                               color:
                                 Colors.green,
                               zIndex: 1,
-                              backgroundColor:
-                                "#fff",
+                              backgroundColor:Colors.background
+                               
                             }}
                           />
                         ) : (
                           <RadioButtonUncheckedIcon
                             sx={{
-                              fontSize:
-                                "14px",
+                               ...Theme.font12Regular,
                               color:
-                                "#d6d6d6",
+                               Colors.background,
                               zIndex: 1,
                               backgroundColor:
-                                "#fff",
+                                Colors.background,
                             }}
                           />
                         )}
@@ -574,12 +572,7 @@ function YourOrders() {
                           sx={{
                             marginLeft:
                               "12px",
-                            fontSize:
-                              "13px",
-                            fontWeight:
-                              completed
-                                ? 600
-                                : 500,
+                             ...Theme.font12Bold,
                             color:
                               completed
                                 ? Colors.black
@@ -673,7 +666,7 @@ function YourOrders() {
                           overflow:
                             "hidden",
                           backgroundColor:
-                            "#fff",
+                          Colors.background,
                         }}
                       >
                         {image ? (
@@ -698,7 +691,7 @@ function YourOrders() {
                               fontSize:
                                 "11px",
                               color:
-                                "#999",
+                                Colors.black
                             }}
                           >
                             No image
@@ -716,11 +709,7 @@ function YourOrders() {
                       >
                         <Typography
                           sx={{
-                            fontSize: {
-                              xs: "13px",
-                              sm: "14px",
-                            },
-                            fontWeight: 600,
+                             ...Theme.font12Bold,
                             lineHeight:
                               1.4,
                             display:
@@ -739,8 +728,7 @@ function YourOrders() {
 
                         <Typography
                           sx={{
-                            fontSize:
-                              "12px",
+                            ...Theme.font12Bold,
                             color:
                               "text.secondary",
                             marginTop:
@@ -752,9 +740,7 @@ function YourOrders() {
 
                         <Typography
                           sx={{
-                            fontSize:
-                              "14px",
-                            fontWeight: 700,
+                           ...Theme.font12Bold,
                             marginTop:
                               "5px",
                           }}
@@ -772,7 +758,7 @@ function YourOrders() {
                           fontSize:
                             "14px",
                           color:
-                            "#aaa",
+                           Colors.background
                         }}
                       />
                     </Box>

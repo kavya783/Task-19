@@ -1871,8 +1871,7 @@ const renderDesktopProfile =
                 "auto",
               padding:
                 "6px 10px",
-              fontSize:
-                "14px",
+             ...Theme.font12Bold,
             }}
           >
             Edit
@@ -2091,10 +2090,10 @@ const renderDesktopProfile =
           sx={{
             textTransform:
               "none",
-            color:
-              "#555",
-            borderColor:
-              "#ccc",
+            color:Colors.black,
+            borderColor:Colors.background,
+            ...Theme.font14Bold,  
+      
           }}
         >
           Cancel
@@ -2116,7 +2115,9 @@ const renderDesktopProfile =
             "&:hover": {
               backgroundColor:
                 Colors.blue1,
+               
             },
+             ...Theme.font16Bold
           }}
         >
           Save
@@ -2221,8 +2222,7 @@ const renderDesktopProfile =
 
         <Typography
           sx={{
-            fontSize:
-              "15px",
+            ...Theme.font14Bold,
             marginBottom:
               "20px",
           }}
@@ -2273,6 +2273,7 @@ const renderDesktopProfile =
                 0,
               display:
                 "block",
+                mb:5,
             }}
           />
 
@@ -2292,8 +2293,7 @@ const renderDesktopProfile =
           >
             <Typography
               sx={{
-                fontSize:
-                  "14px",
+                ...Theme.font12Regular,
                 fontWeight:
                   600,
                 lineHeight:
@@ -2313,7 +2313,7 @@ const renderDesktopProfile =
                 display:
                   "flex",
                 flexDirection:
-                  "row",
+                  "column",
                 alignItems:
                   "center",
                 gap:
@@ -2398,10 +2398,7 @@ const renderDesktopProfile =
       >
         <Typography
           sx={{
-            fontSize:
-              "22px",
-            fontWeight:
-              700,
+            ...Theme.font18Bold,
             marginBottom:
               "25px",
           }}
@@ -2430,8 +2427,8 @@ const renderDesktopProfile =
                 "55px",
               borderRadius:
                 "50%",
-              backgroundColor:
-                "#fff",
+              backgroundColor:Colors.background,
+              
               display:
                 "flex",
               alignItems:
@@ -2463,10 +2460,7 @@ const renderDesktopProfile =
 
           <Typography
             sx={{
-              fontSize:
-                "15px",
-              fontWeight:
-                600,
+             ...Theme.font12Bold,
             }}
           >
             Get Exciting Offers
@@ -2494,8 +2488,8 @@ const renderDesktopProfile =
                 "55px",
               borderRadius:
                 "50%",
-              backgroundColor:
-                "#fff",
+              backgroundColor:Colors.background,
+                
               display:
                 "flex",
               alignItems:
@@ -2527,10 +2521,7 @@ const renderDesktopProfile =
 
           <Typography
             sx={{
-              fontSize:
-                "15px",
-              fontWeight:
-                600,
+             ...Theme.font12Bold,
             }}
           >
             Easy To Track Your Orders
@@ -2556,8 +2547,8 @@ const renderDesktopProfile =
                 "55px",
               borderRadius:
                 "50%",
-              backgroundColor:
-                "#fff",
+              backgroundColor:Colors.background,
+               
               display:
                 "flex",
               alignItems:
@@ -2589,10 +2580,7 @@ const renderDesktopProfile =
 
           <Typography
             sx={{
-              fontSize:
-                "15px",
-              fontWeight:
-                600,
+              ...Theme.font12Bold,
             }}
           >
             Easy To Track Your Plant
