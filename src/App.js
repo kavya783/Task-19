@@ -81,7 +81,7 @@ function App() {
 
     const setupForegroundNotifications = async () => {
       console.log(
-        "🔔 Setting up foreground FCM listener..."
+        " Setting up foreground FCM listener..."
       );
 
       try {
@@ -89,11 +89,11 @@ function App() {
           await listenForForegroundNotifications();
 
         console.log(
-          "✅ Foreground FCM listener initialized"
+          " Foreground FCM listener initialized"
         );
       } catch (error) {
         console.error(
-          "❌ Failed to setup foreground FCM listener:",
+          " Failed to setup foreground FCM listener:",
           error
         );
       }
@@ -106,7 +106,7 @@ function App() {
         unsubscribe();
 
         console.log(
-          "🧹 Foreground FCM listener removed"
+          " Foreground FCM listener removed"
         );
       }
     };
@@ -153,7 +153,7 @@ function App() {
           ===================================== */}
 
           <Route
-            path="/profilepage"
+            path="/profile-page"
             element={<ProfilePage />}
           />
 
