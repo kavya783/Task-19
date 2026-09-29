@@ -163,8 +163,8 @@ const MobileFloatingCart = memo(
 
           height: "58px",
 
-          backgroundColor:Colors.blue,
-            
+          backgroundColor: Colors.blue,
+
 
           borderRadius: "40px",
 
@@ -253,19 +253,15 @@ const MobileFloatingCart = memo(
 
           <Typography
             sx={{
-              fontSize: 15,
-
+              fontSize: "0.9375rem",
               fontWeight: 700,
-
               lineHeight: 1.1,
+              whiteSpace: "nowrap",
             }}
           >
-            View
-            <br />
-            cart
+            View cart
           </Typography>
-
-
+            
           <Typography
             sx={{
               fontSize: 13,
@@ -337,9 +333,9 @@ function HomePage() {
   ] = useState(getCartItems);
 
 
- 
+
   // CART SYNC
- 
+
 
   useEffect(() => {
 
@@ -379,9 +375,9 @@ function HomePage() {
   }, []);
 
 
- 
+
   // TOTAL CART ITEMS
- 
+
 
   const totalItems =
     useMemo(() => {
@@ -396,9 +392,9 @@ function HomePage() {
     }, [cartItems]);
 
 
- 
+
   // OPEN CART
- 
+
 
   const handleOpenCart =
     useCallback(() => {
@@ -452,15 +448,11 @@ function HomePage() {
           MOBILE FLOATING CART
           ======================================== */}
 
-      {totalItems > 0 && (
-
-        <MobileFloatingCart
-          cartItems={cartItems}
-          totalItems={totalItems}
-          onOpenCart={handleOpenCart}
-        />
-
-      )}
+      <MobileFloatingCart
+        cartItems={cartItems}
+        totalItems={totalItems}
+        onOpenCart={handleOpenCart}
+      />
 
     </>
   );
