@@ -75,41 +75,40 @@ const USER_STORAGE_KEY =
 
 
 const getCartKey = () => {
+
   try {
-    const user = JSON.parse(
-      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
-    );
+
+    const user =
+      JSON.parse(
+        localStorage.getItem(
+          USER_STORAGE_KEY
+        ) || "null"
+      );
 
     return user?.id
       ? `mamaearth_cart_${user.id}`
       : GUEST_CART_KEY;
+
   } catch {
+
     return GUEST_CART_KEY;
   }
 };
 
 
 const getCartItems = () => {
+
   try {
-    const cartKey = getCartKey();
 
-    const user = JSON.parse(
-      sessionStorage.getItem(USER_STORAGE_KEY) || "null"
-    );
-
-    const isLoggedIn =
-      sessionStorage.getItem("isLoggedIn") === "true" &&
-      Boolean(sessionStorage.getItem("token")) &&
-      Boolean(user?.id);
-
-    const storage = isLoggedIn
-      ? localStorage
-      : sessionStorage;
+    const cartKey =
+      getCartKey();
 
     return JSON.parse(
-      storage.getItem(cartKey) || "[]"
+      localStorage.getItem(cartKey) || "[]"
     );
+
   } catch {
+
     return [];
   }
 };
@@ -150,7 +149,10 @@ const MobileFloatingCart = memo(
 
           position: "fixed",
 
-          bottom: 18,
+        bottom: {
+  xs: "12px",
+  sm: "18px",
+},
 
           left: "50%",
 
@@ -159,12 +161,19 @@ const MobileFloatingCart = memo(
 
           zIndex: 1199,
 
-          width: "200px",
+         width: {
+  xs: "calc(100% - 24px)",
+  sm: "200px",
+},
 
-          height: "58px",
+maxWidth: "200px",
 
-          backgroundColor: Colors.blue,
+height: {
+  xs: 54,
+  sm: 58,
+},
 
+          backgroundColor:Colors.blue,
 
           borderRadius: "40px",
 
@@ -253,15 +262,19 @@ const MobileFloatingCart = memo(
 
           <Typography
             sx={{
-              fontSize: "0.9375rem",
+              fontSize: 15,
+
               fontWeight: 700,
+
               lineHeight: 1.1,
-              whiteSpace: "nowrap",
             }}
           >
-            View cart
+            View
+            <br />
+            cart
           </Typography>
-            
+
+
           <Typography
             sx={{
               fontSize: 13,
@@ -333,9 +346,9 @@ function HomePage() {
   ] = useState(getCartItems);
 
 
-
+  
   // CART SYNC
-
+  
 
   useEffect(() => {
 
@@ -375,9 +388,9 @@ function HomePage() {
   }, []);
 
 
-
+  
   // TOTAL CART ITEMS
-
+  
 
   const totalItems =
     useMemo(() => {
@@ -392,9 +405,9 @@ function HomePage() {
     }, [cartItems]);
 
 
-
+  
   // OPEN CART
-
+  
 
   const handleOpenCart =
     useCallback(() => {
@@ -448,11 +461,15 @@ function HomePage() {
           MOBILE FLOATING CART
           ======================================== */}
 
-      <MobileFloatingCart
-        cartItems={cartItems}
-        totalItems={totalItems}
-        onOpenCart={handleOpenCart}
-      />
+      {totalItems > 0 && (
+
+        <MobileFloatingCart
+          cartItems={cartItems}
+          totalItems={totalItems}
+          onOpenCart={handleOpenCart}
+        />
+
+      )}
 
     </>
   );
