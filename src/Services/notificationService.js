@@ -414,7 +414,7 @@ export const listenForForegroundNotifications =
                 title,
                 {
                   body: message,
-                  icon: "/logo192.png",
+                  icon: "/images/Logo.webp",
                   tag: "mamaearth-welcome",
                 }
               );
