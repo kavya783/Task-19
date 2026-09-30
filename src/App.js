@@ -9,13 +9,14 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 
 import {
   listenForForegroundNotifications,
 } from "./Services/notificationService";
 
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import "./App.css";
@@ -23,9 +24,9 @@ import "./App.css";
 import HomePage from "./pages/HomePage";
 import Loader from "./components/Loader";
 
-// ==========================================
+
 // LAZY LOADED COMPONENTS
-// ==========================================
+
 
 const Login = lazy(
   () => import("./components/UserLogin")
@@ -51,9 +52,9 @@ const PaymentResultPage = lazy(
   () => import("./pages/PaymentResultPage")
 );
 
-// ==========================================
+
 // PAGE LOADER
-// ==========================================
+
 
 function PageLoader() {
   return (
@@ -71,17 +72,71 @@ function PageLoader() {
   );
 }
 
-// ==========================================
+
+// SELLER AUTH CHECK
+
+
+const isSellerLoggedIn = () => {
+  try {
+    const isLoggedIn =
+      sessionStorage.getItem("isLoggedIn") === "true";
+
+    const token = sessionStorage.getItem("token");
+
+    const user = JSON.parse(
+      sessionStorage.getItem("user") || "null"
+    );
+
+    return (
+      isLoggedIn &&
+      Boolean(token) &&
+      Boolean(user?.id) &&
+      user?.role === "seller"
+    );
+  } catch (error) {
+    console.error(
+      "Seller authentication check failed:",
+      error
+    );
+
+    return false;
+  }
+};
+
+const SellerProtectedRoute = ({ children }) => {
+  const loggedIn = isSellerLoggedIn();
+
+  useEffect(() => {
+    if (!loggedIn) {
+      toast.error("Please login as seller");
+    }
+  }, [loggedIn]);
+
+  if (!loggedIn) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+
+
 // APP
-// ==========================================
+
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+
+  // FCM FOREGROUND NOTIFICATIONS
+
+
   useEffect(() => {
     let unsubscribe;
 
     const setupForegroundNotifications = async () => {
       console.log(
-        " Setting up foreground FCM listener..."
+        "Setting up foreground FCM listener..."
       );
 
       try {
@@ -89,11 +144,11 @@ function App() {
           await listenForForegroundNotifications();
 
         console.log(
-          " Foreground FCM listener initialized"
+          "Foreground FCM listener initialized"
         );
       } catch (error) {
         console.error(
-          " Failed to setup foreground FCM listener:",
+          "Failed to setup foreground FCM listener:",
           error
         );
       }
@@ -106,24 +161,27 @@ function App() {
         unsubscribe();
 
         console.log(
-          " Foreground FCM listener removed"
+          "Foreground FCM listener removed"
         );
       }
     };
   }, []);
-   const [loading, setLoading] = useState(true);
+
+
+  // INITIAL LOADER
+
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
     return <Loader />;
   }
-
-
 
   return (
     <BrowserRouter>
@@ -161,10 +219,16 @@ function App() {
               SELLER DASHBOARD
           ===================================== */}
 
+
           <Route
             path="/seller-dashboard"
-            element={<SellerDashboard />}
+            element={
+              <SellerProtectedRoute>
+                <SellerDashboard />
+              </SellerProtectedRoute>
+            }
           />
+
 
           {/* =====================================
               MAMA CASH
