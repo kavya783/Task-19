@@ -345,6 +345,7 @@ const ProductCardItem = memo(
                   sm: 1.5,
                 },
               },
+                borderBottom:"1px solid #f3eaea",
             }}
           >
             {/* ==================================
