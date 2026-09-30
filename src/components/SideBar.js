@@ -7,15 +7,13 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
   IconButton,
   Drawer,
 } from "@mui/material";
-
+import LogoutIcon from '@mui/icons-material/Logout';
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -29,25 +27,36 @@ function SideBar({
     useState(false);
 
 
-  // LOGOUT
+ // LOGOUT
+
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+  sessionStorage.removeItem("isLoggedIn");
+
+  setMobileMenuOpen(false);
+
+  window.location.href = "/";
+};
 
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("user");
+// MENU CLICK
 
-  //   window.location.href = "/login";
-  // };
+const handleMenuClick = (section) => {
+  if (section === "Logout") {
+    handleLogout();
+    return;
+  }
+
+  setSelectedSection(section);
+  setMobileMenuOpen(false);
+};
 
 
-  // MENU CLICK
-
-
-  const handleMenuClick = (section) => {
-    setSelectedSection(section);
-    setMobileMenuOpen(false);
-  };
-
+ 
 
   // MENU ITEMS
 
@@ -67,6 +76,11 @@ function SideBar({
       label: "Orders",
       value: "orders",
       icon: <NumbersOutlinedIcon />,
+    },
+     {
+      label: "Logout",
+      value: "Logout",
+      icon: <LogoutIcon />,
     },
   ];
 
@@ -233,7 +247,7 @@ function SideBar({
 
           position: "fixed",
 
-          top: "150px",
+          top: "80px",
           left: 0,
 
           width: "100%",
@@ -245,7 +259,7 @@ function SideBar({
             Colors.background,
 
           borderBottom:
-            "1px solid #e0e0e0",
+            "1px solid Colors.background",
 
           boxSizing: "border-box",
 
@@ -271,7 +285,7 @@ function SideBar({
 
             "&:hover": {
               backgroundColor:Colors.background,
-                      },
+            },
           }}
         >
           <MenuIcon
