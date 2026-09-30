@@ -16,13 +16,15 @@ import {
   Select,
   Snackbar,
   Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
+ Table,
+TableBody,
+TableCell,
+TableContainer,
+TableHead,
+TableRow,
+TablePagination,
+Typography,
+ 
 } from "@mui/material";
 
 import Colors from "../themes/colors";
@@ -32,9 +34,7 @@ import { Theme } from "../themes/GlobalStyles";
 // LOCAL BACKEND API
 
 
-const API_URL =
-  process.env.REACT_APP_API_URL ||
-  "http://localhost:3000/api/v1";
+const API_URL = "http://localhost:3000/api/v1";
 
 
 // STATUS OPTIONS
@@ -79,69 +79,56 @@ function SellerOrdersTable() {
     message: "",
     severity: "success",
   });
+  const [page, setPage] = useState(0);
+const [rowsPerPage, setRowsPerPage] = useState(5);
 
   
   // FETCH ALL ORDERS
   
 
-const fetchOrders = useCallback(
-  async (showLoader = false) => {
-    try {
-      if (showLoader) {
-        setLoading(true);
-      }
+  const fetchOrders = useCallback(
+    async (showLoader = false) => {
+      try {
+        if (showLoader) {
+          setLoading(true);
+        }
 
-      console.log(
-        "SELLER API URL:",
-        API_URL
-      );
-
-      const response = await fetch(
-        `${API_URL}/seller/orders`
-      );
-
-      console.log(
-        "SELLER RESPONSE STATUS:",
-        response.status
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "Failed to fetch orders"
+        const response = await fetch(
+          `${API_URL}/seller/orders`
         );
+
+        if (!response.ok) {
+          throw new Error(
+            "Failed to fetch orders"
+          );
+        }
+
+        const data = await response.json();
+
+        setOrders(
+          Array.isArray(data) ? data : []
+        );
+      } catch (error) {
+        console.error(
+          "Fetch orders error:",
+          error
+        );
+
+        if (showLoader) {
+          setSnackbar({
+            open: true,
+            message: "Unable to fetch orders",
+            severity: "error",
+          });
+        }
+      } finally {
+        if (showLoader) {
+          setLoading(false);
+        }
       }
-
-      const data = await response.json();
-
-      console.log(
-        "SELLER ORDERS DATA:",
-        data
-      );
-
-      setOrders(
-        Array.isArray(data) ? data : []
-      );
-    } catch (error) {
-      console.error(
-        "Fetch orders error:",
-        error
-      );
-
-      if (showLoader) {
-        setSnackbar({
-          open: true,
-          message: "Unable to fetch orders",
-          severity: "error",
-        });
-      }
-    } finally {
-      if (showLoader) {
-        setLoading(false);
-      }
-    }
-  },
-  []
-);
+    },
+    []
+  );
 
   
   // INITIAL FETCH + AUTO REFRESH
@@ -166,7 +153,17 @@ const fetchOrders = useCallback(
   const handleView = (order) => {
     setSelectedOrder(order);
   };
+const handleChangePage = (event, newPage) => {
+  setPage(newPage);
+};
 
+const handleChangeRowsPerPage = (event) => {
+  setRowsPerPage(
+    parseInt(event.target.value, 10)
+  );
+
+  setPage(0);
+};
   
   // EDIT ORDER
   
@@ -363,7 +360,12 @@ const fetchOrders = useCallback(
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map((order) => {
+            orders
+  .slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  )
+  .map((order) => {
                 const totalQuantity =
                   order.items?.reduce(
                     (total, item) =>
@@ -491,6 +493,18 @@ const fetchOrders = useCallback(
           </TableBody>
         </Table>
       </TableContainer>
+      
+
+<TablePagination
+  component="div"
+  count={orders.length}
+  page={page}
+  onPageChange={handleChangePage}
+  rowsPerPage={rowsPerPage}
+  onRowsPerPageChange={handleChangeRowsPerPage}
+  rowsPerPageOptions={[5, 10, 25]}
+  labelRowsPerPage="Orders per page"
+/>
 
       {/* ========================================================
           VIEW ORDER DIALOG
