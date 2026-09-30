@@ -536,7 +536,7 @@ function YourOrders() {
                                 stepNumber <
                                 currentStep
                                   ? Colors.green
-                                  : Colors.background,
+                                  : Colors.black,
                                     ...Theme.font12Regular,
                             }}
                           />
@@ -560,7 +560,7 @@ function YourOrders() {
                             sx={{
                                ...Theme.font12Regular,
                               color:
-                               Colors.background,
+                               Colors.black,
                               zIndex: 1,
                               backgroundColor:
                                 Colors.background,

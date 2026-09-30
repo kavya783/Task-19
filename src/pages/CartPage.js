@@ -42,7 +42,11 @@ function CartPage({
 
     const dispatch =
         useDispatch();
-
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [couponDiscount, setCouponDiscount] = useState(0);
+    const [selectedOffer, setSelectedOffer] = useState(null);
+    const [showOfferDetails, setShowOfferDetails] = useState(false);
+    const [showCouponSuccess, setShowCouponSuccess] = useState(false);
 
     const getCurrentUser = () => {
 
@@ -87,6 +91,64 @@ function CartPage({
                 storage: sessionStorage,
             };
         }
+    };
+    const handleApplyCoupon = (offer) => {
+        const prices = cartItems
+            .flatMap((item) => {
+                const mrp = getMrp(item);
+                const quantity =
+                    Number(item.quantity) || 1;
+
+                return Array(quantity).fill(mrp);
+            })
+            .filter((price) => price > 0)
+            .sort((a, b) => a - b);
+
+        let discount = 0;
+
+        // Buy Any 3, Pay for 2
+        if (offer.code === "B3P2") {
+            if (prices.length >= 3) {
+                const freeItemsCount =
+                    Math.floor(prices.length / 3);
+
+                discount = prices
+                    .slice(0, freeItemsCount)
+                    .reduce(
+                        (sum, price) => sum + price,
+                        0
+                    );
+            }
+        }
+
+        // Buy 2 Get 2 FREE
+        else if (offer.code === "B2G2") {
+            if (prices.length >= 4) {
+                discount = prices
+                    .slice(0, 2)
+                    .reduce(
+                        (sum, price) => sum + price,
+                        0
+                    );
+            }
+        }
+
+        // Normal coupon
+        else {
+            discount = Number(
+                offer.discount ||
+                offer.discountAmount ||
+                0
+            );
+        }
+
+        console.log("Coupon:", offer.code);
+        console.log("MRP Prices:", prices);
+        console.log("Coupon Discount:", discount);
+
+        setAppliedCoupon(offer.code);
+        setCouponDiscount(discount);
+        setShowCouponSuccess(true);
     };
 
     // const user =
@@ -294,27 +356,44 @@ function CartPage({
                 updatedCart
             );
         };
-
-
     // PRICE
+    const getPrice = (item) => {
+        const salePrice = Number(item.sale_price);
+        const price = Number(item.price);
+        const sellingPrice = Number(item.selling_price);
+        const mrp = Number(
+            item.mrp || item.original_price
+        );
 
-    const getPrice =
-        (item) =>
-            Number(
-                item.sale_price ||
-                item.price ||
-                0
-            );
+        if (salePrice > 0) {
+            return salePrice;
+        }
 
+        if (sellingPrice > 0) {
+            return sellingPrice;
+        }
 
-    const getMrp =
-        (item) =>
-            Number(
-                item.mrp ||
-                item.original_price ||
-                getPrice(item)
-            );
+        if (price > 0) {
+            return price;
+        }
 
+        if (mrp > 0) {
+            return mrp;
+        }
+
+        return 0;
+    };
+
+    const formatMoney = (amount) => {
+        return `₹${Number(amount || 0).toFixed(2)}`;
+    };
+
+    const getMrp = (item) =>
+        Number(
+            item.mrp ||
+            item.original_price ||
+            getPrice(item)
+        );
 
     // TOTAL ITEMS
 
@@ -332,8 +411,6 @@ function CartPage({
                 ),
             0
         );
-
-
     // TOTAL
 
     const total =
@@ -351,8 +428,6 @@ function CartPage({
                 ),
             0
         );
-
-
     // SAVINGS
 
     const savings =
@@ -374,14 +449,8 @@ function CartPage({
                 ),
             0
         );
-
-
     // ORDER TOTAL
-
-    const orderTotal =
-        total +
-        savings;
-
+    const orderTotal = total;
 
     // SHIPPING
 
@@ -389,14 +458,9 @@ function CartPage({
         total > 399
             ? 0
             : 40;
-
-
     // PREPAID DISCOUNT
-
     const prepaidDiscount =
         50;
-
-
     // AMOUNT TO PAY
 
     const amountToPay =
@@ -407,14 +471,11 @@ function CartPage({
             prepaidDiscount
         );
 
-
-    // FORMAT MONEY
-
-    const formatMoney =
-        (amount) =>
-            `₹${amount.toFixed(2)}`;
-
-
+    const finalAmountToPay =
+        Math.max(
+            0,
+            amountToPay - couponDiscount
+        );
     // PAYU PAYMENT
 
     const handlePayU =
@@ -445,11 +506,6 @@ function CartPage({
                     return;
                 }
 
-
-
-                // CART EMPTY CHECK
-
-
                 if (
                     !cartItems.length
                 ) {
@@ -460,22 +516,12 @@ function CartPage({
 
                     return;
                 }
-
-
-
-                // EXISTING PAYU INTEGRATION
-
-                // NOTHING CHANGED BELOW
-
-
                 const paymentData =
                     await dispatch(
                         createPaymentActionInitiate(
                             {
                                 amount:
-                                    amountToPay.toFixed(
-                                        2
-                                    ),
+                                    finalAmountToPay.toFixed(2),
 
                                 productinfo:
                                     "Mamaearth Order",
@@ -604,20 +650,16 @@ function CartPage({
                         sm: 612,
                     },
 
-                    height:
-                        "100%",
+                    height: "100%",
 
                     backgroundColor:
                         Colors.background,
 
-                    boxSizing:
-                        "border-box",
+                    boxSizing: "border-box",
 
-                    display:
-                        "flex",
+                    display: "flex",
 
-                    flexDirection:
-                        "column",
+                    flexDirection: "column",
                 }}
             >
 
@@ -629,14 +671,11 @@ function CartPage({
 
                     <Box
                         sx={{
-                            display:
-                                "flex",
+                            display: "flex",
 
-                            alignItems:
-                                "center",
+                            alignItems: "center",
 
-                            justifyContent:
-                                "space-between",
+                            justifyContent: "space-between",
 
                             px: {
                                 xs: 2,
@@ -652,21 +691,16 @@ function CartPage({
 
                         <Box
                             sx={{
-                                display:
-                                    "flex",
+                                display: "flex",
 
-                                alignItems:
-                                    "center",
+                                alignItems: "center",
 
                                 gap: 1,
                             }}
                         >
 
                             <IconButton
-                                onClick={
-                                    onClose
-                                }
-
+                                onClick={onClose}
                                 aria-label="back to shopping"
                             >
                                 <ArrowBackIcon />
@@ -677,8 +711,7 @@ function CartPage({
                                 sx={{
                                     ...Theme.font24Bold,
 
-                                    color:
-                                        Colors.black,
+                                    color: Colors.black,
                                 }}
                             >
                                 Your cart
@@ -688,16 +721,14 @@ function CartPage({
 
 
                         <IconButton
-                            onClick={
-                                onClose
-                            }
-
+                            onClick={onClose}
                             aria-label="close cart"
                         >
                             <CloseIcon />
                         </IconButton>
 
                     </Box>
+
                 )}
 
 
@@ -714,18 +745,17 @@ function CartPage({
                             backgroundColor:
                                 Colors.background,
 
-                            overflowY:
-                                "auto",
+                            overflowY: "auto",
                         }}
                     >
 
+                        {/* OFFERS HEADER */}
+
                         <Box
                             sx={{
-                                display:
-                                    "flex",
+                                display: "flex",
 
-                                alignItems:
-                                    "center",
+                                alignItems: "center",
 
                                 gap: 1,
 
@@ -746,9 +776,7 @@ function CartPage({
 
                             <IconButton
                                 onClick={() =>
-                                    setShowOffers(
-                                        false
-                                    )
+                                    setShowOffers(false)
                                 }
 
                                 aria-label="back to cart"
@@ -777,13 +805,13 @@ function CartPage({
                             }}
                         >
 
+                            {/* SAVED AMOUNT */}
+
                             <Box
                                 sx={{
-                                    display:
-                                        "flex",
+                                    display: "flex",
 
-                                    alignItems:
-                                        "center",
+                                    alignItems: "center",
 
                                     gap: 1.5,
 
@@ -801,7 +829,6 @@ function CartPage({
                             >
 
                                 <CheckIcon />
-
 
                                 <Typography
                                     sx={{
@@ -824,13 +851,13 @@ function CartPage({
                             </Box>
 
 
+                            {/* COUPON INPUT */}
+
                             <Box
                                 sx={{
-                                    display:
-                                        "flex",
+                                    display: "flex",
 
-                                    alignItems:
-                                        "center",
+                                    alignItems: "center",
 
                                     backgroundColor:
                                         Colors.background,
@@ -856,19 +883,16 @@ function CartPage({
                                     style={{
                                         flex: 1,
 
-                                        border:
-                                            "none",
+                                        border: "none",
 
-                                        outline:
-                                            "none",
+                                        outline: "none",
 
                                         ...Theme.font14Regular,
 
                                         padding:
                                             "14px 4px",
 
-                                        minWidth:
-                                            0,
+                                        minWidth: 0,
                                     }}
                                 />
 
@@ -890,6 +914,8 @@ function CartPage({
                             </Box>
 
 
+                            {/* OTHER OFFERS */}
+
                             <Typography
                                 sx={{
                                     ...Theme.font18Bold,
@@ -904,47 +930,40 @@ function CartPage({
                                     title:
                                         "Get Upto 35% OFF + Extra FREEBIE",
 
-                                    description:
-                                        "Add any 2 Favorites to the cart & apply the code to get flat 30% OFF + Extra FREEBIE",
+                                    saving:
+                                        "Save ₹558.8 with this offer",
 
                                     code:
                                         "REDEEM35",
 
-                                    bottomText:
-                                        "Add 1 or more items to avail this offer.",
+                                    discount:
+                                        558.8,
+
+                                    details:
+                                        "Add any 2 Favorites to the cart & apply the code to get flat 30% OFF + Extra FREEBIE.",
                                 },
 
                                 {
-                                    title:
-                                        "Buy Any 3, Pay for 2",
-
-                                    description:
-                                        "Add any 3 favorite products to your cart, apply the coupon code, and get the lowest-priced product FREE",
-
-                                    code:
-                                        "B3P2",
-
-                                    bottomText:
-                                        "Add 2 or more items to avail this offer.",
+                                    title: "Buy Any 3, Pay for 2",
+                                    saving: "Lowest priced product FREE",
+                                    code: "B3P2",
+                                    details: "Add any 3 favorite products to your cart, apply the coupon code, and get the lowest-priced product FREE.",
                                 },
-
                                 {
                                     title:
                                         "Buy 2 Get 2 FREE + 200 Cashback",
 
-                                    description:
-                                        "Add any 4 favorite products to your cart, apply the coupon code to get 2 lowest priced products FREE",
+                                    saving:
+                                        "Add 4 products to avail this offer",
 
                                     code:
                                         "B2G2",
 
-                                    bottomText:
-                                        "Add 4 or more items to avail this offer.",
-                                },
+                                    details:
+                                        "Add any 4 favorite products to your cart, apply the coupon code to get 2 lowest priced products FREE.",
+                                }
                             ].map(
-                                (
-                                    offer
-                                ) => (
+                                (offer) => (
 
                                     <Box
                                         key={
@@ -952,33 +971,37 @@ function CartPage({
                                         }
 
                                         sx={{
+                                            minWidth: 320,
+
                                             backgroundColor:
                                                 Colors.background,
 
-                                            borderRadius:
-                                                2,
-
-                                            mb: 1.5,
+                                            borderRadius: 2,
 
                                             overflow:
                                                 "hidden",
 
-                                            border:
-                                                "1px solid #e5e5e5",
+                                            mb: 1.5,
                                         }}
                                     >
 
                                         <Box
                                             sx={{
-                                                p: 2,
+                                                backgroundColor:
+                                                    Colors.background,
+
+                                                border:
+                                                    "4px solid #eaf6fb",
+
+                                                borderRadius: 2,
+
+                                                p: 1.5,
                                             }}
                                         >
 
                                             <Typography
                                                 sx={{
-                                                    ...Theme.font18Bold,
-
-                                                    mb: 1,
+                                                    ...Theme.font14Bold,
                                                 }}
                                             >
                                                 {
@@ -989,61 +1012,43 @@ function CartPage({
 
                                             <Typography
                                                 sx={{
-                                                    ...Theme.font14Regular,
-
-                                                    fontSize:
-                                                        "14px !important",
-
-                                                    lineHeight:
-                                                        1.5,
-
                                                     color:
-                                                        Colors.black,
+                                                        Colors.green,
+
+                                                    ...Theme.font14SemiBold,
+
+                                                    mt: 0.5,
                                                 }}
                                             >
                                                 {
-                                                    offer.description
+                                                    offer.saving
                                                 }
                                             </Typography>
 
 
-                                            <Typography
-                                                sx={{
-                                                    ...Theme.font14Regular,
-
-                                                    fontSize:
-                                                        "14px !important",
-
-                                                    color:
-                                                        Colors.black,
-
-                                                    mt: 0.8,
-                                                }}
-                                            >
-                                                Not applicable on Kits &
-                                                Lightning Sale Products.
-                                                {" | "}
-                                                No Cashback can be availed
-                                                with this offer.
-                                            </Typography>
-
+                                            {/* COUPON CODE */}
 
                                             <Box
                                                 sx={{
                                                     display:
-                                                        "inline-block",
+                                                        "inline-flex",
+
+                                                    alignItems:
+                                                        "center",
+
+                                                    mt: 1,
+
+                                                    px: 1.5,
+
+                                                    py: 0.7,
 
                                                     border:
                                                         "1px dashed #08a9e2",
 
-                                                    borderRadius:
-                                                        1,
+                                                    borderRadius: 1,
 
-                                                    px: 1.5,
-
-                                                    py: 0.8,
-
-                                                    mt: 1.5,
+                                                    backgroundColor:
+                                                        "#f5fcff",
                                                 }}
                                             >
 
@@ -1052,9 +1057,13 @@ function CartPage({
                                                         color:
                                                             Colors.blue,
 
-                                                        ...Theme.font14SemiBold,
+                                                        ...Theme.font12Bold,
+
+                                                        letterSpacing:
+                                                            "0.5px",
                                                     }}
                                                 >
+                                                    CODE:{" "}
                                                     {
                                                         offer.code
                                                     }
@@ -1062,14 +1071,42 @@ function CartPage({
 
                                             </Box>
 
+
+                                            {/* VIEW DETAILS */}
+
+                                            <Typography
+                                                onClick={() => {
+                                                    setSelectedOffer(
+                                                        offer
+                                                    );
+
+                                                    setShowOfferDetails(
+                                                        true
+                                                    );
+                                                }}
+
+                                                sx={{
+                                                    textDecoration:
+                                                        "underline",
+
+                                                    mt: 1,
+
+                                                    ...Theme.font12SemiBold,
+
+                                                    cursor:
+                                                        "pointer",
+                                                }}
+                                            >
+                                                View details
+                                            </Typography>
+
                                         </Box>
 
 
+                                        {/* CODE + APPLY */}
+
                                         <Box
                                             sx={{
-                                                borderTop:
-                                                    "1px solid #e5e5e5",
-
                                                 display:
                                                     "flex",
 
@@ -1079,7 +1116,7 @@ function CartPage({
                                                 justifyContent:
                                                     "space-between",
 
-                                                px: 2,
+                                                px: 2.5,
 
                                                 py: 1.2,
                                             }}
@@ -1087,35 +1124,76 @@ function CartPage({
 
                                             <Typography
                                                 sx={{
-                                                    color:
-                                                        Colors.orange,
-
-                                                    ...Theme.font12Regular,
+                                                    ...Theme.font12Bold,
                                                 }}
                                             >
                                                 {
-                                                    offer.bottomText
+                                                    offer.code
                                                 }
                                             </Typography>
 
 
                                             <Button
+                                                variant="contained"
+
+                                                disabled={
+                                                    appliedCoupon ===
+                                                    offer.code
+                                                }
+
+                                                onClick={() => {
+                                                    if (
+                                                        appliedCoupon ===
+                                                        offer.code
+                                                    ) {
+                                                        return;
+                                                    }
+
+                                                    handleApplyCoupon(
+                                                        offer
+                                                    );
+                                                }}
+
                                                 sx={{
-                                                    color:
-                                                        Colors.black,
-
-                                                    ...Theme.font14Bold,
-
                                                     textTransform:
                                                         "none",
+
+                                                    borderRadius: 2,
+
+                                                    backgroundColor:
+                                                        appliedCoupon ===
+                                                            offer.code
+                                                            ? Colors.green
+                                                            : Colors.blue,
+
+                                                    boxShadow:
+                                                        "none",
+
+                                                    "&:hover":
+                                                    {
+                                                        backgroundColor:
+                                                            appliedCoupon ===
+                                                                offer.code
+                                                                ? Colors.green
+                                                                : Colors.blue,
+
+                                                        boxShadow:
+                                                            "none",
+                                                    },
                                                 }}
                                             >
-                                                Apply
+                                                {
+                                                    appliedCoupon ===
+                                                        offer.code
+                                                        ? "Applied"
+                                                        : "Apply"
+                                                }
                                             </Button>
 
                                         </Box>
 
                                     </Box>
+
                                 )
                             )}
 
@@ -1133,20 +1211,15 @@ function CartPage({
                         sx={{
                             flex: 1,
 
-                            display:
-                                "flex",
+                            display: "flex",
 
-                            flexDirection:
-                                "column",
+                            flexDirection: "column",
 
-                            justifyContent:
-                                "center",
+                            justifyContent: "center",
 
-                            alignItems:
-                                "center",
+                            alignItems: "center",
 
-                            textAlign:
-                                "center",
+                            textAlign: "center",
 
                             px: 2,
                         }}
@@ -1154,11 +1227,9 @@ function CartPage({
 
                         <Typography
                             sx={{
-                                fontSize:
-                                    30,
+                                fontSize: 30,
 
-                                fontWeight:
-                                    500,
+                                fontWeight: 500,
 
                                 mb: 2,
                             }}
@@ -1169,11 +1240,9 @@ function CartPage({
 
                         <Typography
                             sx={{
-                                fontSize:
-                                    16,
+                                fontSize: 16,
 
-                                color:
-                                    "#666",
+                                color: "#666",
 
                                 mb: 3,
                             }}
@@ -1222,8 +1291,7 @@ function CartPage({
 
                                 pt: 2,
 
-                                overflowY:
-                                    "auto",
+                                overflowY: "auto",
 
                                 flex: 1,
 
@@ -1235,19 +1303,16 @@ function CartPage({
 
                             <Box
                                 sx={{
-                                    display:
-                                        "flex",
+                                    display: "flex",
 
-                                    alignItems:
-                                        "center",
+                                    alignItems: "center",
 
                                     gap: 1,
 
                                     backgroundColor:
                                         Colors.background,
 
-                                    borderRadius:
-                                        2,
+                                    borderRadius: 2,
 
                                     px: 2.5,
 
@@ -1258,7 +1323,6 @@ function CartPage({
                             >
 
                                 <CheckIcon />
-
 
                                 <Typography
                                     sx={{
@@ -1285,34 +1349,28 @@ function CartPage({
 
                             <Box
                                 onClick={() =>
-                                    setShowOffers(
-                                        true
-                                    )
+                                    setShowOffers(true)
                                 }
 
                                 sx={{
                                     backgroundColor:
                                         Colors.background,
 
-                                    borderRadius:
-                                        2,
+                                    borderRadius: 2,
 
                                     p: 2,
 
                                     mb: 2,
 
-                                    cursor:
-                                        "pointer",
+                                    cursor: "pointer",
                                 }}
                             >
 
                                 <Box
                                     sx={{
-                                        display:
-                                            "flex",
+                                        display: "flex",
 
-                                        alignItems:
-                                            "center",
+                                        alignItems: "center",
 
                                         justifyContent:
                                             "space-between",
@@ -1321,8 +1379,7 @@ function CartPage({
 
                                     <Box
                                         sx={{
-                                            display:
-                                                "flex",
+                                            display: "flex",
 
                                             alignItems:
                                                 "center",
@@ -1332,7 +1389,6 @@ function CartPage({
                                     >
 
                                         <LocalOfferOutlinedIcon />
-
 
                                         <Typography
                                             sx={{
@@ -1366,13 +1422,11 @@ function CartPage({
 
                                 <Box
                                     sx={{
-                                        display:
-                                            "flex",
+                                        display: "flex",
 
                                         gap: 1.5,
 
-                                        overflowX:
-                                            "auto",
+                                        overflowX: "auto",
 
                                         mt: 2,
 
@@ -1390,6 +1444,12 @@ function CartPage({
 
                                             code:
                                                 "REDEEM35",
+
+                                            discount:
+                                                558.8,
+
+                                            details:
+                                                "Add any 2 Favorites to the cart & apply the code to get flat 30% OFF + Extra FREEBIE.",
                                         },
 
                                         {
@@ -1401,11 +1461,15 @@ function CartPage({
 
                                             code:
                                                 "B3P2",
+
+                                            discount:
+                                                349,
+
+                                            details:
+                                                "Add any 3 favorite products to your cart, apply the coupon code, and get the lowest-priced product FREE.",
                                         },
                                     ].map(
-                                        (
-                                            offer
-                                        ) => (
+                                        (offer) => (
 
                                             <Box
                                                 key={
@@ -1413,14 +1477,12 @@ function CartPage({
                                                 }
 
                                                 sx={{
-                                                    minWidth:
-                                                        320,
+                                                    minWidth: 320,
 
                                                     backgroundColor:
                                                         Colors.background,
 
-                                                    borderRadius:
-                                                        2,
+                                                    borderRadius: 2,
 
                                                     overflow:
                                                         "hidden",
@@ -1435,8 +1497,7 @@ function CartPage({
                                                         border:
                                                             "4px solid #eaf6fb",
 
-                                                        borderRadius:
-                                                            2,
+                                                        borderRadius: 2,
 
                                                         p: 1.5,
                                                     }}
@@ -1469,14 +1530,75 @@ function CartPage({
                                                     </Typography>
 
 
+                                                    {/* COUPON CODE */}
+
+                                                    <Box
+                                                        sx={{
+                                                            display:
+                                                                "inline-flex",
+
+                                                            alignItems:
+                                                                "center",
+
+                                                            mt: 1,
+
+                                                            px: 1.5,
+
+                                                            py: 0.7,
+
+                                                            border:
+                                                                "1px dashed #08a9e2",
+
+                                                            borderRadius: 1,
+
+                                                            backgroundColor:
+                                                                "#f5fcff",
+                                                        }}
+                                                    >
+
+                                                        <Typography
+                                                            sx={{
+                                                                color:
+                                                                    Colors.blue,
+
+                                                                ...Theme.font12Bold,
+
+                                                                letterSpacing:
+                                                                    "0.5px",
+                                                            }}
+                                                        >
+                                                            CODE:{" "}
+                                                            {
+                                                                offer.code
+                                                            }
+                                                        </Typography>
+
+                                                    </Box>
+
+
                                                     <Typography
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+
+                                                            setSelectedOffer(
+                                                                offer
+                                                            );
+
+                                                            setShowOfferDetails(
+                                                                true
+                                                            );
+                                                        }}
+
                                                         sx={{
                                                             textDecoration:
                                                                 "underline",
 
-                                                            mt: 0.5,
+                                                            mt: 1,
 
                                                             ...Theme.font12SemiBold,
+
+                                                            cursor:
+                                                                "pointer",
                                                         }}
                                                     >
                                                         View details
@@ -1487,8 +1609,7 @@ function CartPage({
 
                                                 <Box
                                                     sx={{
-                                                        display:
-                                                            "flex",
+                                                        display: "flex",
 
                                                         alignItems:
                                                             "center",
@@ -1516,26 +1637,70 @@ function CartPage({
                                                     <Button
                                                         variant="contained"
 
+                                                        disabled={
+                                                            appliedCoupon ===
+                                                            offer.code
+                                                        }
+
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+
+                                                            if (
+                                                                appliedCoupon ===
+                                                                offer.code
+                                                            ) {
+                                                                return;
+                                                            }
+
+                                                            setShowOffers(
+                                                                true
+                                                            );
+
+                                                            handleApplyCoupon(
+                                                                offer
+                                                            );
+                                                        }}
+
                                                         sx={{
                                                             textTransform:
                                                                 "none",
 
-                                                            borderRadius:
-                                                                2,
+                                                            borderRadius: 2,
 
                                                             backgroundColor:
-                                                                Colors.blue,
+                                                                appliedCoupon ===
+                                                                    offer.code
+                                                                    ? Colors.green
+                                                                    : Colors.blue,
 
                                                             boxShadow:
                                                                 "none",
+
+                                                            "&:hover":
+                                                            {
+                                                                backgroundColor:
+                                                                    appliedCoupon ===
+                                                                        offer.code
+                                                                        ? Colors.green
+                                                                        : Colors.blue,
+
+                                                                boxShadow:
+                                                                    "none",
+                                                            },
                                                         }}
                                                     >
-                                                        Apply
+                                                        {
+                                                            appliedCoupon ===
+                                                                offer.code
+                                                                ? "Applied"
+                                                                : "Apply"
+                                                        }
                                                     </Button>
 
                                                 </Box>
 
                                             </Box>
+
                                         )
                                     )}
 
@@ -1551,8 +1716,7 @@ function CartPage({
                                     backgroundColor:
                                         Colors.background,
 
-                                    borderRadius:
-                                        2,
+                                    borderRadius: 2,
 
                                     p: 2,
                                 }}
@@ -1560,8 +1724,7 @@ function CartPage({
 
                                 <Box
                                     sx={{
-                                        display:
-                                            "flex",
+                                        display: "flex",
 
                                         alignItems:
                                             "center",
@@ -1596,51 +1759,261 @@ function CartPage({
                                 </Box>
 
 
-                                {cartItems.map(
-                                    (
-                                        item
-                                    ) => {
+                                {cartItems.map((item) => {
 
-                                        const quantity =
-                                            Number(
-                                                item.quantity
-                                            ) || 1;
+                                    console.log("CART ITEM PRICE DATA:", {
+                                        name: item.name,
+                                        heading: item.heading,
+                                        price: item.price,
+                                        sale_price: item.sale_price,
+                                        discount_price: item.discount_price,
+                                        selling_price: item.selling_price,
+                                        mrp: item.mrp,
+                                        original_price: item.original_price,
+                                    });
 
+                                    const quantity =
+                                        Number(item.quantity) || 1;
 
-                                        const price =
-                                            getPrice(
-                                                item
-                                            );
-
-
-                                        const mrp =
-                                            getMrp(
-                                                item
-                                            );
+                                    const price = getPrice(item);
 
 
-                                        const discount =
-                                            mrp
-                                                ? Math.round(
+
+
+
+
+                                    const mrp =
+                                        getMrp(
+                                            item
+                                        );
+
+
+                                    const discount =
+                                        mrp
+                                            ? Math.round(
+                                                (
                                                     (
-                                                        (
-                                                            mrp -
-                                                            price
-                                                        ) /
-                                                        mrp
-                                                    ) *
-                                                    100
-                                                )
-                                                : 0;
+                                                        mrp -
+                                                        price
+                                                    ) /
+                                                    mrp
+                                                ) *
+                                                100
+                                            )
+                                            : 0;
 
 
-                                        return (
+                                    return (
+
+                                        <Box
+                                            key={
+                                                item.id
+                                            }
+
+                                            sx={{
+                                                display:
+                                                    "grid",
+
+                                                gridTemplateColumns:
+                                                {
+                                                    xs:
+                                                        "60px minmax(0, 1fr) auto",
+
+                                                    sm:
+                                                        "70px minmax(0, 1fr) auto",
+                                                },
+
+                                                gap:
+                                                {
+                                                    xs: 1,
+
+                                                    sm: 1.5,
+                                                },
+
+                                                alignItems:
+                                                    "center",
+
+                                                py: 1.5,
+
+                                                borderTop:
+                                                    "1px solid #e5e5e5",
+                                            }}
+                                        >
+
+                                            {/* PRODUCT IMAGE */}
 
                                             <Box
-                                                key={
-                                                    item.id
+                                                component="img"
+
+                                                src={
+                                                    item.image_url ||
+                                                    item.image_urls?.[0] ||
+                                                    item.images?.[0] ||
+                                                    ""
                                                 }
 
+                                                alt={
+                                                    item.name ||
+                                                    "Product"
+                                                }
+
+                                                sx={{
+                                                    width:
+                                                    {
+                                                        xs: 60,
+
+                                                        sm: 70,
+                                                    },
+
+                                                    height:
+                                                    {
+                                                        xs: 60,
+
+                                                        sm: 70,
+                                                    },
+
+                                                    objectFit:
+                                                        "contain",
+
+                                                    borderRadius: 1,
+
+                                                    border:
+                                                        "1px solid #eaeaea",
+
+                                                    backgroundColor:
+                                                        Colors.background,
+                                                }}
+                                            />
+
+
+                                            {/* PRODUCT DETAILS */}
+
+                                            <Box
+                                                sx={{
+                                                    minWidth: 0,
+
+                                                    overflow:
+                                                        "hidden",
+                                                }}
+                                            >
+
+                                                <Typography
+                                                    noWrap
+
+                                                    sx={{
+                                                        ...Theme.font12Bold,
+
+                                                        overflow:
+                                                            "hidden",
+
+                                                        textOverflow:
+                                                            "ellipsis",
+                                                    }}
+                                                >
+                                                    {
+                                                        item.heading ||
+                                                        "Product"
+                                                    }
+                                                </Typography>
+
+
+                                                <Box
+                                                    sx={{
+                                                        display:
+                                                            "flex",
+
+                                                        alignItems:
+                                                            "center",
+
+                                                        flexWrap:
+                                                            "wrap",
+
+                                                        gap:
+                                                        {
+                                                            xs: 0.6,
+
+                                                            sm: 1,
+                                                        },
+
+                                                        mt: 0.5,
+                                                    }}
+                                                >
+
+                                                    <Typography
+                                                        sx={{
+                                                            ...Theme.font12Bold,
+
+                                                            whiteSpace:
+                                                                "nowrap",
+                                                        }}
+                                                    >
+                                                        {
+                                                            formatMoney(
+                                                                price
+                                                            )
+                                                        }
+                                                    </Typography>
+
+
+                                                    {mrp >
+                                                        price && (
+
+                                                            <Typography
+                                                                sx={{
+                                                                    textDecoration:
+                                                                        "line-through",
+
+                                                                    color:
+                                                                        Colors.black,
+
+                                                                    ...Theme.font12Bold,
+
+                                                                    whiteSpace:
+                                                                        "nowrap",
+                                                                }}
+                                                            >
+                                                                {
+                                                                    formatMoney(
+                                                                        mrp
+                                                                    )
+                                                                }
+                                                            </Typography>
+
+                                                        )}
+
+                                                </Box>
+
+
+                                                {discount >
+                                                    0 && (
+
+                                                        <Typography
+                                                            sx={{
+                                                                color:
+                                                                    Colors.orange,
+
+                                                                ...Theme.font12Bold,
+
+                                                                mt: 0.3,
+
+                                                                whiteSpace:
+                                                                    "nowrap",
+                                                            }}
+                                                        >
+                                                            {
+                                                                discount
+                                                            }%
+                                                            OFF
+                                                        </Typography>
+
+                                                    )}
+
+                                            </Box>
+
+
+                                            {/* QUANTITY */}
+
+                                            <Box
                                                 sx={{
                                                     display:
                                                         "grid",
@@ -1648,364 +2021,133 @@ function CartPage({
                                                     gridTemplateColumns:
                                                     {
                                                         xs:
-                                                            "60px minmax(0, 1fr) auto",
+                                                            "28px 32px 28px",
 
                                                         sm:
-                                                            "70px minmax(0, 1fr) auto",
+                                                            "32px 36px 32px",
                                                     },
 
-                                                    gap:
+                                                    height:
                                                     {
-                                                        xs:
-                                                            1,
+                                                        xs: 32,
 
-                                                        sm:
-                                                            1.5,
+                                                        sm: 36,
                                                     },
 
-                                                    alignItems:
-                                                        "center",
+                                                    border:
+                                                        "1px solid #d6d6d6",
 
-                                                    py:
-                                                        1.5,
+                                                    borderRadius: 2,
 
-                                                    borderTop:
-                                                        "1px solid #e5e5e5",
+                                                    overflow:
+                                                        "hidden",
+
+                                                    flexShrink: 0,
                                                 }}
                                             >
 
-                                                {/* PRODUCT IMAGE */}
+                                                <IconButton
+                                                    aria-label="decrease quantity"
 
-                                                <Box
-                                                    component="img"
-
-                                                    src={
-                                                        item.image_url ||
-                                                        item.image_urls?.[0] ||
-                                                        item.images?.[0] ||
-                                                        ""
-                                                    }
-
-                                                    alt={
-                                                        item.name ||
-                                                        "Product"
+                                                    onClick={() =>
+                                                        quantity === 1
+                                                            ? handleRemoveCartItem(
+                                                                item.id
+                                                            )
+                                                            : changeQuantity(
+                                                                item.id,
+                                                                -1
+                                                            )
                                                     }
 
                                                     sx={{
-                                                        width:
-                                                        {
-                                                            xs:
-                                                                60,
+                                                        borderRadius: 0,
 
-                                                            sm:
-                                                                70,
-                                                        },
-
-                                                        height:
-                                                        {
-                                                            xs:
-                                                                60,
-
-                                                            sm:
-                                                                70,
-                                                        },
-
-                                                        objectFit:
-                                                            "contain",
-
-                                                        borderRadius:
-                                                            1,
-
-                                                        border:
-                                                            "1px solid #eaeaea",
-
-                                                        backgroundColor:
-                                                            Colors.background,
-                                                    }}
-                                                />
-
-
-                                                {/* PRODUCT DETAILS */}
-
-                                                <Box
-                                                    sx={{
-                                                        minWidth:
-                                                            0,
-
-                                                        overflow:
-                                                            "hidden",
+                                                        p: 0,
                                                     }}
                                                 >
 
-                                                    <Typography
-                                                        noWrap
-
+                                                    <RemoveIcon
                                                         sx={{
-                                                            ...Theme.font12Bold,
-
-                                                            overflow:
-                                                                "hidden",
-
-                                                            textOverflow:
-                                                                "ellipsis",
-                                                        }}
-                                                    >
-                                                        {
-                                                            item.heading ||
-                                                            "Product"
-                                                        }
-                                                    </Typography>
-
-
-                                                    <Box
-                                                        sx={{
-                                                            display:
-                                                                "flex",
-
-                                                            alignItems:
-                                                                "center",
-
-                                                            flexWrap:
-                                                                "wrap",
-
-                                                            gap:
+                                                            fontSize:
                                                             {
-                                                                xs:
-                                                                    0.6,
+                                                                xs: 16,
 
-                                                                sm:
-                                                                    1,
+                                                                sm: 18,
                                                             },
-
-                                                            mt:
-                                                                0.5,
                                                         }}
-                                                    >
+                                                    />
 
-                                                        <Typography
-                                                            sx={{
-                                                                ...Theme.font12Bold,
-
-                                                                whiteSpace:
-                                                                    "nowrap",
-                                                            }}
-                                                        >
-                                                            {
-                                                                formatMoney(
-                                                                    price
-                                                                )
-                                                            }
-                                                        </Typography>
+                                                </IconButton>
 
 
-                                                        {mrp >
-                                                            price && (
-
-                                                                <Typography
-                                                                    sx={{
-                                                                        textDecoration:
-                                                                            "line-through",
-
-                                                                        color:
-                                                                            Colors.black,
-
-                                                                        ...Theme.font12Bold,
-
-                                                                        whiteSpace:
-                                                                            "nowrap",
-                                                                    }}
-                                                                >
-                                                                    {
-                                                                        formatMoney(
-                                                                            mrp
-                                                                        )
-                                                                    }
-                                                                </Typography>
-                                                            )}
-
-                                                    </Box>
-
-
-                                                    {discount >
-                                                        0 && (
-
-                                                            <Typography
-                                                                sx={{
-                                                                    color:
-                                                                        Colors.orange,
-
-                                                                    ...Theme.font12Bold,
-
-                                                                    mt:
-                                                                        0.3,
-
-                                                                    whiteSpace:
-                                                                        "nowrap",
-                                                                }}
-                                                            >
-                                                                {
-                                                                    discount
-                                                                }%
-                                                                OFF
-                                                            </Typography>
-                                                        )}
-
-                                                </Box>
-
-
-                                                {/* QUANTITY */}
-
-                                                <Box
+                                                <Typography
                                                     sx={{
                                                         display:
                                                             "grid",
 
-                                                        gridTemplateColumns:
-                                                        {
-                                                            xs:
-                                                                "28px 32px 28px",
+                                                        placeItems:
+                                                            "center",
 
-                                                            sm:
-                                                                "32px 36px 32px",
-                                                        },
-
-                                                        height:
-                                                        {
-                                                            xs:
-                                                                32,
-
-                                                            sm:
-                                                                36,
-                                                        },
-
-                                                        border:
+                                                        borderLeft:
                                                             "1px solid #d6d6d6",
 
-                                                        borderRadius:
-                                                            2,
+                                                        borderRight:
+                                                            "1px solid #d6d6d6",
 
-                                                        overflow:
-                                                            "hidden",
+                                                        fontWeight: 700,
 
-                                                        flexShrink:
-                                                            0,
+                                                        fontSize:
+                                                        {
+                                                            xs: 13,
+
+                                                            sm: 14,
+                                                        },
+                                                    }}
+                                                >
+                                                    {
+                                                        quantity
+                                                    }
+                                                </Typography>
+
+
+                                                <IconButton
+                                                    aria-label="increase quantity"
+
+                                                    onClick={() =>
+                                                        changeQuantity(
+                                                            item.id,
+                                                            1
+                                                        )
+                                                    }
+
+                                                    sx={{
+                                                        borderRadius: 0,
+
+                                                        p: 0,
                                                     }}
                                                 >
 
-                                                    <IconButton
-                                                        aria-label="decrease quantity"
-
-                                                        onClick={() =>
-                                                            quantity ===
-                                                                1
-
-                                                                ? handleRemoveCartItem(
-                                                                    item.id
-                                                                )
-
-                                                                : changeQuantity(
-                                                                    item.id,
-                                                                    -1
-                                                                )
-                                                        }
-
+                                                    <AddIcon
                                                         sx={{
-                                                            borderRadius:
-                                                                0,
-
-                                                            p:
-                                                                0,
-                                                        }}
-                                                    >
-
-                                                        <RemoveIcon
-                                                            sx={{
-                                                                fontSize:
-                                                                {
-                                                                    xs:
-                                                                        16,
-
-                                                                    sm:
-                                                                        18,
-                                                                },
-                                                            }}
-                                                        />
-
-                                                    </IconButton>
-
-
-                                                    <Typography
-                                                        sx={{
-                                                            display:
-                                                                "grid",
-
-                                                            placeItems:
-                                                                "center",
-
-                                                            borderLeft:
-                                                                "1px solid #d6d6d6",
-
-                                                            borderRight:
-                                                                "1px solid #d6d6d6",
-
-                                                            fontWeight:
-                                                                700,
-
                                                             fontSize:
                                                             {
-                                                                xs:
-                                                                    13,
+                                                                xs: 16,
 
-                                                                sm:
-                                                                    14,
+                                                                sm: 18,
                                                             },
                                                         }}
-                                                    >
-                                                        {
-                                                            quantity
-                                                        }
-                                                    </Typography>
+                                                    />
 
-
-                                                    <IconButton
-                                                        aria-label="increase quantity"
-
-                                                        onClick={() =>
-                                                            changeQuantity(
-                                                                item.id,
-                                                                1
-                                                            )
-                                                        }
-
-                                                        sx={{
-                                                            borderRadius:
-                                                                0,
-
-                                                            p:
-                                                                0,
-                                                        }}
-                                                    >
-
-                                                        <AddIcon
-                                                            sx={{
-                                                                fontSize:
-                                                                {
-                                                                    xs:
-                                                                        16,
-
-                                                                    sm:
-                                                                        18,
-                                                                },
-                                                            }}
-                                                        />
-
-                                                    </IconButton>
-
-                                                </Box>
+                                                </IconButton>
 
                                             </Box>
-                                        );
-                                    }
+
+                                        </Box>
+
+                                    );
+
+                                }
                                 )}
 
                             </Box>
@@ -2018,8 +2160,7 @@ function CartPage({
                                     backgroundColor:
                                         Colors.background,
 
-                                    borderRadius:
-                                        2,
+                                    borderRadius: 2,
 
                                     p: 2,
 
@@ -2031,8 +2172,7 @@ function CartPage({
 
                                 <Box
                                     sx={{
-                                        display:
-                                            "flex",
+                                        display: "flex",
 
                                         alignItems:
                                             "center",
@@ -2044,7 +2184,6 @@ function CartPage({
                                 >
 
                                     <EventNoteIcon />
-
 
                                     <Typography
                                         sx={{
@@ -2059,18 +2198,15 @@ function CartPage({
 
                                 <Box
                                     sx={{
-                                        display:
-                                            "grid",
+                                        display: "grid",
 
-                                        gap:
-                                            1.2,
+                                        gap: 1.2,
                                     }}
                                 >
 
                                     <Box
                                         sx={{
-                                            display:
-                                                "flex",
+                                            display: "flex",
 
                                             justifyContent:
                                                 "space-between",
@@ -2105,8 +2241,7 @@ function CartPage({
 
                                     <Box
                                         sx={{
-                                            display:
-                                                "flex",
+                                            display: "flex",
 
                                             justifyContent:
                                                 "space-between",
@@ -2145,8 +2280,7 @@ function CartPage({
 
                                     <Box
                                         sx={{
-                                            display:
-                                                "flex",
+                                            display: "flex",
 
                                             justifyContent:
                                                 "space-between",
@@ -2168,24 +2302,20 @@ function CartPage({
 
                                             <Typography
                                                 component="span"
-
                                                 sx={{
                                                     color:
                                                         Colors.green,
 
                                                     ...Theme.font14SemiBold,
 
-                                                    mr:
-                                                        1,
+                                                    mr: 1,
                                                 }}
                                             >
                                                 Free
                                             </Typography>
 
-
                                             <Typography
                                                 component="span"
-
                                                 sx={{
                                                     textDecoration:
                                                         "line-through",
@@ -2208,8 +2338,7 @@ function CartPage({
 
                                     <Box
                                         sx={{
-                                            display:
-                                                "flex",
+                                            display: "flex",
 
                                             justifyContent:
                                                 "space-between",
@@ -2230,8 +2359,7 @@ function CartPage({
                                                 color:
                                                     Colors.green,
 
-                                                fontWeight:
-                                                    700,
+                                                fontWeight: 700,
                                             }}
                                         >
                                             -
@@ -2245,19 +2373,63 @@ function CartPage({
                                     </Box>
 
 
+                                    {/* COUPON DISCOUNT */}
+
+                                    {couponDiscount >
+                                        0 && (
+
+                                            <Box
+                                                sx={{
+                                                    display:
+                                                        "flex",
+
+                                                    justifyContent:
+                                                        "space-between",
+                                                }}
+                                            >
+
+                                                <Typography
+                                                    sx={{
+                                                        ...Theme.font14SemiBold,
+                                                    }}
+                                                >
+                                                    Coupon Discount
+                                                </Typography>
+
+
+                                                <Typography
+                                                    sx={{
+                                                        color:
+                                                            Colors.green,
+
+                                                        ...Theme.font14SemiBold,
+                                                    }}
+                                                >
+                                                    -
+                                                    {
+                                                        formatMoney(
+                                                            couponDiscount
+                                                        )
+                                                    }
+                                                </Typography>
+
+                                            </Box>
+
+                                        )}
+
+
+                                    {/* TO PAY */}
+
                                     <Box
                                         sx={{
                                             borderTop:
                                                 "1px solid #d5d5d5",
 
-                                            pt:
-                                                1.2,
+                                            pt: 1.2,
 
-                                            mt:
-                                                0.3,
+                                            mt: 0.3,
 
-                                            display:
-                                                "flex",
+                                            display: "flex",
 
                                             justifyContent:
                                                 "space-between",
@@ -2279,9 +2451,7 @@ function CartPage({
                                             }}
                                         >
                                             {
-                                                formatMoney(
-                                                    amountToPay
-                                                )
+                                                formatMoney(finalAmountToPay)
                                             }
                                         </Typography>
 
@@ -2300,20 +2470,15 @@ function CartPage({
 
                         <Box
                             sx={{
-                                position:
-                                    "absolute",
+                                position: "absolute",
 
-                                bottom:
-                                    0,
+                                bottom: 0,
 
-                                left:
-                                    0,
+                                left: 0,
 
-                                right:
-                                    0,
+                                right: 0,
 
-                                p:
-                                    1.5,
+                                p: 1.5,
 
                                 backgroundColor:
                                     Colors.background,
@@ -2333,11 +2498,9 @@ function CartPage({
                                 }
 
                                 sx={{
-                                    minHeight:
-                                        62,
+                                    minHeight: 62,
 
-                                    borderRadius:
-                                        4,
+                                    borderRadius: 4,
 
                                     backgroundColor:
                                         Colors.blue,
@@ -2348,20 +2511,16 @@ function CartPage({
                                     boxShadow:
                                         "none",
 
-                                    display:
-                                        "flex",
+                                    display: "flex",
 
                                     justifyContent:
                                         "space-between",
 
-                                    px:
-                                        2.5,
+                                    px: 2.5,
 
-                                    fontSize:
-                                        18,
+                                    fontSize: 18,
 
-                                    fontWeight:
-                                        700,
+                                    fontWeight: 700,
 
                                     "&:hover":
                                     {
@@ -2376,11 +2535,9 @@ function CartPage({
 
                                 <Box
                                     sx={{
-                                        textAlign:
-                                            "left",
+                                        textAlign: "left",
 
-                                        lineHeight:
-                                            1.1,
+                                        lineHeight: 1.1,
                                     }}
                                 >
 
@@ -2400,7 +2557,11 @@ function CartPage({
                                     >
                                         {
                                             formatMoney(
-                                                amountToPay
+                                                Math.max(
+                                                    0,
+                                                    amountToPay -
+                                                    couponDiscount
+                                                )
                                             )
                                         }
                                     </Typography>
@@ -2418,13 +2579,415 @@ function CartPage({
 
                             </Button>
 
-
                         </Box>
+
+
+                        {/* =====================================================
+                                COUPON SUCCESS POPUP
+                            ===================================================== */}
+
+                        {showCouponSuccess && (
+
+                            <Box
+                                sx={{
+                                    position: "fixed",
+
+                                    inset: 0,
+
+                                    backgroundColor:
+                                        "rgba(0,0,0,0.65)",
+
+                                    zIndex: 9999,
+
+                                    display: "flex",
+
+                                    alignItems:
+                                        "center",
+
+                                    justifyContent:
+                                        "center",
+
+                                    px: 2,
+                                }}
+                            >
+
+                                <Box
+                                    sx={{
+                                        width:
+                                            "100%",
+
+                                        maxWidth:
+                                            410,
+
+                                        backgroundColor:
+                                            Colors.background,
+
+                                        borderRadius: 4,
+
+                                        p: 4,
+
+                                        textAlign:
+                                            "center",
+
+                                        position:
+                                            "relative",
+                                    }}
+                                >
+
+                                    <IconButton
+                                        onClick={() =>
+                                            setShowCouponSuccess(
+                                                false
+                                            )
+                                        }
+
+                                        sx={{
+                                            position:
+                                                "absolute",
+
+                                            top: 8,
+
+                                            right: 8,
+
+                                            backgroundColor: Colors.background,
+
+
+                                            width: 32,
+
+                                            height: 32,
+
+                                            "&:hover":
+                                            {
+                                                backgroundColor:
+                                                    Colors.background,
+                                            },
+                                        }}
+                                    >
+                                        <CloseIcon
+                                            sx={{
+                                                fontSize: 20,
+                                            }}
+                                        />
+                                    </IconButton>
+
+
+
+                                    <Typography
+                                        sx={{
+                                            fontSize: 18,
+
+                                            fontWeight: 500,
+
+                                            mb: 1,
+                                        }}
+                                    >
+                                        Congratulations
+                                    </Typography>
+
+
+                                    <Typography
+                                        sx={{
+                                            fontSize: 20,
+
+                                            fontWeight: 700,
+                                        }}
+                                    >
+                                        {
+                                            appliedCoupon
+                                        }{" "}
+                                        applied and you saved ₹
+                                        {
+                                            couponDiscount
+                                        }
+                                    </Typography>
+
+
+                                    <Button
+                                        variant="contained"
+
+                                        onClick={() =>
+                                            setShowCouponSuccess(
+                                                false
+                                            )
+                                        }
+
+                                        sx={{
+                                            mt: 3,
+
+                                            backgroundColor:
+                                                Colors.blue,
+
+                                            textTransform:
+                                                "none",
+
+                                            borderRadius: 2,
+
+                                            px: 4,
+
+                                            boxShadow:
+                                                "none",
+
+                                            "&:hover":
+                                            {
+                                                backgroundColor:
+                                                    Colors.blue,
+
+                                                boxShadow:
+                                                    "none",
+                                            },
+                                        }}
+                                    >
+                                        Continue
+                                    </Button>
+
+                                </Box>
+
+                            </Box>
+
+                        )}
+
+
+                        {/* =====================================================
+                                VIEW DETAILS POPUP
+                            ===================================================== */}
+
+                        {showOfferDetails &&
+                            selectedOffer && (
+
+                                <Box
+                                    sx={{
+                                        position:
+                                            "fixed",
+
+                                        inset: 0,
+
+                                        backgroundColor: Colors.black,
+
+                                        zIndex: 10000,
+
+                                        display:
+                                            "flex",
+
+                                        alignItems:
+                                            "center",
+
+                                        justifyContent:
+                                            "center",
+
+                                        px: 2,
+                                    }}
+                                >
+
+                                    <Box
+                                        sx={{
+                                            width:
+                                                "100%",
+
+                                            maxWidth:
+                                                430,
+
+                                            backgroundColor:
+                                                Colors.background,
+
+                                            borderRadius: 3,
+
+                                            p: 3,
+
+                                            position:
+                                                "relative",
+                                        }}
+                                    >
+
+                                        <IconButton
+                                            onClick={() =>
+                                                setShowOfferDetails(
+                                                    false
+                                                )
+                                            }
+
+                                            sx={{
+                                                position:
+                                                    "absolute",
+
+                                                top: 8,
+
+                                                right: 8,
+                                            }}
+                                        >
+                                            <CloseIcon />
+                                        </IconButton>
+
+
+                                        <Typography
+                                            sx={{
+                                                ...Theme.font18Bold,
+
+                                                pr: 4,
+
+                                                mb: 1.5,
+                                            }}
+                                        >
+                                            {
+                                                selectedOffer.title
+                                            }
+                                        </Typography>
+
+
+                                        <Typography
+                                            sx={{
+                                                ...Theme.font14Regular,
+
+                                                lineHeight:
+                                                    1.6,
+
+                                                mb: 2,
+                                            }}
+                                        >
+                                            {
+                                                selectedOffer.details
+                                            }
+                                        </Typography>
+
+
+                                        <Box
+                                            sx={{
+                                                display:
+                                                    "inline-flex",
+
+                                                px: 1.5,
+
+                                                py: 0.8,
+
+                                                border:
+                                                    "1px dashed #08a9e2",
+
+                                                borderRadius: 1,
+
+                                                backgroundColor:
+                                                    Colors.background,
+
+                                                mb: 2,
+                                            }}
+                                        >
+
+                                            <Typography
+                                                sx={{
+                                                    color:
+                                                        Colors.blue,
+
+                                                    ...Theme.font12Bold,
+
+                                                    letterSpacing:
+                                                        "0.5px",
+                                                }}
+                                            >
+                                                COUPON CODE:{" "}
+                                                {
+                                                    selectedOffer.code
+                                                }
+                                            </Typography>
+
+                                        </Box>
+
+
+                                        {selectedOffer.discount >
+                                            0 && (
+
+                                                <Typography
+                                                    sx={{
+                                                        color:
+                                                            Colors.green,
+
+                                                        ...Theme.font14Bold,
+
+                                                        mb: 2,
+                                                    }}
+                                                >
+                                                    You save ₹
+                                                    {
+                                                        selectedOffer.discount
+                                                    }
+                                                    {" "}
+                                                    with this offer.
+                                                </Typography>
+
+                                            )}
+
+
+                                        <Button
+                                            fullWidth
+
+                                            variant="contained"
+
+                                            onClick={() => {
+                                                if (
+                                                    selectedOffer.discount >
+                                                    0
+                                                ) {
+                                                    handleApplyCoupon(
+                                                        selectedOffer
+                                                    );
+                                                }
+
+                                                setShowOfferDetails(
+                                                    false
+                                                );
+                                            }}
+
+                                            sx={{
+                                                backgroundColor:
+                                                    Colors.blue,
+
+                                                textTransform:
+                                                    "none",
+
+                                                borderRadius: 2,
+
+                                                boxShadow:
+                                                    "none",
+
+                                                "&:hover":
+                                                {
+                                                    backgroundColor:
+                                                        Colors.blue,
+
+                                                    boxShadow:
+                                                        "none",
+                                                },
+                                            }}
+                                        >
+                                            {
+                                                appliedCoupon ===
+                                                    selectedOffer.code
+                                                    ? "Applied"
+                                                    : "Apply"
+                                            }
+                                        </Button>
+
+                                    </Box>
+
+                                </Box>
+
+                            )}
+
+
                         <Login
-                            open={showLoginPopup}
-                            onClose={() => setShowLoginPopup(false)}
-                            onLoginSuccess={(user) => {
-                                setShowLoginPopup(false);
+                            open={
+                                showLoginPopup
+                            }
+
+                            onClose={() =>
+                                setShowLoginPopup(
+                                    false
+                                )
+                            }
+
+                            onLoginSuccess={(
+                                user
+                            ) => {
+                                setShowLoginPopup(
+                                    false
+                                );
                             }}
                         />
 
@@ -2436,9 +2999,10 @@ function CartPage({
 
         </Drawer>
 
-
     );
 
 }
+
+
 
 export default CartPage;
