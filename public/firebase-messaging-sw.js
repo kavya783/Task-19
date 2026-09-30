@@ -26,12 +26,13 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle =
     payload.notification?.title || "Mamaearth";
 
-  const notificationOptions = {
-    body:
-      payload.notification?.body ||
-      "Welcome to Mamaearth!",
-    icon: "/logo192.png",
-  };
+ const notificationOptions = {
+  body:
+    payload.notification?.body ||
+    "Welcome to Mamaearth!",
+
+  icon: "/images/Logo.webp",
+};
 
   self.registration.showNotification(
     notificationTitle,
