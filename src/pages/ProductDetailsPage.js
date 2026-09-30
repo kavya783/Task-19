@@ -202,57 +202,57 @@ function ProductDetailsPage() {
         setSelectedVariant(0);
     }, [id]);
 
-   useEffect(() => {
-    const syncProductQuantity = () => {
-        try {
-            const { cartKey, storage } = getCartInfo();
+    useEffect(() => {
+        const syncProductQuantity = () => {
+            try {
+                const { cartKey, storage } = getCartInfo();
 
-            const cart = JSON.parse(
-                storage.getItem(cartKey) || "[]"
-            );
+                const cart = JSON.parse(
+                    storage.getItem(cartKey) || "[]"
+                );
 
-            const cartItem = cart.find(
-                (item) =>
-                    String(item.id) === String(id)
-            );
+                const cartItem = cart.find(
+                    (item) =>
+                        String(item.id) === String(id)
+                );
 
-            setCartQuantity(
-                Number(cartItem?.quantity) || 0
-            );
-        } catch (error) {
-            console.error(
-                "Product cart sync failed:",
-                error
-            );
+                setCartQuantity(
+                    Number(cartItem?.quantity) || 0
+                );
+            } catch (error) {
+                console.error(
+                    "Product cart sync failed:",
+                    error
+                );
 
-            setCartQuantity(0);
-        }
-    };
+                setCartQuantity(0);
+            }
+        };
 
-    syncProductQuantity();
+        syncProductQuantity();
 
-    window.addEventListener(
-        "cart:update",
-        syncProductQuantity
-    );
-
-    window.addEventListener(
-        "auth:changed",
-        syncProductQuantity
-    );
-
-    return () => {
-        window.removeEventListener(
+        window.addEventListener(
             "cart:update",
             syncProductQuantity
         );
 
-        window.removeEventListener(
+        window.addEventListener(
             "auth:changed",
             syncProductQuantity
         );
-    };
-}, [id]);
+
+        return () => {
+            window.removeEventListener(
+                "cart:update",
+                syncProductQuantity
+            );
+
+            window.removeEventListener(
+                "auth:changed",
+                syncProductQuantity
+            );
+        };
+    }, [id]);
 
 
     // SELECT DEFAULT VARIANT
@@ -467,154 +467,154 @@ function ProductDetailsPage() {
     };
     // ADD TO CART
     const handleAddToCart = () => {
-    try {
-        const { cartKey, storage } = getCartInfo();
+        try {
+            const { cartKey, storage } = getCartInfo();
 
-        const existingCart = JSON.parse(
-            storage.getItem(cartKey) || "[]"
-        );
-
-        const productId = String(product.id);
-
-        const cartIndex =
-            existingCart.findIndex(
-                (item) =>
-                    String(item.id) === productId
+            const existingCart = JSON.parse(
+                storage.getItem(cartKey) || "[]"
             );
 
-        let updatedCart;
-        let newQuantity;
+            const productId = String(product.id);
 
-        if (cartIndex >= 0) {
-            newQuantity =
-                (Number(
-                    existingCart[cartIndex].quantity
-                ) || 1) + 1;
-
-            updatedCart = existingCart.map(
-                (item, index) =>
-                    index === cartIndex
-                        ? {
-                            ...item,
-                            quantity: newQuantity,
-                        }
-                        : item
-            );
-        } else {
-            newQuantity = 1;
-
-            updatedCart = [
-                ...existingCart,
-                {
-                    ...product,
-                    quantity: 1,
-                },
-            ];
-        }
-
-        storage.setItem(
-            cartKey,
-            JSON.stringify(updatedCart)
-        );
-
-        setCartQuantity(newQuantity);
-
-        window.dispatchEvent(
-            new CustomEvent("cart:update")
-        );
-
-        setSnackbarMessage(
-            "Added to cart"
-        );
-
-        setSnackbarOpen(true);
-
-    } catch (error) {
-        console.error(
-            "Add to cart failed:",
-            error
-        );
-
-        setSnackbarMessage(
-            "Unable to add to cart"
-        );
-
-        setSnackbarOpen(true);
-    }
-};
-
-  const handleCartQuantityChange = (
-    change
-) => {
-    try {
-        const { cartKey, storage } =
-            getCartInfo();
-
-        const existingCart = JSON.parse(
-            storage.getItem(cartKey) || "[]"
-        );
-
-        const productId =
-            String(product.id);
-
-        const cartIndex =
-            existingCart.findIndex(
-                (item) =>
-                    String(item.id) ===
-                    productId
-            );
-
-        if (cartIndex < 0) {
-            return;
-        }
-
-        const nextQuantity =
-            (Number(
-                existingCart[cartIndex].quantity
-            ) || 1) + change;
-
-        let updatedCart;
-
-        if (nextQuantity <= 0) {
-            updatedCart =
-                existingCart.filter(
-                    (_, index) =>
-                        index !== cartIndex
+            const cartIndex =
+                existingCart.findIndex(
+                    (item) =>
+                        String(item.id) === productId
                 );
-        } else {
-            updatedCart =
-                existingCart.map(
+
+            let updatedCart;
+            let newQuantity;
+
+            if (cartIndex >= 0) {
+                newQuantity =
+                    (Number(
+                        existingCart[cartIndex].quantity
+                    ) || 1) + 1;
+
+                updatedCart = existingCart.map(
                     (item, index) =>
                         index === cartIndex
                             ? {
                                 ...item,
-                                quantity:
-                                    nextQuantity,
+                                quantity: newQuantity,
                             }
                             : item
                 );
+            } else {
+                newQuantity = 1;
+
+                updatedCart = [
+                    ...existingCart,
+                    {
+                        ...product,
+                        quantity: 1,
+                    },
+                ];
+            }
+
+            storage.setItem(
+                cartKey,
+                JSON.stringify(updatedCart)
+            );
+
+            setCartQuantity(newQuantity);
+
+            window.dispatchEvent(
+                new CustomEvent("cart:update")
+            );
+
+            setSnackbarMessage(
+                "Added to cart"
+            );
+
+            setSnackbarOpen(true);
+
+        } catch (error) {
+            console.error(
+                "Add to cart failed:",
+                error
+            );
+
+            setSnackbarMessage(
+                "Unable to add to cart"
+            );
+
+            setSnackbarOpen(true);
         }
+    };
 
-        storage.setItem(
-            cartKey,
-            JSON.stringify(updatedCart)
-        );
+    const handleCartQuantityChange = (
+        change
+    ) => {
+        try {
+            const { cartKey, storage } =
+                getCartInfo();
 
-        setCartQuantity(
-            Math.max(0, nextQuantity)
-        );
+            const existingCart = JSON.parse(
+                storage.getItem(cartKey) || "[]"
+            );
 
-        window.dispatchEvent(
-            new CustomEvent("cart:update")
-        );
+            const productId =
+                String(product.id);
 
-    } catch (error) {
-        console.error(
-            "Cart quantity update failed:",
-            error
-        );
-    }
-};
+            const cartIndex =
+                existingCart.findIndex(
+                    (item) =>
+                        String(item.id) ===
+                        productId
+                );
+
+            if (cartIndex < 0) {
+                return;
+            }
+
+            const nextQuantity =
+                (Number(
+                    existingCart[cartIndex].quantity
+                ) || 1) + change;
+
+            let updatedCart;
+
+            if (nextQuantity <= 0) {
+                updatedCart =
+                    existingCart.filter(
+                        (_, index) =>
+                            index !== cartIndex
+                    );
+            } else {
+                updatedCart =
+                    existingCart.map(
+                        (item, index) =>
+                            index === cartIndex
+                                ? {
+                                    ...item,
+                                    quantity:
+                                        nextQuantity,
+                                }
+                                : item
+                    );
+            }
+
+            storage.setItem(
+                cartKey,
+                JSON.stringify(updatedCart)
+            );
+
+            setCartQuantity(
+                Math.max(0, nextQuantity)
+            );
+
+            window.dispatchEvent(
+                new CustomEvent("cart:update")
+            );
+
+        } catch (error) {
+            console.error(
+                "Cart quantity update failed:",
+                error
+            );
+        }
+    };
 
     // PINCODE CHANGE
 
@@ -3032,33 +3032,36 @@ function ProductDetailsPage() {
                             >
                                 <IconButton
                                     aria-label="decrease quantity"
-                                    onClick={(event) =>
-                                        handleCartQuantityChange(event, product, -1)
+                                    onClick={() =>
+                                        handleCartQuantityChange(-1)
                                     }
+
                                     sx={{
                                         borderRadius: 0,
                                         color: Colors.black,
                                     }}
                                 >
                                     <RemoveIcon />
-                                </IconButton>                                
+                                </IconButton>
                                 <Typography sx={{ display: "flex", alignItems: "center", justifyContent: "center", borderLeft: "1px solid #d5d5d5", borderRight: "1px solid #d5d5d5", fontWeight: 700, fontSize: { xs: 16, sm: 18 } }}>{cartQuantity}</Typography>
                                 <IconButton
                                     aria-label="increase quantity"
-                                    onClick={(event) =>
-                                        handleCartQuantityChange(event, product, 1)
+                                    onClick={() =>
+                                        handleCartQuantityChange(1)
                                     }
+
                                     sx={{
                                         borderRadius: 0,
                                         color: Colors.black,
                                     }}
                                 >
                                     <AddIcon />
-                                </IconButton>                            </Box>
+                                </IconButton>                         
+                                   </Box>
                         ) : (
                             <Button
                                 variant="contained"
-                                onClick={(event) => handleAddToCart(event, product)}
+                                onClick={handleAddToCart}
                                 sx={{
                                     flexShrink: 0,
                                     backgroundColor: Colors.blue,
