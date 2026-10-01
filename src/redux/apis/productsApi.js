@@ -33,10 +33,12 @@ export const getProductsApi = async () => {
 
 // GET CATEGORIES FROM ADMIN PANEL
 
+// GET CATEGORIES FROM ADMIN PANEL
+
 export const getCategoriesApi = async () => {
   try {
     const response = await api.get(
-      "v1/product-categories"
+      "v1/categories"
     );
 
     return response.data;
