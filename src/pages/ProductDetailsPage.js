@@ -2706,8 +2706,8 @@ function ProductDetailsPage() {
                                             },
                                             borderRadius:
                                                 "20px",
-                                            backgroundColor:
-                                                "#e5f2f3",
+                                            backgroundColor:Colors.background,
+                                               
                                             borderTop:
                                                 "1px solid #008c8c",
                                             boxSizing:

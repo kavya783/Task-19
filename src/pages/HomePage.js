@@ -24,7 +24,7 @@ import { Theme } from "../themes/GlobalStyles";
 
 const MostLovedbyCustomers = lazy(
   () => import("../components/MostLovedbyCustomers")
-);
+);  
 
 const OurFaceBestsellers = lazy(
   () => import("../components/OurFaceBestsellers")

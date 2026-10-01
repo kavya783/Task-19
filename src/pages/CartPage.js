@@ -92,6 +92,76 @@ function CartPage({
             };
         }
     };
+//     const addProductToBackendCart = async (productId, quantity = 1) => {
+//     try {
+//         const user = JSON.parse(
+//             sessionStorage.getItem("user") || "null"
+//         );
+
+//         const isLoggedIn =
+//             sessionStorage.getItem("isLoggedIn") === "true" &&
+//             Boolean(sessionStorage.getItem("token")) &&
+//             Boolean(user?.id);
+
+//         if (!isLoggedIn) {
+//             console.log("User is not logged in");
+//             return;
+//         }
+
+//         const cartResponse = await fetch(
+//             "http://localhost:3000/api/v1/carts",
+//             {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify({
+//                     user_id: user.id,
+//                 }),
+//             }
+//         );
+
+//         if (!cartResponse.ok) {
+//             throw new Error("Failed to create/get cart");
+//         }
+
+//         const cart = await cartResponse.json();
+
+//         console.log("User Cart:", cart);
+
+//         const cartItemResponse = await fetch(
+//             `http://localhost:3000/api/v1/carts/${cart.id}/cart_items`,
+//             {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify({
+//                     product_id: productId,
+//                     quantity: quantity,
+//                 }),
+//             }
+//         );
+
+//         if (!cartItemResponse.ok) {
+//             throw new Error("Failed to add product to cart");
+//         }
+
+//         const cartItem =
+//             await cartItemResponse.json();
+
+//         console.log(
+//             "Product added to backend cart:",
+//             cartItem
+//         );
+
+//     } catch (error) {
+//         console.error(
+//             "Backend cart error:",
+//             error
+//         );
+//     }
+// };
     const handleApplyCoupon = (offer) => {
         const prices = cartItems
             .flatMap((item) => {
@@ -201,9 +271,6 @@ function CartPage({
         showOffers, setShowOffers,] = useState(false);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-    // SYNC CART
-
-    // SYNC CART
 
     useEffect(() => {
         const syncCartItems = () => {
@@ -626,6 +693,9 @@ function CartPage({
 
                 toast.error(
                     "Payment could not be started"
+                );
+                 toast.error(
+                    "Please fill the details"
                 );
             }
         };
