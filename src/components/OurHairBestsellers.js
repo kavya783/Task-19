@@ -733,7 +733,7 @@ function OurHairBestsellers({
           SUB HEADING
       ==================================== */}
 
-       <Typography
+      <Typography
         sx={{
           mt: 1,
 
@@ -749,17 +749,7 @@ function OurHairBestsellers({
 
           whiteSpace:
             "normal",
-
-          fontFamily:
-            '"OpenSans", sans-serif',
-
-          fontSize: {
-            xs: "12px",
-            sm: "13px",
-            md: "14px",
-          },
-
-          fontWeight: 400,
+  ...Theme.font12Regular,
 
           lineHeight: 1.5,
 
@@ -774,60 +764,51 @@ function OurHairBestsellers({
         of natural ingredients and no
         harmful chemicals
       </Typography>
-  {/* DESKTOP CATEGORIES */}
-
-      <Box
-        sx={{
-          display: {
-            xs: "none",
-            md: "block",
-          },
-        }}
-      >
-
-        <CategoryList
-          categories={categories}
-          selectedCategory={
-            selectedCategory
-          }
-          onCategoryClick={
-            handleCategoryClick
-          }
-        />
-
-      </Box>
-
-
-      {/* MOBILE CATEGORIES */}
-
-      <Box
-        sx={{
-          display: {
-            xs: "block",
-            md: "none",
-          },
-        }}
-      >
-
-        <CategoryList
-          categories={categories}
-          selectedCategory={
-            selectedCategory
-          }
-          onCategoryClick={
-            handleCategoryClick
-          }
-          mobile
-        />
-
-      </Box>
 
 
       {/* ====================================
-          SELECTED CATEGORY
+          DESKTOP CATEGORIES
       ==================================== */}
 
-      <Box
+      <CategoryList
+        categories={
+          categories
+        }
+
+        selectedCategory={
+          selectedCategory
+        }
+
+        onCategoryClick={
+          handleCategoryClick
+        }
+      />
+
+
+      {/* ====================================
+          MOBILE CATEGORIES
+      ==================================== */}
+
+      <CategoryList
+        categories={
+          categories
+        }
+
+        selectedCategory={
+          selectedCategory
+        }
+
+        onCategoryClick={
+          handleCategoryClick
+        }
+
+        mobile
+      />
+
+
+     
+
+      {/* <Box
         sx={{
           width: "100%",
 
@@ -863,7 +844,7 @@ function OurHairBestsellers({
           {selectedCategory}
         </Typography>
 
-      </Box>
+      </Box> */}
 
 
       {/* ====================================
