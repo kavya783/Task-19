@@ -2,162 +2,79 @@ import API from "../../API/API";
 
 const api = new API();
 
-
-
 // CREATE PRODUCT
 
-
 export const createProductApi = async (data) => {
-
   try {
-
     const response = await api.post(
       "v1/products",
       data
     );
 
     return response.data;
-
   } catch (error) {
-
-    // console.error(
-    //   "Create Product API Error:",
-    //   error
-    // );
-
     throw error;
   }
 };
 
-
-
 // GET PRODUCTS
 
-
 export const getProductsApi = async () => {
-
   try {
-
     const response = await api.get(
       "v1/products"
     );
 
     return response.data;
-
   } catch (error) {
-
-    // console.error(
-    //   "Get Products API Error:",
-    //   error
-    // );
-
     throw error;
   }
 };
 
-
-
+// GET CATEGORIES FROM ADMIN PANEL
 
 export const getCategoriesApi = async () => {
-
   try {
-
     const response = await api.get(
-      "v1/categories"
+      "v1/product-categories"
     );
 
     return response.data;
-
   } catch (error) {
-
-    // console.error(
-    //   "Get Categories API Error:",
-    //   error
-    // );
-
     throw error;
   }
-}
+};
 
 // UPDATE PRODUCT
-
 
 export const updateProductApi = async (
   id,
   data
 ) => {
+  try {
+    const response = await api.put(
+      `v1/products/${id}`,
+      data
+    );
 
-  const token =
-    localStorage.getItem("token");
-
-  const response = await fetch(
-    `http://localhost:3000/api/v1/products/${id}`,
-    {
-      method: "PUT",
-
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-
-      body: data,
-    }
-  );
-
-  if (!response.ok) {
-    let message = "Failed to update product";
-
-    try {
-      const errorData = await response.json();
-      const errors = errorData.errors;
-      message = Array.isArray(errors)
-        ? errors.join(", ")
-        : errors || errorData.error || message;
-    } catch {
-      const errorText = await response.text();
-      if (errorText) message = errorText;
-    }
-
-    throw new Error(message);
+    return response.data;
+  } catch (error) {
+    throw error;
   }
-
-  return await response.json();
 };
 
-
-
 // DELETE PRODUCT
-
 
 export const deleteProductApi = async (
   id
 ) => {
-
-  const token =
-    localStorage.getItem("token");
-
-  const response = await fetch(
-    `http://localhost:3000/api/v1/products/${id}`,
-    {
-      method: "DELETE",
-
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    const errorData =
-      await response.json();
-
-    throw new Error(
-      errorData.errors ||
-      errorData.error ||
-      "Failed to delete product"
+  try {
+    const response = await api.delete(
+      `v1/products/${id}`
     );
+
+    return response.data;
+  } catch (error) {
+    throw error;
   }
-
-  return await response.json();
 };
-
