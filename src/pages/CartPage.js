@@ -30,7 +30,7 @@ import { useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 import Login from "../components/UserLogin";
-
+import Confetti from "react-confetti";
 
 function CartPage({
     open,
@@ -47,7 +47,7 @@ function CartPage({
     const [selectedOffer, setSelectedOffer] = useState(null);
     const [showOfferDetails, setShowOfferDetails] = useState(false);
     const [showCouponSuccess, setShowCouponSuccess] = useState(false);
-
+    const [showConfetti, setShowConfetti] = useState(false);
     const getCurrentUser = () => {
 
         try {
@@ -92,76 +92,23 @@ function CartPage({
             };
         }
     };
-//     const addProductToBackendCart = async (productId, quantity = 1) => {
-//     try {
-//         const user = JSON.parse(
-//             sessionStorage.getItem("user") || "null"
-//         );
+  useEffect(() => {
+    if (!showCouponSuccess) {
+        setShowConfetti(false);
+        return;
+    }
 
-//         const isLoggedIn =
-//             sessionStorage.getItem("isLoggedIn") === "true" &&
-//             Boolean(sessionStorage.getItem("token")) &&
-//             Boolean(user?.id);
+    setShowConfetti(true);
 
-//         if (!isLoggedIn) {
-//             console.log("User is not logged in");
-//             return;
-//         }
+    const timer = setTimeout(() => {
+        setShowConfetti(false);
+    }, 5000);
 
-//         const cartResponse = await fetch(
-//             "http://localhost:3000/api/v1/carts",
-//             {
-//                 method: "POST",
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                 },
-//                 body: JSON.stringify({
-//                     user_id: user.id,
-//                 }),
-//             }
-//         );
-
-//         if (!cartResponse.ok) {
-//             throw new Error("Failed to create/get cart");
-//         }
-
-//         const cart = await cartResponse.json();
-
-//         console.log("User Cart:", cart);
-
-//         const cartItemResponse = await fetch(
-//             `http://localhost:3000/api/v1/carts/${cart.id}/cart_items`,
-//             {
-//                 method: "POST",
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                 },
-//                 body: JSON.stringify({
-//                     product_id: productId,
-//                     quantity: quantity,
-//                 }),
-//             }
-//         );
-
-//         if (!cartItemResponse.ok) {
-//             throw new Error("Failed to add product to cart");
-//         }
-
-//         const cartItem =
-//             await cartItemResponse.json();
-
-//         console.log(
-//             "Product added to backend cart:",
-//             cartItem
-//         );
-
-//     } catch (error) {
-//         console.error(
-//             "Backend cart error:",
-//             error
-//         );
-//     }
-// };
+    return () => {
+        clearTimeout(timer);
+    };
+}, [showCouponSuccess]);
+   
     const handleApplyCoupon = (offer) => {
         const prices = cartItems
             .flatMap((item) => {
@@ -694,7 +641,7 @@ function CartPage({
                 toast.error(
                     "Payment could not be started"
                 );
-                 toast.error(
+                toast.error(
                     "Please fill the details"
                 );
             }
@@ -2657,53 +2604,48 @@ function CartPage({
                             ===================================================== */}
 
                         {showCouponSuccess && (
-
                             <Box
                                 sx={{
                                     position: "fixed",
-
                                     inset: 0,
-
-                                    backgroundColor:
-                                        "rgba(0,0,0,0.65)",
-
+                                    backgroundColor: "rgba(0,0,0,0.65)",
                                     zIndex: 9999,
-
                                     display: "flex",
-
-                                    alignItems:
-                                        "center",
-
-                                    justifyContent:
-                                        "center",
-
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                     px: 2,
                                 }}
                             >
 
+
+
                                 <Box
                                     sx={{
-                                        width:
-                                            "100%",
-
-                                        maxWidth:
-                                            410,
-
-                                        backgroundColor:
-                                            Colors.background,
-
+                                        width: "100%",
+                                        maxWidth: 410,
+                                        backgroundColor: Colors.background,
                                         borderRadius: 4,
-
                                         p: 4,
-
-                                        textAlign:
-                                            "center",
-
-                                        position:
-                                            "relative",
+                                        textAlign: "center",
+                                        position: "relative",
                                     }}
                                 >
-
+                                    {showConfetti && (
+                                        <Confetti
+                                            width={410}
+                                            height={300}
+                                            numberOfPieces={250}
+                                            recycle={false}
+                                            gravity={0.25}
+                                            style={{
+                                                position: "absolute",
+                                                top: 0,
+                                                left: 0,
+                                                pointerEvents: "none",
+                                                zIndex: 1,
+                                            }}
+                                        />
+                                    )}
                                     <IconButton
                                         onClick={() =>
                                             setShowCouponSuccess(
