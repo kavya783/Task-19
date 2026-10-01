@@ -110,10 +110,10 @@ const [rowsPerPage, setRowsPerPage] = useState(5);
           Array.isArray(data) ? data : []
         );
       } catch (error) {
-        console.error(
-          "Fetch orders error:",
-          error
-        );
+        // console.error(
+        //   "Fetch orders error:",
+        //   error
+        // );
 
         if (showLoader) {
           setSnackbar({
@@ -229,10 +229,10 @@ const handleChangeRowsPerPage = (event) => {
         severity: "success",
       });
     } catch (error) {
-      console.error(
-        "Status update error:",
-        error
-      );
+      // console.error(
+      //   "Status update error:",
+      //   error
+      // );
 
       setSnackbar({
         open: true,

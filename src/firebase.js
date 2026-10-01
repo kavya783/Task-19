@@ -21,10 +21,10 @@ export const getFirebaseMessaging = async () => {
   try {
     return messaging;
   } catch (error) {
-    console.error(
-      "Firebase Messaging unavailable:",
-      error
-    );
+    // console.error(
+    //   "Firebase Messaging unavailable:",
+    //   error
+    // );
 
     return null;
   }

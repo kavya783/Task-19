@@ -1055,10 +1055,10 @@ function NavBar() {
 
                 } catch (error) {
 
-                    console.error(
-                        "Cart merge error:",
-                        error
-                    );
+                    // console.error(
+                    //     "Cart merge error:",
+                    //     error
+                    // );
                 }
             }
 

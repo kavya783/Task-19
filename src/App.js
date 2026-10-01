@@ -94,10 +94,10 @@ const isSellerLoggedIn = () => {
       user?.role === "seller"
     );
   } catch (error) {
-    console.error(
-      "Seller authentication check failed:",
-      error
-    );
+    // console.error(
+    //   "Seller authentication check failed:",
+    //   error
+    // );
 
     return false;
   }
@@ -135,22 +135,22 @@ function App() {
     let unsubscribe;
 
     const setupForegroundNotifications = async () => {
-      console.log(
-        "Setting up foreground FCM listener..."
-      );
+      // console.log(
+      //   "Setting up foreground FCM listener..."
+      // );
 
       try {
         unsubscribe =
           await listenForForegroundNotifications();
 
-        console.log(
-          "Foreground FCM listener initialized"
-        );
+        // console.log(
+        //   "Foreground FCM listener initialized"
+        // );
       } catch (error) {
-        console.error(
-          "Failed to setup foreground FCM listener:",
-          error
-        );
+        // console.error(
+        //   "Failed to setup foreground FCM listener:",
+        //   error
+        // );
       }
     };
 
@@ -160,9 +160,9 @@ function App() {
       if (typeof unsubscribe === "function") {
         unsubscribe();
 
-        console.log(
-          "Foreground FCM listener removed"
-        );
+        // console.log(
+        //   "Foreground FCM listener removed"
+        // );
       }
     };
   }, []);

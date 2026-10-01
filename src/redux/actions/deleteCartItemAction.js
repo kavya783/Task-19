@@ -12,7 +12,7 @@ export const deleteCartItemActionInitiate =
         payload: cartItemId,
       });
     } catch (error) {
-      console.error("Delete cart item error:", error);
+      // console.error("Delete cart item error:", error);
       throw error;
     }
   };

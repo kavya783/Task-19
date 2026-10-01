@@ -9,7 +9,7 @@ export const loginUser = async (data) => {
 
     return response.data;
   } catch (error) {
-    console.error("Login API Error:", error);
+    // console.error("Login API Error:", error);
 
     throw error;
   }
@@ -24,7 +24,7 @@ export const sendOTPApi = async (phone) => {
 
     return response.data;
   } catch (error) {
-    console.error("Send OTP API Error:", error);
+    // console.error("Send OTP API Error:", error);
 
     throw error;
   }
@@ -40,7 +40,7 @@ export const verifyOTPApi = async (phone, otp) => {
 
     return response.data;
   } catch (error) {
-    console.error("Verify OTP API Error:", error);
+    // console.error("Verify OTP API Error:", error);
 
     throw error;
   }
@@ -56,7 +56,7 @@ export const updateProfileApi = async (userId, data) => {
 
     return response.data;
   } catch (error) {
-    console.error("Update Profile API Error:", error);
+    // console.error("Update Profile API Error:", error);
 
     throw error;
   }

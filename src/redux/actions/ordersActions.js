@@ -38,7 +38,7 @@ export const deleteOrderActionInitiate = (orderId) => async (dispatch) => {
       dispatch(getOrdersActionInitiate(user.id));
     }
   } catch (error) {
-    console.error("Delete order error:", error);
+    // console.error("Delete order error:", error);
     throw error;
   }
 };

@@ -31,10 +31,10 @@ function PaymentResultPage() {
 
                     localStorage.removeItem(cartKey);
 
-                    console.log(
-                        "Cart cleared:",
-                        cartKey
-                    );
+                    // console.log(
+                    //     "Cart cleared:",
+                    //     cartKey
+                    // );
                 }
 
               
@@ -66,10 +66,10 @@ function PaymentResultPage() {
                 });
 
             } catch (error) {
-                console.error(
-                    "Error clearing cart after payment:",
-                    error
-                );
+                // console.error(
+                //     "Error clearing cart after payment:",
+                //     error
+                // );
 
                 toast.error(
                     "Payment successful, but cart could not be cleared"

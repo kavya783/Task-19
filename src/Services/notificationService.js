@@ -18,7 +18,7 @@ const VAPID_KEY =
 
 
 export const requestNotificationPermission = async () => {
-  console.log(" Notification function started");
+  // console.log(" Notification function started");
 
   try {
   
@@ -26,16 +26,16 @@ export const requestNotificationPermission = async () => {
   
 
     if (!("Notification" in window)) {
-      console.error(
-        " Browser notifications are not supported"
-      );
+      // console.error(
+      //   " Browser notifications are not supported"
+      // );
       return null;
     }
 
     if (!("serviceWorker" in navigator)) {
-      console.error(
-        " Service Worker is not supported"
-      );
+      // console.error(
+      //   " Service Worker is not supported"
+      // );
       return null;
     }
 
@@ -44,9 +44,9 @@ export const requestNotificationPermission = async () => {
   
 
     if (!VAPID_KEY) {
-      console.error(
-        " Firebase VAPID key is missing"
-      );
+      // console.error(
+      //   " Firebase VAPID key is missing"
+      // );
       return null;
     }
 
@@ -55,9 +55,9 @@ export const requestNotificationPermission = async () => {
   
 
     if (!messaging) {
-      console.error(
-        " Firebase messaging is unavailable"
-      );
+      // console.error(
+      //   " Firebase messaging is unavailable"
+      // );
       return null;
     }
 
@@ -68,25 +68,25 @@ export const requestNotificationPermission = async () => {
     let permission =
       Notification.permission;
 
-    console.log(
-      " Current notification permission:",
-      permission
-    );
+    // console.log(
+    //   " Current notification permission:",
+    //   permission
+    // );
 
     if (permission !== "granted") {
       permission =
         await Notification.requestPermission();
     }
 
-    console.log(
-      " Notification permission:",
-      permission
-    );
+    // console.log(
+    //   " Notification permission:",
+    //   permission
+    // );
 
     if (permission !== "granted") {
-      console.error(
-        " Notification permission denied"
-      );
+      // console.error(
+      //   " Notification permission denied"
+      // );
       return null;
     }
 
@@ -94,9 +94,9 @@ export const requestNotificationPermission = async () => {
     // SERVICE WORKER
   
 
-    console.log(
-      " Checking Firebase service worker..."
-    );
+    // console.log(
+    //   " Checking Firebase service worker..."
+    // );
 
     const serviceWorkerUrl =
       "/firebase-messaging-sw.js";
@@ -105,20 +105,20 @@ export const requestNotificationPermission = async () => {
     // CHECK WHETHER FILE EXISTS
   
 
-    console.log(
-      " Checking:",
-      serviceWorkerUrl
-    );
+    // console.log(
+    //   " Checking:",
+    //   serviceWorkerUrl
+    // );
 
     const swResponse =
       await fetch(serviceWorkerUrl, {
         cache: "no-store",
       });
 
-    console.log(
-      "Service worker HTTP status:",
-      swResponse.status
-    );
+    // console.log(
+    //   "Service worker HTTP status:",
+    //   swResponse.status
+    // );
 
     if (!swResponse.ok) {
       throw new Error(
@@ -136,10 +136,10 @@ export const requestNotificationPermission = async () => {
       );
 
     if (registration) {
-      console.log(
-        " Existing service worker found:",
-        registration.scope
-      );
+      // console.log(
+      //   " Existing service worker found:",
+      //   registration.scope
+      // );
 
       
       if (
@@ -147,9 +147,9 @@ export const requestNotificationPermission = async () => {
         registration.installing ||
         registration.waiting
       ) {
-        console.log(
-          "Existing service worker registration can be used"
-        );
+        // console.log(
+        //   "Existing service worker registration can be used"
+        // );
       }
     }
 
@@ -158,9 +158,9 @@ export const requestNotificationPermission = async () => {
   
 
     if (!registration) {
-      console.log(
-        " Registering Firebase service worker..."
-      );
+      // console.log(
+      //   " Registering Firebase service worker..."
+      // );
 
       registration =
         await navigator.serviceWorker.register(
@@ -171,23 +171,23 @@ export const requestNotificationPermission = async () => {
           }
         );
 
-      console.log(
-        " Firebase service worker registration created"
-      );
+      // console.log(
+      //   " Firebase service worker registration created"
+      // );
 
-      console.log(
-        " Service worker scope:",
-        registration.scope
-      );
+      // console.log(
+      //   " Service worker scope:",
+      //   registration.scope
+      // );
     }
 
   
     // WAIT FOR SERVICE WORKER
   
 
-    console.log(
-      " Checking service worker activation..."
-    );
+    // console.log(
+    //   " Checking service worker activation..."
+    // );
 
     if (!registration.active) {
       await new Promise(
@@ -204,9 +204,9 @@ export const requestNotificationPermission = async () => {
             if (registration.active) {
               clearTimeout(timeout);
 
-              console.log(
-                " Firebase service worker is active"
-              );
+              // console.log(
+              //   " Firebase service worker is active"
+              // );
 
               resolve();
               return;
@@ -222,18 +222,18 @@ export const requestNotificationPermission = async () => {
         }
       );
     } else {
-      console.log(
-        " Firebase service worker is already active"
-      );
+      // console.log(
+      //   " Firebase service worker is already active"
+      // );
     }
 
   
     // GENERATE FCM TOKEN
   
 
-    console.log(
-      " Generating FCM token..."
-    );
+    // console.log(
+    //   " Generating FCM token..."
+    // );
 
     const token = await getToken(
       messaging,
@@ -245,29 +245,29 @@ export const requestNotificationPermission = async () => {
     );
 
     if (!token) {
-      console.error(
-        " FCM token was not generated"
-      );
+      // console.error(
+      //   " FCM token was not generated"
+      // );
 
       return null;
     }
 
-    console.log(
-      " FCM token generated successfully"
-    );
+    // console.log(
+    //   " FCM token generated successfully"
+    // );
 
-    console.log(
-      "FCM TOKEN:",
-      token
-    );
+    // console.log(
+    //   "FCM TOKEN:",
+    //   token
+    // );
 
     return token;
 
   } catch (error) {
-    console.error(
-      " Notification setup error:",
-      error
-    );
+    // console.error(
+    //   " Notification setup error:",
+    //   error
+    // );
 
     return null;
   }
@@ -283,30 +283,30 @@ export const saveDeviceToken = async (
 ) => {
   try {
     if (!token) {
-      console.error(
-        " FCM token missing"
-      );
+      // console.error(
+      //   " FCM token missing"
+      // );
       return false;
     }
 
     if (!userId) {
-      console.error(
-        " User ID missing"
-      );
+      // console.error(
+      //   " User ID missing"
+      // );
       return false;
     }
 
     if (!API_URL) {
-      console.error(
-        " REACT_APP_API_URL is missing"
-      );
+      // console.error(
+      //   " REACT_APP_API_URL is missing"
+      // );
       return false;
     }
 
-    console.log(
-      "📤 Saving FCM token for user:",
-      userId
-    );
+    // console.log(
+    //   " Saving FCM token for user:",
+    //   userId
+    // );
 
     const response = await fetch(
       `${API_URL}/device_tokens`,
@@ -328,31 +328,31 @@ export const saveDeviceToken = async (
     const responseText =
       await response.text();
 
-    console.log(
-      "📥 Device token response:",
-      response.status,
-      responseText
-    );
+    // console.log(
+    //   " Device token response:",
+    //   response.status,
+    //   responseText
+    // );
 
     if (!response.ok) {
-      console.error(
-        " Device token save failed"
-      );
+      // console.error(
+      //   " Device token save failed"
+      // );
 
       return false;
     }
 
-    console.log(
-      "FCM TOKEN SAVED SUCCESSFULLY"
-    );
+    // console.log(
+    //   "FCM TOKEN SAVED SUCCESSFULLY"
+    // );
 
     return true;
 
   } catch (error) {
-    console.error(
-      " Device token save error:",
-      error
-    );
+    // console.error(
+    //   " Device token save error:",
+    //   error
+    // );
 
     return false;
   }
@@ -365,24 +365,24 @@ export const listenForForegroundNotifications =
   async () => {
     try {
       if (!messaging) {
-        console.error(
-          " Firebase Messaging unavailable"
-        );
+        // console.error(
+        //   " Firebase Messaging unavailable"
+        // );
 
         return () => {};
       }
 
-      console.log(
-        " Registering foreground FCM listener..."
-      );
+      // console.log(
+      //   " Registering foreground FCM listener..."
+      // );
 
       const unsubscribe = onMessage(
         messaging,
         (payload) => {
-          console.log(
-            " FOREGROUND FCM MESSAGE RECEIVED:",
-            payload
-          );
+          // console.log(
+          //   " FOREGROUND FCM MESSAGE RECEIVED:",
+          //   payload
+          // );
 
           const notification =
             payload?.notification || {};
@@ -397,11 +397,11 @@ export const listenForForegroundNotifications =
             payload?.data?.body ||
             "Welcome to Mamaearth!";
 
-          console.log(
-            " Showing foreground notification:",
-            title,
-            message
-          );
+          // console.log(
+          //   " Showing foreground notification:",
+          //   title,
+          //   message
+          // );
 
           // Show browser notification
           if (
@@ -425,24 +425,24 @@ export const listenForForegroundNotifications =
                 browserNotification.close();
               };
           } else {
-            console.log(
-              " Browser notification permission is not granted"
-            );
+            // console.log(
+            //   " Browser notification permission is not granted"
+            // );
           }
         }
       );
 
-      console.log(
-        " Foreground FCM listener registered"
-      );
+      // console.log(
+      //   " Foreground FCM listener registered"
+      // );
 
       return unsubscribe;
 
     } catch (error) {
-      console.error(
-        " Foreground notification listener error:",
-        error
-      );
+      // console.error(
+      //   " Foreground notification listener error:",
+      //   error
+      // );
 
       return () => {};
     }

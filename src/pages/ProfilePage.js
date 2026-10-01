@@ -89,10 +89,10 @@ const getStoredUser = useCallback(() => {
       ? JSON.parse(storedUser)
       : null;
   } catch (error) {
-    console.error(
-      "Failed to parse stored user:",
-      error
-    );
+    // console.error(
+    //   "Failed to parse stored user:",
+    //   error
+    // );
 
     return null;
   }
@@ -217,10 +217,10 @@ return;
         )
       );
 
-    console.log(
-      "UPDATE RESPONSE:",
-      response
-    );
+    // console.log(
+    //   "UPDATE RESPONSE:",
+    //   response
+    // );
 
     if (response.success) {
       const updatedUser =
@@ -253,10 +253,10 @@ return;
       );
     }
   } catch (error) {
-    console.error(
-      "Profile update error:",
-      error
-    );
+    // console.error(
+    //   "Profile update error:",
+    //   error
+    // );
 
     if (
       error.response?.data?.errors

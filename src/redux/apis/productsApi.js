@@ -3,9 +3,9 @@ import API from "../../API/API";
 const api = new API();
 
 
-// ========================================
+
 // CREATE PRODUCT
-// ========================================
+
 
 export const createProductApi = async (data) => {
 
@@ -20,19 +20,19 @@ export const createProductApi = async (data) => {
 
   } catch (error) {
 
-    console.error(
-      "Create Product API Error:",
-      error
-    );
+    // console.error(
+    //   "Create Product API Error:",
+    //   error
+    // );
 
     throw error;
   }
 };
 
 
-// ========================================
+
 // GET PRODUCTS
-// ========================================
+
 
 export const getProductsApi = async () => {
 
@@ -46,10 +46,10 @@ export const getProductsApi = async () => {
 
   } catch (error) {
 
-    console.error(
-      "Get Products API Error:",
-      error
-    );
+    // console.error(
+    //   "Get Products API Error:",
+    //   error
+    // );
 
     throw error;
   }
@@ -70,17 +70,17 @@ export const getCategoriesApi = async () => {
 
   } catch (error) {
 
-    console.error(
-      "Get Categories API Error:",
-      error
-    );
+    // console.error(
+    //   "Get Categories API Error:",
+    //   error
+    // );
 
     throw error;
   }
 }
-// ========================================
+
 // UPDATE PRODUCT
-// ========================================
+
 
 export const updateProductApi = async (
   id,
@@ -124,9 +124,9 @@ export const updateProductApi = async (
 };
 
 
-// ========================================
+
 // DELETE PRODUCT
-// ========================================
+
 
 export const deleteProductApi = async (
   id

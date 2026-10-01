@@ -15,7 +15,7 @@ export const updateCartItemActionInitiate =
 
       return cartItem;
     } catch (error) {
-      console.error("Update cart item error:", error);
+      // console.error("Update cart item error:", error);
       throw error;
     }
   };

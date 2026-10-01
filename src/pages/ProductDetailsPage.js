@@ -220,10 +220,10 @@ function ProductDetailsPage() {
                     Number(cartItem?.quantity) || 0
                 );
             } catch (error) {
-                console.error(
-                    "Product cart sync failed:",
-                    error
-                );
+                // console.error(
+                //     "Product cart sync failed:",
+                //     error
+                // );
 
                 setCartQuantity(0);
             }
@@ -453,10 +453,10 @@ function ProductDetailsPage() {
                 country: postOffice.Country,
             });
         } catch (error) {
-            console.error(
-                "Pincode API Error:",
-                error
-            );
+            // console.error(
+            //     "Pincode API Error:",
+            //     error
+            // );
 
             setLocationError(
                 "Unable to check location. Please try again."
@@ -530,10 +530,10 @@ function ProductDetailsPage() {
             setSnackbarOpen(true);
 
         } catch (error) {
-            console.error(
-                "Add to cart failed:",
-                error
-            );
+            // console.error(
+            //     "Add to cart failed:",
+            //     error
+            // );
 
             setSnackbarMessage(
                 "Unable to add to cart"
@@ -609,10 +609,10 @@ function ProductDetailsPage() {
             );
 
         } catch (error) {
-            console.error(
-                "Cart quantity update failed:",
-                error
-            );
+            // console.error(
+            //     "Cart quantity update failed:",
+            //     error
+            // );
         }
     };
 

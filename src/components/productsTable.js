@@ -82,13 +82,13 @@ const fetchProducts = useCallback(async () => {
       getProductsDataActionInitiate()
     );
 
-    console.log("PRODUCT API RESPONSE:", data);
+    // console.log("PRODUCT API RESPONSE:", data);
 
     setProducts(data?.products || []);
 
     setPage(0);
   } catch (error) {
-    console.error("Products fetch error:", error);
+    // console.error("Products fetch error:", error);
 
     setError("Failed to load products");
   } finally {
@@ -285,10 +285,10 @@ useEffect(() => {
         )
       );
 
-      console.log(
-        "UPDATE PRODUCT RESPONSE:",
-        result
-      );
+      // console.log(
+      //   "UPDATE PRODUCT RESPONSE:",
+      //   result
+      // );
 
       const updatedProduct = result?.product || {
         ...editProduct,
@@ -312,10 +312,10 @@ useEffect(() => {
       setEditOpen(false);
       setEditProduct(null);
     } catch (error) {
-      console.error(
-        "Product update error:",
-        error
-      );
+      // console.error(
+      //   "Product update error:",
+      //   error
+      // );
 
       setError(
         error.message ||
@@ -370,10 +370,10 @@ useEffect(() => {
 
       handleCloseDelete();
     } catch (error) {
-      console.error(
-        "Product delete error:",
-        error
-      );
+      // console.error(
+      //   "Product delete error:",
+      //   error
+      // );
 
       setError(
         error.message ||

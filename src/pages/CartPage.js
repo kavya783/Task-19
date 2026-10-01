@@ -159,9 +159,9 @@ function CartPage({
             );
         }
 
-        console.log("Coupon:", offer.code);
-        console.log("MRP Prices:", prices);
-        console.log("Coupon Discount:", discount);
+        // console.log("Coupon:", offer.code);
+        // console.log("MRP Prices:", prices);
+        // console.log("Coupon Discount:", discount);
 
         setAppliedCoupon(offer.code);
         setCouponDiscount(discount);
@@ -208,7 +208,7 @@ function CartPage({
                 ? savedCart
                 : [];
         } catch (error) {
-            console.error("Initial cart load failed:", error);
+            // console.error("Initial cart load failed:", error);
             return [];
         }
     });
@@ -234,12 +234,12 @@ function CartPage({
                         : []
                 );
 
-                console.log("Cart synced:", latestCart);
+                // console.log("Cart synced:", latestCart);
             } catch (error) {
-                console.error(
-                    "Cart sync failed:",
-                    error
-                );
+                // console.error(
+                //     "Cart sync failed:",
+                //     error
+                // );
 
                 setCartItems([]);
             }
@@ -315,10 +315,10 @@ function CartPage({
             );
 
         } catch (error) {
-            console.error(
-                "Update cart failed:",
-                error
-            );
+            // console.error(
+            //     "Update cart failed:",
+            //     error
+            // );
         }
     };
 
@@ -632,10 +632,10 @@ function CartPage({
             error
             ) {
 
-                console.error(
-                    "PayU payment error:",
-                    error
-                );
+                // console.error(
+                //     "PayU payment error:",
+                //     error
+                // );
 
 
                 toast.error(
@@ -1778,16 +1778,16 @@ function CartPage({
 
                                 {cartItems.map((item) => {
 
-                                    console.log("CART ITEM PRICE DATA:", {
-                                        name: item.name,
-                                        heading: item.heading,
-                                        price: item.price,
-                                        sale_price: item.sale_price,
-                                        discount_price: item.discount_price,
-                                        selling_price: item.selling_price,
-                                        mrp: item.mrp,
-                                        original_price: item.original_price,
-                                    });
+                                    // console.log("CART ITEM PRICE DATA:", {
+                                    //     name: item.name,
+                                    //     heading: item.heading,
+                                    //     price: item.price,
+                                    //     sale_price: item.sale_price,
+                                    //     discount_price: item.discount_price,
+                                    //     selling_price: item.selling_price,
+                                    //     mrp: item.mrp,
+                                    //     original_price: item.original_price,
+                                    // });
 
                                     const quantity =
                                         Number(item.quantity) || 1;

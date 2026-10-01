@@ -37,7 +37,7 @@ const [showHistory, setShowHistory] = useState(false);
         setCopied(false);
       }, 2000);
     } catch (error) {
-      console.error("Copy error:", error);
+      // console.error("Copy error:", error);
       toast.error("Unable to copy referral link");
     }
   };

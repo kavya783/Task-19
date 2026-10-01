@@ -502,10 +502,10 @@ onProductAdded?.();
       ]);
 
     } catch (error) {
-      console.error(
-        "Product creation error:",
-        error
-      );
+      // console.error(
+      //   "Product creation error:",
+      //   error
+      // );
 
       toast.error(
         "Product creation failed"

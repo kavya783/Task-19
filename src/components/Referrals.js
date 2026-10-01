@@ -34,7 +34,7 @@ function Referrals() {
         setCopied(false);
       }, 2000);
     } catch (error) {
-      console.error("Copy failed:", error);
+      // console.error("Copy failed:", error);
     }
   };
 

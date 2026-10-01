@@ -20,7 +20,7 @@ function TrackOrder() {
       return;
     }
 
-    console.log("AWB Number:", awbNumber);
+    // console.log("AWB Number:", awbNumber);
 
    
   };

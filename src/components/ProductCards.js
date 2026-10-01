@@ -988,10 +988,10 @@ function ProductCards({
         setSnackbarOpen(true);
 
       } catch (error) {
-        console.error(
-          "Add to cart failed:",
-          error
-        );
+        // console.error(
+        //   "Add to cart failed:",
+        //   error
+        // );
 
         setSnackbarMessage(
           "Unable to add to cart"
@@ -1077,10 +1077,10 @@ function ProductCards({
             return next;
           });
         } catch (error) {
-          console.error(
-            "Cart quantity update failed:",
-            error
-          );
+          // console.error(
+          //   "Cart quantity update failed:",
+          //   error
+          // );
         }
       },
       []

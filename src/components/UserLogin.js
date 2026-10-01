@@ -240,10 +240,10 @@ function Login({
                     `+91${phone}`;
 
 
-                console.log(
-                    "Sending OTP:",
-                    formattedPhone
-                );
+                // console.log(
+                //     "Sending OTP:",
+                //     formattedPhone
+                // );
 
 
                 const data =
@@ -254,10 +254,10 @@ function Login({
                     );
 
 
-                console.log(
-                    "Send OTP Response:",
-                    data
-                );
+                // console.log(
+                //     "Send OTP Response:",
+                //     data
+                // );
 
 
                 if (
@@ -290,10 +290,10 @@ function Login({
             error
             ) {
 
-                console.error(
-                    "Send OTP Error:",
-                    error
-                );
+                // console.error(
+                //     "Send OTP Error:",
+                //     error
+                // );
 
 
                 toast.error(
@@ -343,10 +343,10 @@ function Login({
 
             const formattedPhone = `+91${phone}`;
 
-            console.log(
-                "Resending OTP:",
-                formattedPhone
-            );
+            // console.log(
+            //     "Resending OTP:",
+            //     formattedPhone
+            // );
 
             const data = await dispatch(
                 sendOTPActionInitiate(
@@ -354,10 +354,10 @@ function Login({
                 )
             );
 
-            console.log(
-                "Resend OTP Response:",
-                data
-            );
+            // console.log(
+            //     "Resend OTP Response:",
+            //     data
+            // );
 
             if (!data?.success) {
                 throw new Error(
@@ -380,10 +380,10 @@ function Login({
             }, 100);
 
         } catch (error) {
-            console.error(
-                "Resend OTP Error:",
-                error
-            );
+            // console.error(
+            //     "Resend OTP Error:",
+            //     error
+            // );
 
             const errorMessage =
                 error?.response?.data?.message ||
@@ -437,10 +437,10 @@ function Login({
 
             const formattedPhone = `+91${phone}`;
 
-            console.log(
-                "Verifying OTP:",
-                formattedPhone
-            );
+            // console.log(
+            //     "Verifying OTP:",
+            //     formattedPhone
+            // );
 
             const data = await dispatch(
                 verifyOTPActionInitiate(
@@ -449,10 +449,10 @@ function Login({
                 )
             );
 
-            console.log(
-                "Verify OTP Response:",
-                data
-            );
+            // console.log(
+            //     "Verify OTP Response:",
+            //     data
+            // );
 
             if (!data?.success) {
                 throw new Error(
@@ -478,10 +478,10 @@ function Login({
                 JSON.stringify(data.user)
             );
 
-            console.log(
-                "Logged in user:",
-                data.user
-            );
+            // console.log(
+            //     "Logged in user:",
+            //     data.user
+            // );
 
             if (onLoginSuccess) {
                 onLoginSuccess(
@@ -519,23 +519,23 @@ function Login({
             ) {
                 (async () => {
                     try {
-                        console.log(
-                            "Starting Mamaearth notification setup..."
-                        );
+                        // console.log(
+                        //     "Starting Mamaearth notification setup..."
+                        // );
 
                         const fcmToken =
                             await requestNotificationPermission();
 
                         if (!fcmToken) {
-                            console.log(
-                                "FCM token was not generated"
-                            );
+                            // console.log(
+                            //     "FCM token was not generated"
+                            // );
                             return;
                         }
 
-                        console.log(
-                            "FCM token received"
-                        );
+                        // console.log(
+                        //     "FCM token received"
+                        // );
 
                         const tokenSaved =
                             await saveDeviceToken(
@@ -544,32 +544,32 @@ function Login({
                             );
 
                         if (tokenSaved) {
-                            console.log(
-                                "FCM token saved for user:",
-                                data.user.id
-                            );
+                            // console.log(
+                            //     "FCM token saved for user:",
+                            //     data.user.id
+                            // );
                         } else {
-                            console.log(
-                                "FCM token was not saved"
-                            );
+                            // console.log(
+                            //     "FCM token was not saved"
+                            // );
                         }
 
                     } catch (
                     notificationError
                     ) {
-                        console.log(
-                            "Notification setup failed:",
-                            notificationError
-                        );
+                        // console.log(
+                        //     "Notification setup failed:",
+                        //     notificationError
+                        // );
                     }
                 })();
             }
 
         } catch (error) {
-            console.error(
-                "Verify OTP Error:",
-                error
-            );
+            // console.error(
+            //     "Verify OTP Error:",
+            //     error
+            // );
 
             setLoading(false);
 

@@ -18,10 +18,10 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  console.log(
-    "[firebase-messaging-sw.js] Background message:",
-    payload
-  );
+  // console.log(
+  //   "[firebase-messaging-sw.js] Background message:",
+  //   payload
+  // );
 
   const notificationTitle =
     payload.notification?.title || "Mamaearth";
