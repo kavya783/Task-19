@@ -25,6 +25,7 @@ import { useDispatch } from "react-redux";
 import {
     createPaymentActionInitiate,
 } from "../redux/actions/paymentActions";
+import { getCouponsApi } from "../redux/apis/couponsApi";
 
 import { useNavigate } from "react-router-dom";
 
@@ -42,12 +43,32 @@ function CartPage({
 
     const dispatch =
         useDispatch();
+    const [offers, setOffers] = useState([]);
     const [appliedCoupon, setAppliedCoupon] = useState(null);
     const [couponDiscount, setCouponDiscount] = useState(0);
     const [selectedOffer, setSelectedOffer] = useState(null);
     const [showOfferDetails, setShowOfferDetails] = useState(false);
     const [showCouponSuccess, setShowCouponSuccess] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        getCouponsApi()
+            .then((coupons) => {
+                if (isMounted) {
+                    setOffers(coupons);
+                }
+            })
+            .catch((error) => {
+                console.error("Unable to load coupons:", error);
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
     const getCurrentUser = () => {
 
         try {
@@ -92,80 +113,66 @@ function CartPage({
             };
         }
     };
-  useEffect(() => {
-    if (!showCouponSuccess) {
-        setShowConfetti(false);
-        return;
-    }
+    useEffect(() => {
+        if (!showCouponSuccess) {
+            setShowConfetti(false);
+            return;
+        }
 
-    setShowConfetti(true);
+        setShowConfetti(true);
 
-    const timer = setTimeout(() => {
-        setShowConfetti(false);
-    }, 5000);
+        const timer = setTimeout(() => {
+            setShowConfetti(false);
+        }, 5000);
 
-    return () => {
-        clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [showCouponSuccess]);
+    const getDiscountPercentage = (price) => {
+        if (price >= 1000) return 30;
+        if (price >= 500) return 25;
+        if (price >= 300) return 20;
+        if (price >= 200) return 15;
+        if (price > 50) return 10;
+
+        return 0;
     };
-}, [showCouponSuccess]);
-   
+
     const handleApplyCoupon = (offer) => {
-        const prices = cartItems
-            .flatMap((item) => {
-                const mrp = getMrp(item);
-                const quantity =
-                    Number(item.quantity) || 1;
-
-                return Array(quantity).fill(mrp);
-            })
-            .filter((price) => price > 0)
-            .sort((a, b) => a - b);
-
-        let discount = 0;
-
-        // Buy Any 3, Pay for 2
-        if (offer.code === "B3P2") {
-            if (prices.length >= 3) {
-                const freeItemsCount =
-                    Math.floor(prices.length / 3);
-
-                discount = prices
-                    .slice(0, freeItemsCount)
-                    .reduce(
-                        (sum, price) => sum + price,
-                        0
-                    );
-            }
-        }
-
-        // Buy 2 Get 2 FREE
-        else if (offer.code === "B2G2") {
-            if (prices.length >= 4) {
-                discount = prices
-                    .slice(0, 2)
-                    .reduce(
-                        (sum, price) => sum + price,
-                        0
-                    );
-            }
-        }
-
-        // Normal coupon
-        else {
-            discount = Number(
-                offer.discount ||
-                offer.discountAmount ||
-                0
+        const minimumAmount = Number(
+            offer.minimum_amount || 0
+        );
+        // Check minimum order amount
+        if (total < minimumAmount) {
+            toast.error(
+                `Minimum order amount is ${formatMoney(minimumAmount)}`
             );
+            return;
         }
 
-        // console.log("Coupon:", offer.code);
-        // console.log("MRP Prices:", prices);
-        // console.log("Coupon Discount:", discount);
+        const discount = cartItems.reduce((totalDiscount, item) => {
+            const price = getMrp(item);
+            const quantity = Number(item.quantity) || 1;
+
+            const discountPercentage =
+                getDiscountPercentage(price);
+
+            const itemDiscount =
+                (price * discountPercentage) / 100;
+
+            return totalDiscount + (itemDiscount * quantity);
+        }, 0);
 
         setAppliedCoupon(offer.code);
         setCouponDiscount(discount);
         setShowCouponSuccess(true);
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponDiscount(0);
+        setShowCouponSuccess(false);
     };
 
     // const user =
@@ -374,6 +381,7 @@ function CartPage({
     const getPrice = (item) => {
         const salePrice = Number(item.sale_price);
         const price = Number(item.price);
+        const discountPrice = Number(item.discount_price);
         const sellingPrice = Number(item.selling_price);
         const mrp = Number(
             item.mrp || item.original_price
@@ -389,6 +397,10 @@ function CartPage({
 
         if (price > 0) {
             return price;
+        }
+
+        if (discountPrice > 0) {
+            return discountPrice;
         }
 
         if (mrp > 0) {
@@ -464,14 +476,15 @@ function CartPage({
             0
         );
     // ORDER TOTAL
-    const orderTotal = total;
+    const orderTotal = total + savings;
 
     // SHIPPING
 
+    const baseShippingCharge = 40;
     const shippingCharge =
         total > 399
             ? 0
-            : 40;
+            : baseShippingCharge;
     // PREPAID DISCOUNT
     const prepaidDiscount =
         50;
@@ -942,44 +955,7 @@ function CartPage({
                             </Typography>
 
 
-                            {[
-                                {
-                                    title:
-                                        "Get Upto 35% OFF + Extra FREEBIE",
-
-                                    saving:
-                                        "Save ₹200 with this offer",
-
-                                    code:
-                                        "REDEEM35",
-
-                                    discount:
-                                        200,
-
-                                    details:
-                                        "Add any 2 Favorites to the cart & apply the code to get flat 30% OFF + Extra FREEBIE.",
-                                },
-
-                                {
-                                    title: "Buy Any 3, Pay for 2",
-                                    saving: "Lowest priced product FREE",
-                                    code: "B3P2",
-                                    details: "Add any 3 favorite products to your cart, apply the coupon code, and get the lowest-priced product FREE.",
-                                },
-                                {
-                                    title:
-                                        "Buy 2 Get 2 FREE + 200 Cashback",
-
-                                    saving:
-                                        "Add 4 products to avail this offer",
-
-                                    code:
-                                        "B2G2",
-
-                                    details:
-                                        "Add any 4 favorite products to your cart, apply the coupon code to get 2 lowest priced products FREE.",
-                                }
-                            ].map(
+                            {offers.map(
                                 (offer) => (
 
                                     <Box
@@ -1150,62 +1126,52 @@ function CartPage({
                                             </Typography>
 
 
-                                            <Button
-                                                variant="contained"
+                                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                <Button
+                                                    variant="contained"
+                                                    disabled={appliedCoupon === offer.code}
+                                                    onClick={() => {
+                                                        if (appliedCoupon === offer.code) {
+                                                            return;
+                                                        }
 
-                                                disabled={
-                                                    appliedCoupon ===
-                                                    offer.code
-                                                }
-
-                                                onClick={() => {
-                                                    if (
-                                                        appliedCoupon ===
-                                                        offer.code
-                                                    ) {
-                                                        return;
-                                                    }
-
-                                                    handleApplyCoupon(
-                                                        offer
-                                                    );
-                                                }}
-
-                                                sx={{
-                                                    textTransform:
-                                                        "none",
-
-                                                    borderRadius: 2,
-
-                                                    backgroundColor:
-                                                        appliedCoupon ===
-                                                            offer.code
-                                                            ? Colors.green
-                                                            : Colors.blue,
-
-                                                    boxShadow:
-                                                        "none",
-
-                                                    "&:hover":
-                                                    {
+                                                        handleApplyCoupon(offer);
+                                                    }}
+                                                    sx={{
+                                                        textTransform: "none",
+                                                        borderRadius: 2,
                                                         backgroundColor:
-                                                            appliedCoupon ===
-                                                                offer.code
+                                                            appliedCoupon === offer.code
                                                                 ? Colors.green
                                                                 : Colors.blue,
+                                                        boxShadow: "none",
+                                                        "&:hover": {
+                                                            backgroundColor:
+                                                                appliedCoupon === offer.code
+                                                                    ? Colors.green
+                                                                    : Colors.blue,
+                                                            boxShadow: "none",
+                                                        },
+                                                    }}
+                                                >
+                                                    {appliedCoupon === offer.code ? "Applied" : "Apply"}
+                                                </Button>
 
-                                                        boxShadow:
-                                                            "none",
-                                                    },
-                                                }}
-                                            >
-                                                {
-                                                    appliedCoupon ===
-                                                        offer.code
-                                                        ? "Applied"
-                                                        : "Apply"
-                                                }
-                                            </Button>
+                                                {appliedCoupon === offer.code && (
+                                                    <Button
+                                                        size="small"
+                                                        onClick={handleRemoveCoupon}
+                                                        sx={{
+                                                            minWidth: "auto",
+                                                            color: Colors.blue,
+                                                            textTransform: "none",
+                                                            ...Theme.font12Bold,
+                                                        }}
+                                                    >
+                                                        Remove
+                                                    </Button>
+                                                )}
+                                            </Box>
 
                                         </Box>
 
@@ -1413,7 +1379,7 @@ function CartPage({
                                             }}
                                         >
                                             Available offers for
-                                            you (3)
+                                            you ({offers.length})
                                         </Typography>
 
                                     </Box>
@@ -1451,41 +1417,7 @@ function CartPage({
                                     }}
                                 >
 
-                                    {[
-                                        {
-                                            title:
-                                                "Get Upto 35% OFF + Extra FREEBIE",
-
-                                            saving:
-                                                "Save ₹200 with this offer",
-
-                                            code:
-                                                "REDEEM35",
-
-                                            discount:
-                                                200,
-
-                                            details:
-                                                "Add any 2 Favorites to the cart & apply the code to get flat 30% OFF + Extra FREEBIE.",
-                                        },
-
-                                        {
-                                            title:
-                                                "Buy Any 3, Pay for 2",
-
-                                            saving:
-                                                "Save ₹349 with this offer",
-
-                                            code:
-                                                "B3P2",
-
-                                            discount:
-                                                349,
-
-                                            details:
-                                                "Add any 3 favorite products to your cart, apply the coupon code, and get the lowest-priced product FREE.",
-                                        },
-                                    ].map(
+                                    {offers.map(
                                         (offer) => (
 
                                             <Box
@@ -1568,8 +1500,8 @@ function CartPage({
 
                                                             borderRadius: 1,
 
-                                                            backgroundColor:
-                                                                "#f5fcff",
+                                                            backgroundColor: Colors.background,
+
                                                         }}
                                                     >
 
@@ -1651,68 +1583,58 @@ function CartPage({
                                                     </Typography>
 
 
-                                                    <Button
-                                                        variant="contained"
+                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                        <Button
+                                                            variant="contained"
+                                                            disabled={appliedCoupon === offer.code}
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
 
-                                                        disabled={
-                                                            appliedCoupon ===
-                                                            offer.code
-                                                        }
+                                                                if (appliedCoupon === offer.code) {
+                                                                    return;
+                                                                }
 
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-
-                                                            if (
-                                                                appliedCoupon ===
-                                                                offer.code
-                                                            ) {
-                                                                return;
-                                                            }
-
-                                                            setShowOffers(
-                                                                true
-                                                            );
-
-                                                            handleApplyCoupon(
-                                                                offer
-                                                            );
-                                                        }}
-
-                                                        sx={{
-                                                            textTransform:
-                                                                "none",
-
-                                                            borderRadius: 2,
-
-                                                            backgroundColor:
-                                                                appliedCoupon ===
-                                                                    offer.code
-                                                                    ? Colors.green
-                                                                    : Colors.blue,
-
-                                                            boxShadow:
-                                                                "none",
-
-                                                            "&:hover":
-                                                            {
+                                                                setShowOffers(true);
+                                                                handleApplyCoupon(offer);
+                                                            }}
+                                                            sx={{
+                                                                textTransform: "none",
+                                                                borderRadius: 2,
                                                                 backgroundColor:
-                                                                    appliedCoupon ===
-                                                                        offer.code
+                                                                    appliedCoupon === offer.code
                                                                         ? Colors.green
                                                                         : Colors.blue,
+                                                                boxShadow: "none",
+                                                                "&:hover": {
+                                                                    backgroundColor:
+                                                                        appliedCoupon === offer.code
+                                                                            ? Colors.green
+                                                                            : Colors.blue,
+                                                                    boxShadow: "none",
+                                                                },
+                                                            }}
+                                                        >
+                                                            {appliedCoupon === offer.code ? "Applied" : "Apply"}
+                                                        </Button>
 
-                                                                boxShadow:
-                                                                    "none",
-                                                            },
-                                                        }}
-                                                    >
-                                                        {
-                                                            appliedCoupon ===
-                                                                offer.code
-                                                                ? "Applied"
-                                                                : "Apply"
-                                                        }
-                                                    </Button>
+                                                        {appliedCoupon === offer.code && (
+                                                            <Button
+                                                                size="small"
+                                                                onClick={(event) => {
+                                                                    event.stopPropagation();
+                                                                    handleRemoveCoupon();
+                                                                }}
+                                                                sx={{
+                                                                    minWidth: "auto",
+                                                                    color: Colors.blue,
+                                                                    textTransform: "none",
+                                                                    ...Theme.font12Bold,
+                                                                }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        )}
+                                                    </Box>
 
                                                 </Box>
 
@@ -2315,40 +2237,38 @@ function CartPage({
                                         </Typography>
 
 
-                                        <Box>
+                                        {shippingCharge === 0 ? (
+                                            <Box>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{
+                                                        color: Colors.green,
+                                                        ...Theme.font14SemiBold,
+                                                        mr: 1,
+                                                    }}
+                                                >
+                                                    Free
+                                                </Typography>
 
+                                                <Typography
+                                                    component="span"
+                                                    sx={{
+                                                        textDecoration: "line-through",
+                                                        color: Colors.black,
+                                                    }}
+                                                >
+                                                    {formatMoney(baseShippingCharge)}
+                                                </Typography>
+                                            </Box>
+                                        ) : (
                                             <Typography
-                                                component="span"
                                                 sx={{
-                                                    color:
-                                                        Colors.green,
-
                                                     ...Theme.font14SemiBold,
-
-                                                    mr: 1,
                                                 }}
                                             >
-                                                Free
+                                                {formatMoney(shippingCharge)}
                                             </Typography>
-
-                                            <Typography
-                                                component="span"
-                                                sx={{
-                                                    textDecoration:
-                                                        "line-through",
-
-                                                    color:
-                                                        Colors.black,
-                                                }}
-                                            >
-                                                {
-                                                    formatMoney(
-                                                        shippingCharge
-                                                    )
-                                                }
-                                            </Typography>
-
-                                        </Box>
+                                        )}
 
                                     </Box>
 
@@ -2932,14 +2852,9 @@ function CartPage({
                                             variant="contained"
 
                                             onClick={() => {
-                                                if (
-                                                    selectedOffer.discount >
-                                                    0
-                                                ) {
-                                                    handleApplyCoupon(
-                                                        selectedOffer
-                                                    );
-                                                }
+                                                handleApplyCoupon(
+                                                    selectedOffer
+                                                );
 
                                                 setShowOfferDetails(
                                                     false
