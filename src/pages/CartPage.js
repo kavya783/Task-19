@@ -948,7 +948,7 @@ function CartPage({
                                         "Get Upto 35% OFF + Extra FREEBIE",
 
                                     saving:
-                                        "Save ₹558.8 with this offer",
+                                        "Save ₹200 with this offer",
 
                                     code:
                                         "REDEEM35",
@@ -1457,7 +1457,7 @@ function CartPage({
                                                 "Get Upto 35% OFF + Extra FREEBIE",
 
                                             saving:
-                                                "Save ₹558.8 with this offer",
+                                                "Save ₹200 with this offer",
 
                                             code:
                                                 "REDEEM35",
