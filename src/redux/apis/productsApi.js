@@ -33,7 +33,7 @@ export const getProductsApi = async () => {
 
 // GET CATEGORIES FROM ADMIN PANEL
 
-// GET CATEGORIES FROM ADMIN PANEL
+
 
 export const getCategoriesApi = async () => {
   try {

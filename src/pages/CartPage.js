@@ -954,7 +954,7 @@ function CartPage({
                                         "REDEEM35",
 
                                     discount:
-                                        558.8,
+                                        200,
 
                                     details:
                                         "Add any 2 Favorites to the cart & apply the code to get flat 30% OFF + Extra FREEBIE.",
@@ -1463,7 +1463,7 @@ function CartPage({
                                                 "REDEEM35",
 
                                             discount:
-                                                558.8,
+                                                200,
 
                                             details:
                                                 "Add any 2 Favorites to the cart & apply the code to get flat 30% OFF + Extra FREEBIE.",
