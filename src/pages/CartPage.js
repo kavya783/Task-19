@@ -310,14 +310,14 @@ function CartPage({
 
                 const token = sessionStorage.getItem("token");
 
-                const response = await fetch(
-                    `http://localhost:3000/api/v1/mama-cash/balance?user_id=${user.id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+               const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/mama-cash/balance?user_id=${user.id}`,
+    {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+    }
+);
 
                 const data = await response.json();
 
