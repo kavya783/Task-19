@@ -58,27 +58,11 @@ const Referrals = lazy(
 const ChatWithUs = lazy(
 () => import("../components/ChatWithUs")
 );
-
-const TrackOrder = lazy(
-() => import("../components/TrackOrder")
-);
-
-
 // COMPONENT
-
-
 function ProfilePage() {
-
-// RESPONSIVE
-
-
 const isMobile = useMediaQuery(
 "(max-width:599.95px)"
 );
-
-
-// USER
-
 
 const getStoredUser = useCallback(() => {
   try {
@@ -89,10 +73,10 @@ const getStoredUser = useCallback(() => {
       ? JSON.parse(storedUser)
       : null;
   } catch (error) {
-    // console.error(
-    //   "Failed to parse stored user:",
-    //   error
-    // );
+    console.error(
+      "Failed to parse stored user:",
+      error
+    );
 
     return null;
   }
@@ -217,10 +201,10 @@ return;
         )
       );
 
-    // console.log(
-    //   "UPDATE RESPONSE:",
-    //   response
-    // );
+    console.log(
+      "UPDATE RESPONSE:",
+      response
+    );
 
     if (response.success) {
       const updatedUser =
@@ -253,10 +237,10 @@ return;
       );
     }
   } catch (error) {
-    // console.error(
-    //   "Profile update error:",
-    //   error
-    // );
+    console.error(
+      "Profile update error:",
+      error
+    );
 
     if (
       error.response?.data?.errors
@@ -349,8 +333,7 @@ return "Your orders";
   case "referrals":
     return "Referrals";
 
-  case "trackorders":
-    return "Track Orders";
+ 
 
   case "chat":
     return "Chat with us";
@@ -411,10 +394,7 @@ return (
       <ChatWithUs />
     )}
 
-    {selectedSection ===
-      "trackorders" && (
-      <TrackOrder />
-    )}
+   
   </Suspense>
 );
 
@@ -1504,75 +1484,7 @@ overflowX:
           </Typography>
         </Box>
 
-        {/* TRACK ORDERS */}
-
-        <Box
-          onClick={() =>
-            selectSection(
-              "trackorders"
-            )
-          }
-          sx={{
-            minWidth:
-              "145px",
-            height:
-              "55px",
-            borderRadius:
-              "30px",
-            backgroundColor:
-              selectedSection ===
-              "trackorders"
-                ? Colors.blue
-                : Colors.background,
-            display:
-              "flex",
-            alignItems:
-              "center",
-            gap:
-              "8px",
-            padding:
-              "0 15px",
-            boxSizing:
-              "border-box",
-            cursor:
-              "pointer",
-            flexShrink:
-              0,
-          }}
-        >
-          <LocalShippingOutlinedIcon
-            sx={{
-              width:
-                "30px",
-              color:
-                selectedSection ===
-                "trackorders"
-                  ? Colors.background
-                  : Colors.black,
-            }}
-          />
-
-          <Typography
-            sx={{
-              fontSize:
-                Theme.font12Regular,
-              whiteSpace:
-                "nowrap",
-              color:
-                selectedSection ===
-                "trackorders"
-                  ? Colors.background
-                  : Colors.black,
-              fontWeight:
-                selectedSection ===
-                "trackorders"
-                  ? 600
-                  : 400,
-            }}
-          >
-            Track Orders
-          </Typography>
-        </Box>
+       
 
         {/* REFERRALS */}
 
@@ -2868,35 +2780,8 @@ boxSizing:
 
         <Divider />
 
-        {/* TRACK ORDERS */}
 
-        <ListItem
-          onClick={() =>
-            selectSection(
-              "trackorders"
-            )
-          }
-          sx={sidebarItemSx(
-            "trackorders"
-          )}
-        >
-          <ListItemIcon
-            sx={{
-              color:
-                Colors.black,
-            }}
-          >
-            <LocalShippingOutlinedIcon />
-          </ListItemIcon>
-
-          <ListItemText
-            primary="Track Orders"
-            primaryTypographyProps={{
-              fontSize:
-                "15px",
-            }}
-          />
-        </ListItem>
+       
 
         <Divider />
 

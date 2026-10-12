@@ -47,6 +47,9 @@ function CartPage({
     const [appliedCoupon, setAppliedCoupon] = useState(null);
     const [couponDiscount, setCouponDiscount] = useState(0);
     const [selectedOffer, setSelectedOffer] = useState(null);
+    const [mamaCashBalance, setMamaCashBalance] = useState(0);
+    const [useMamaCash, setUseMamaCash] = useState(false);
+    const [mamaCashLoading, setMamaCashLoading] = useState(false);
     const [showOfferDetails, setShowOfferDetails] = useState(false);
     const [showCouponSuccess, setShowCouponSuccess] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -284,6 +287,70 @@ function CartPage({
             );
         };
     }, [open]);
+    useEffect(() => {
+        if (!open) return;
+
+        const user = getCurrentUser();
+        const loggedIn =
+            sessionStorage.getItem("isLoggedIn") === "true" &&
+            Boolean(sessionStorage.getItem("token")) &&
+            Boolean(user?.id);
+
+        if (!loggedIn) {
+            setMamaCashBalance(0);
+            setUseMamaCash(false);
+            return;
+        }
+
+        let cancelled = false;
+
+        const fetchMamaCashBalance = async () => {
+            try {
+                setMamaCashLoading(true);
+
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(
+                    `http://localhost:3000/api/v1/mama-cash/balance?user_id=${user.id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message || "Unable to fetch MamaCash balance"
+                    );
+                }
+
+                if (!cancelled) {
+                    setMamaCashBalance(
+                        Math.max(0, Number(data.balance) || 0)
+                    );
+                }
+            } catch (error) {
+                console.error("MamaCash balance error:", error);
+
+                if (!cancelled) {
+                    setMamaCashBalance(0);
+                }
+            } finally {
+                if (!cancelled) {
+                    setMamaCashLoading(false);
+                }
+            }
+        };
+
+        fetchMamaCashBalance();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [open]);
 
     // REMOVE CART ITEM
 
@@ -498,11 +565,19 @@ function CartPage({
             prepaidDiscount
         );
 
-    const finalAmountToPay =
-        Math.max(
-            0,
-            amountToPay - couponDiscount
-        );
+    const amountAfterCoupon = Math.max(
+        0,
+        amountToPay - couponDiscount
+    );
+
+    const mamaCashDiscount = useMamaCash
+        ? Math.min(mamaCashBalance, amountAfterCoupon)
+        : 0;
+
+    const payableAfterMamaCash = Math.max(
+        0,
+        amountAfterCoupon - mamaCashDiscount
+    );
     // PAYU PAYMENT
 
     const handlePayU =
@@ -543,36 +618,21 @@ function CartPage({
 
                     return;
                 }
-                const paymentData =
-                    await dispatch(
-                        createPaymentActionInitiate(
-                            {
-                                amount:
-                                    finalAmountToPay.toFixed(2),
+              
+const paymentData = await dispatch(
+    createPaymentActionInitiate({
+        amount: payableAfterMamaCash.toFixed(2),
+        mama_cash_used: mamaCashDiscount.toFixed(2),
 
-                                productinfo:
-                                    "Mamaearth Order",
+        productinfo: "Mamaearth Order",
+        firstname: currentUser?.name || "Customer",
+        email: currentUser?.email || "customer@example.com",
+        phone: currentUser?.phone || "9999999999",
+        user_id: currentUser?.id,
+        items: cartItems,
+    })
+);
 
-                                firstname:
-                                    currentUser?.name ||
-                                    "Customer",
-
-                                email:
-                                    currentUser?.email ||
-                                    "customer@example.com",
-
-                                phone:
-                                    currentUser?.phone ||
-                                    "9999999999",
-
-                                user_id:
-                                    currentUser?.id,
-
-                                items:
-                                    cartItems,
-                            }
-                        )
-                    );
 
 
 
@@ -820,7 +880,7 @@ function CartPage({
                                     ...Theme.font20Bold,
                                 }}
                             >
-                                Available offers (3)
+                                Available offers (1)
                             </Typography>
 
                         </Box>
@@ -2308,7 +2368,89 @@ function CartPage({
                                         </Typography>
 
                                     </Box>
+                                    {/* MAMACASH REDEMPTION */}
 
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            gap: 2,
+                                            py: 1,
+                                        }}
+                                    >
+                                        <Box>
+                                            <Typography sx={{ ...Theme.font14SemiBold }}>
+                                                MamaCash Balance
+                                            </Typography>
+
+                                            <Typography
+                                                sx={{
+                                                    color: Colors.green,
+                                                    ...Theme.font12Regular,
+                                                }}
+                                            >
+                                                {mamaCashLoading
+                                                    ? "Loading balance..."
+                                                    : formatMoney(
+                                                        Math.max(
+                                                            0,
+                                                            mamaCashBalance -
+                                                                mamaCashDiscount
+                                                        )
+                                                    )}
+                                            </Typography>
+                                        </Box>
+
+                                        <Button
+                                            variant="outlined"
+                                            disabled={
+                                                mamaCashLoading ||
+                                                mamaCashBalance <= 0 ||
+                                                amountAfterCoupon <= 0
+                                            }
+                                            onClick={() => {
+                                                if (useMamaCash) {
+                                                    setUseMamaCash(false);
+                                                    toast.info("MamaCash removed");
+                                                } else {
+                                                    setUseMamaCash(true);
+                                                    toast.success("MamaCash applied");
+                                                }
+                                            }}
+                                            sx={{
+                                                textTransform: "none",
+                                                borderRadius: 2,
+                                                whiteSpace: "nowrap",
+                                                borderColor: Colors.blue,
+                                                color: Colors.blue,
+                                            }}
+                                        >
+                                            {useMamaCash ? "Remove" : "Use MamaCash"}
+                                        </Button>
+                                    </Box>
+
+                                    {useMamaCash && mamaCashDiscount > 0 && (
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                            }}
+                                        >
+                                            <Typography sx={{ ...Theme.font14SemiBold }}>
+                                                MamaCash Discount
+                                            </Typography>
+
+                                            <Typography
+                                                sx={{
+                                                    color: Colors.green,
+                                                    ...Theme.font14SemiBold,
+                                                }}
+                                            >
+                                                -{formatMoney(mamaCashDiscount)}
+                                            </Typography>
+                                        </Box>
+                                    )}
 
                                     {/* COUPON DISCOUNT */}
 
@@ -2388,7 +2530,7 @@ function CartPage({
                                             }}
                                         >
                                             {
-                                                formatMoney(finalAmountToPay)
+                                                formatMoney(payableAfterMamaCash)
                                             }
                                         </Typography>
 
@@ -2493,13 +2635,7 @@ function CartPage({
                                         }}
                                     >
                                         {
-                                            formatMoney(
-                                                Math.max(
-                                                    0,
-                                                    amountToPay -
-                                                    couponDiscount
-                                                )
-                                            )
+                                            formatMoney(payableAfterMamaCash)
                                         }
                                     </Typography>
 

@@ -5,11 +5,11 @@ import {
   Typography,
   Paper,
   Divider,
- 
+   Button,
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
-
+import DownloadIcon from "@mui/icons-material/Download";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -24,6 +24,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { toast } from "react-toastify";
+import { BASE_URL } from "../API/constants";
 
 
 function YourOrders() {
@@ -32,6 +34,64 @@ function YourOrders() {
   const { orders, loading, error } = useSelector(
     (state) => state.orders
   );
+
+  const getInvoiceUrl = (orderId) => {
+    let user;
+
+    try {
+      user = JSON.parse(
+        sessionStorage.getItem("user") || "null"
+      );
+    } catch {
+      toast.error("Please log in again to access your invoice.");
+      return null;
+    }
+
+    if (!user?.id) {
+      toast.error("Please log in to access your invoice.");
+      return null;
+    }
+
+    return `${BASE_URL}v1/orders/${orderId}/invoice?user_id=${encodeURIComponent(
+      user.id
+    )}`;
+  };
+
+  const handleInvoiceDownload = async (orderId) => {
+    const invoiceUrl = getInvoiceUrl(orderId);
+
+    if (!invoiceUrl) {
+      return;
+    }
+
+    try {
+      const response = await fetch(invoiceUrl);
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        toast.error(
+          error.error || "Unable to download the invoice."
+        );
+        return;
+      }
+
+      const pdfBlob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `invoice-${orderId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(
+        () => window.URL.revokeObjectURL(downloadUrl),
+        1000
+      );
+    } catch (downloadError) {
+      console.error("Failed to download invoice:", downloadError);
+      toast.error("Unable to download the invoice. Please try again.");
+    }
+  };
 
   useEffect(() => {
     let user = null;
@@ -451,6 +511,7 @@ function YourOrders() {
             </Box>
 
             <Divider />
+            
 
             {/* ==================================================
                 DELIVERY
@@ -772,6 +833,41 @@ function YourOrders() {
           
 
             <Divider />
+            {normalizeStatus(order.status) === "delivered" && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  flexWrap: "wrap",
+                  gap: 1.5,
+                  padding: {
+                    xs: "12px",
+                    sm: "16px 20px",
+                  },
+                }}
+              >
+               
+
+                <Button
+                  variant="contained"
+                  startIcon={<DownloadIcon />}
+                  onClick={() => handleInvoiceDownload(order.id)}
+                  sx={{
+                    textTransform: "none",
+                    backgroundColor: Colors.green,
+                    fontWeight: 600,
+                    "&:hover": {
+                      backgroundColor: Colors.green,
+                      opacity: 0.9,
+                    },
+                  }}
+                >
+                  Download PDF
+                </Button>
+              </Box>
+            )}
+
+        
 
           
 
