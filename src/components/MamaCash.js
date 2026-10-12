@@ -57,18 +57,18 @@ function MamaCash() {
           return;
         }
 
-        const response = await fetch(
-          `http://localhost:3000/api/v1/mama-cash/balance?user_id=${encodeURIComponent(
-            user.id
-          )}`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+const response = await fetch(
+  `${API_BASE_URL}/api/v1/mama-cash/balance`,
+  {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
         const data = await response.json();
 
