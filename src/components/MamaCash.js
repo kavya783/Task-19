@@ -57,18 +57,18 @@ function MamaCash() {
           return;
         }
 
-      const API_BASE_URL = process.env.REACT_APP_API_URL;
+        const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-const response = await fetch(
-  `${API_BASE_URL}/api/v1/mama-cash/balance`,
-  {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+        const response = await fetch(
+          `${API_BASE_URL.replace(/\/+$/, "").replace(/\/api\/v1$/, "")}/api/v1/mama-cash/balance?user_id=${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const data = await response.json();
 
@@ -93,9 +93,7 @@ const response = await fetch(
         console.error("MamaCash fetch error:", error);
 
         if (!cancelled) {
-          setMamaCashBalance(0);
-          setTransactions([]);
-          toast.error("Unable to load MamaCash balance");
+          toast.error(error.message || "Unable to load MamaCash balance");
         }
       } finally {
         if (!cancelled) {
@@ -316,8 +314,8 @@ const response = await fetch(
                         >
                           {transaction.created_at
                             ? new Date(
-                                transaction.created_at
-                              ).toLocaleDateString()
+                              transaction.created_at
+                            ).toLocaleDateString()
                             : ""}
                         </Typography>
 
